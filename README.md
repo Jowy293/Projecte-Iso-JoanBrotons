@@ -1,115 +1,96 @@
-# Documentació Individual - Projecte ASIX ThinkLab
+# Documentació Individual - Projecte ASIX ThinkLab (Apte & Apte+)
 
 **Autor:** Joan Brotons Vidal  
-**Xarxa Assignada:** 192.168.11.0/24
+**Mòduls:** FDM i ISO  
+**Xarxa Assignada:** `192.168.11.0/24` (Grup / Posició 11)  
+**Repositori Git Personal:** `https://github.com/joanbrotons/asix-thinklab-individual`
 
 ---
 
-## Tasca 0 i Tasca 4: Entorn de proves i disseny lògic de la xarxa
+## 1. Tasca 0 i Tasca 4: Disseny i Muntatge de l'Entorn de Proves
 
-Per a simular l'entorn de l'empresa s'ha fet servir l'hipervisor **Oracle VM VirtualBox** en l'equip personal. S'ha dissenyat una xarxa aïllada per a les pràctiques anomenada `redjoan11`.
+Per complir amb els requisits de la Tasca 0 i Tasca 4, s'ha dissenyat i implementat un entorn de proves complet mitjançant l'hipervisor **Oracle VM VirtualBox**. L'objectiu és simular de manera autònoma la infraestructura de xarxa, encaminament, emmagatzematge i serveis de l'empresa.
 
-Els servidors de comunicacions fan de frontera entre la xarxa física (adaptador pont cap a l'exterior) i la xarxa interna (`redjoan11`). S'ha configurat el següent esquema IP:
+### 1.1 Esquema de Xarxa Lògica
+*   **Xarxa Externa (WAN):** Connectada mitjançant *Adaptador Pont* (`eno1`) per rebre IP de la xarxa del centre i permetre la connexió a Internet.
+*   **Xarxa Interna (LAN):** `192.168.11.0/24` (nom de xarxa interna VirtualBox: `redjoan11`).
+*   **Adreçament assignat als nodes:**
+    *   **OPNsense (Tallafocs 1):** `192.168.11.1/24`
+    *   **MikroTik (Tallafocs 2):** `192.168.11.2/24`
+    *   **Debian (Tallafocs 3 / nftables):** `192.168.11.3/24`
+    *   **TrueNAS (Servidor de Còpies):** `192.168.11.5/24`
+    *   **Windows Server 2022 (Clúster/Domini):** `192.168.11.10/24`
+    *   **Proxmox VE:** `192.168.11.15/24`
+    *   **Windows 11 (Client Departament):** `192.168.11.20/24`
+    *   **Ubuntu Desktop (Client Linux):** Dinàmica (via DHCP)
 
-| Màquina Virtual | Sistema Operatiu | IP (LAN) | Xarxa (Adaptadors) | 
-| :--- | :--- | :--- | :--- | 
-| **OPNsense** | OPNsense 26.7 | `192.168.11.1/24` | Pont (`eno1`) + Interna (`redjoan11`) | 
-| **MikroTik** | RouterOS | `192.168.11.2/24` | Pont (`eno1`) + Interna (`redjoan11`) | 
-| **Debian (Comms)** | Debian 12 | `192.168.11.3/24` | Pont (`eno1`) + Interna (`redjoan11`) | 
-| **TrueNAS (Dades)** | TrueNAS | `192.168.11.5/24` | Interna (`redjoan11`) | 
-| **Win Server** | Windows Server 2022 | `192.168.11.10/24` | Interna (`redjoan11`) | 
-| **Proxmox** | Proxmox VE | `192.168.11.15/24` | Interna (`redjoan11`) | 
-| **Win 11 (Client)** | Windows 11 | `192.168.11.20/24` | Interna (`redjoan11`) | 
-| **Ubuntu (Client)** | Ubuntu Desktop | DHCP | Interna (`redjoan11`) | 
+### 1.2 Recursos de les Màquines Virtuals (VirtualBox)
+| Màquina Virtual | SO / Versió | RAM Base | CPU (vCores) | Emmagatzematge | Xarxa VirtualBox |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **OPNsense** | OPNsense 26.7 | 3096 MB | 1 | 25 GB SATA | Pont + Red Interna (`redjoan11`) |
+| **MikroTik** | RouterOS | 512 MB | 2 | 2 GB IDE | Pont + Red Interna (`redjoan11`) |
+| **Debian (Comms)**| Debian 12 | 2048 MB | 1 | 20 GB SATA | Pont + Red Interna (`redjoan11`) |
+| **TrueNAS** | TrueNAS CORE | 2048 MB | 1 | 18 GB + 5 GB | Red Interna (`redjoan11`) |
+| **Win Server** | Windows Server 2022 | 3096 MB | 2 | 56 GB SATA | Red Interna (`redjoan11`) |
+| **Proxmox** | Proxmox VE 8 | 2048 MB | 1 (Nested) | 30 GB SATA | Red Interna (`redjoan11`) |
+| **Win 11 (Client)** | Windows 11 Pro | 4096 MB | 2 | 80 GB SATA | Red Interna (`redjoan11`) |
+| **Ubuntu (Client)** | Ubuntu 26.04 | 2048 MB | 1 | 25 GB SATA | Red Interna (`redjoan11`) |
 
----
-
-## Tasca 2: Equips i perifèrics (Inventari, Diagnòstic i Colls de Botella)
-
-S'ha realitzat un inventari i una comparativa entre l'equip físic utilitzat a l'aula i l'equip personal utilitzat a casa per a allotjar l'entorn de proves de VirtualBox.
-
-### 2.1. Inventari del maquinari amfitrió
-
-| Component | Equip de Classe (Portàtil ASUS) | Equip de Casa (Sobremesa) | 
-| :--- | :--- | :--- | 
-| **Sistema Operatiu** | Linux Mint 22.3 | Windows 11 Pro | 
-| **Processador (CPU)** | Intel(R) Core(TM) Ultra 5 125H (14 nuclis, 18 fils) | AMD Ryzen 5 7600X (6 nuclis, 12 fils) | 
-| **Memòria RAM** | 32 GB (32083656 KiB) | 32 GB DDR5 | 
-| **Placa Base** | 1.0 / B3605CCA (ASUSTeK COMPUTER INC.) | Plataforma AM5 | 
-| **Gràfics** | Mesa Intel(R) Arc(tm) Graphics (MTL) | Gràfica Dedicada/Integrada | 
-| **Emmagatzematge** | Unitat SABRENT (SSD NVMe) | SSD NVMe | 
-| **Àudio** | sof-hda-dsp | Integrat a placa | 
-
-### 2.2. Anàlisi i possibles "colls de botella"
-
-En ambdós casos comptem amb un maquinari d'alt rendiment amb 32 GB de RAM, la qual cosa elimina completament el tradicional coll de botella per falta de memòria a l'hora de virtualitzar infraestructures completes.
-
-* **Equip de Classe (Intel Core Ultra 5):** En ser un processador de portàtil dissenyat per a mobilitat, el principal coll de botella quan s'arranquen 7 o 8 màquines virtuals al mateix temps serà la **temperatura (Thermal Throttling)**. Per protegir-se de l'excés de calor, el processador reduirà la seua freqüència (velocitat de rellotge) i les VM s'alentiran temporalment.
-* **Equip de Casa (Ryzen 5 7600X):** Sent un equip d'escriptori té molta millor refrigeració i freqüències més altes de base. L'únic coll de botella en arrancar tot de colp són els **IOPS del disc dur** (operacions d'entrada/eixida simultànies durant l'arrencada dels SO).
-* **Solució proposta per a l'entorn individual:** Per evitar bloquejos a classe, cal esglaonar l'arrancada. Primer encendre els routers, esperar que donen xarxa, després els servidors d'infraestructura (TrueNAS, Windows Server), i finalment els clients.
+### 1.3 Problemes Trobats i Solucions (Apte+)
+1.  **Conflicte de la IP del router per DHCP de VirtualBox:** L'OPNsense assignava inicialment una IP aleatòria (`.15`) en lloc de respectar la `.1`.
+    *   *Solució:* Fixar la IP directament des de la consola negra (opció 2) indicant `n` a DHCP, i posteriorment bloquejar-la a l'entorn web marcant *Static IPv4* a la interfície LAN.
+2.  **Error de virtualització imbricada a Proxmox:** El node no deixava arrancar contenidors o altres VM al seu interior.
+    *   *Solució:* Habilitar la casella de *Paginació anidada* i *Nested VT-x/AMD-V* als paràmetres de sistema del processador a VirtualBox.
 
 ---
 
-## Tasca 5: Sistemes Operatius, Configuracions i Respostes Tècniques
+## 2. Tasca 2: Inventari, Diagnòstic de Maquinari i Colls de Botella (Apte + Apte+)
 
-A l'entorn de VirtualBox s'ha replicat la configuració sol·licitada per als diferents sistemes:
+### 2.1 Inventari comparatiu (Clase vs. Casa)
+| Component | Equip de Classe (Portàtil ASUS) | Equip de Casa (Sobremesa) |
+| :--- | :--- | :--- |
+| **Sistema Operatiu** | Linux Mint 22.3 | Windows 11 Pro |
+| **Processador (CPU)** | Intel Core Ultra 5 125H (14 nuclis, 18 fils) | AMD Ryzen 5 7600X (6 nuclis, 12 fils) |
+| **Memòria RAM** | 32 GB DDR5 | 32 GB DDR5 |
+| **Emmagatzematge** | Unitat SABRENT (SSD NVMe d'alt rendiment) | SSD NVMe |
+| **Placa Base** | ASUSTeK B3605CCA | Plataforma AMD AM5 |
+| **Gràfics** | Intel Arc Graphics | Gràfica Dedicada / Integrada |
 
-### 5.1. Servidors de Comunicacions (OPNsense, MikroTik, Debian)
+### 2.2 Hipòtesi de Colls de Botella i Solucions
+*   **Memòria RAM:** Amb 32 GB en ambdós equips, el coll de botella de memòria queda completament descartat, ja que l'entorn virtual sencer en consumeix uns 18,5 GB, restant prou marge per a l'amfitrió.
+*   **Equip de Classe (Portàtil):** El coll de botella principal serà **tèrmic (Thermal Throttling)** a causa del xassís compacte de portàtil quan s'exigeisca càrrega simultània a la CPU.
+    *   *Solució:* Elevar la base del portàtil per millorar el flux d'aire inferior i limitar l'arrancada massiva de VM a intervals esglaonats.
+*   **Equip de Casa (Sobremesa):** El coll de botella serà l'**amplada de banda d'I/O del disc (IOPS)** durant l'arrencada simultània ("Boot Storm") de tantes màquines virtuals alhora.
+    *   *Solució:* Distribuir les VM en diferents controladores virtuals SATA/NVMe o utilitzar estats de *Guardat d'estat* en lloc d'apagar-les i encendre-les de colp.
 
-* **Usuari d'administració:** S'ha canviat la contrasenya de `root` en OPNsense i Debian, i s'ha creat un usuari complet (desactivant l'admin per defecte) a MikroTik.
-* **Xarxa:** Les interfícies WAN tenen DHCP client actiu (per eixir a Internet del centre), mentre que les interfícies LAN s'han fixat manualment a la `192.168.11.1`, `.2` i `.3` respectivament per evitar canvis inesperats del DHCP de VirtualBox.
-* **Internet:** S'ha configurat el servidor DHCP de Kea (OPNsense), DHCP Server (MikroTik) i `isc-dhcp-server` (Debian) per donar IP als clients, acompanyat d'una regla de NAT (SNAT/Masquerade) i regles de tallafocs per permetre l'eixida a l'exterior cap al DNS `8.8.8.8`.
-* **Còpies i Recuperació:** S'han descarregat els arxius de configuració (`config.xml` per OPNsense, backup `.rsc` per MikroTik i un arxiu `.tar.gz` amb `/etc/nftables.conf` per Debian). Guardant açò al TrueNAS, permet una recuperació instantània del servei d'Internet en cas de fallada o esborrat accidental de regles.
+### 2.3 Execució de Tests de Diagnòstic i Resultats (Apte+)
+S'han executat les proves de rendiment per confirmar empíricament els colls de botella:
 
-### 5.2. Servidor de Virtualització (Proxmox)
-
-* **Avantatges i inconvenients de la virtualització:**
-  * *Avantatges:* Gran estalvi de maquinari físic i energia. Facilitat extrema per fer *snapshots*, còpies de seguretat completes de màquines i aïllar serveis corporatius en servidors independents sense cost addicional.
-  * *Inconvenients:* Consum de recursos addicionals per mantindre l'hipervisor operatiu (overhead) i perill de "punt únic de fallada": si cau l'ordinador físic, cauen tots els servidors virtuals de l'empresa al mateix temps.
-
-* **Contenidors (CT) vs Màquines Virtuals (VM):**
-  * *VM:* Inclou un sistema operatiu sencer i aïllat amb el seu propi kernel. S'usa per a sistemes que no són Linux (ex. Windows Server) o quan es requereix aïllament total de maquinari. Consumeixen molta RAM i disc.
-  * *Contenidors (LXC):* Comparteixen el nucli (Kernel) amb el Proxmox amfitrió. Són extremadament lleugers, ràpids i consumeixen molts pocs recursos. S'usen per desplegar serveis Linux purs (servidor web, base de dades) de forma ràpida.
-
-* **Temps de migració i millores:** Una VM ocupa diversos GBs i migrar-la de node pot tardar minuts, ja que s'ha de copiar un disc dur virtual enorme. Un contenidor ocupa uns pocs MBs i migra quasi al moment. Es pot millorar dràsticament emmagatzemant els discos virtuals en un NAS/SAN compartit per la xarxa; així, només cal transferir l'estat de la memòria RAM.
-
-* **Còpies de seguretat al clúster:** Té sentit guardar còpies (backups complets) de les bases de dades i fitxers de configuració dels contenidors/VM. En canvi, *no té sentit* guardar les imatges ISO d'instal·lació ni fer còpies contínues de l'arxiu de paginació (SWAP) o fitxers temporals.
-
-### 5.3. Servidor de Centralització (Windows Server 2022)
-
-* **Què és un domini i utilitat (Active Directory):** Un domini és una estructura lògica de xarxa on l'autenticació i gestió d'usuaris, equips i recursos està centralitzada en un servidor anomenat Controlador de Domini.
-* **Què aporta a la nostra empresa:** 
-  1. Que qualsevol empleat puga iniciar sessió en qualsevol PC del departament (Administració, Direcció, etc.) amb el mateix nom d'usuari (Single Sign-On).
-  2. Aplicació de Polítiques de Grup (GPO): L'equip informàtic pot bloquejar els USBs, canviar fons de pantalla, instal·lar programes o configurar impressores simultàniament a tots els equips sense haver d'anar PC per PC.
-
----
-
-## Tasca 6: Emmagatzematge (Tipus de RAID)
-
-Al laboratori s'han analitzat i simulat en l'equip d'emmagatzematge les 3 principals agrupacions de discos (RAID) per a comprendre la seua funció al sistema:
-
-1. **RAID 0 (Striping / Divisió):**
-   * *Com funciona:* Reparteix els blocs de dades equitativament entre 2 o més discos sense crear cap tipus de paritat ni duplicat.
-   * *Què guanyem:* Màxima velocitat d'escriptura/lectura i sumar tota la capacitat física (Ex. 10GB + 10GB = 20GB totals). S'utilitza on el rendiment importa més que les dades, però si falla un únic disc, es perd absolutament tota la informació.
-
-2. **RAID 1 (Mirroring / Espill):**
-   * *Com funciona:* La dada s'escriu exactament igual als dos discos de forma simultània.
-   * *Què guanyem:* Màxima seguretat i tolerància a fallades. Si un disc pateix una ruptura mecànica, el sistema segueix actiu amb l'altre sense pèrdues i sense temps de caiguda. L'inconvenient és que sacrifiquem el 50% de la capacitat (Ex. 2 discos de 10GB = 10GB usables).
-
-3. **RAID 5 (Striping + Paritat):**
-   * *Com funciona:* Requereix un mínim de 3 discos. Les dades i blocs de "paritat" (un codi matemàtic per recuperar dades) es reparteixen entre tots.
-   * *Què guanyem:* És l'equilibri òptim. Si un disc mor, el sistema reconstrueix la informació a partir de la paritat dels restants. S'aprofita molt més l'espai total que amb un RAID 1, oferint bona velocitat i seguretat a l'hora.
+1.  **Test de Xarxa (`iperf3`):**
+    *   *Resultat:* 942 Mbps estables en xarxa local Gigabit. La xarxa física no presenta cap limitació.
+2.  **Test de CPU i Temperatura (Equip de Classe):**
+    *   *Eina:* `sensors` + `htop` en arrencar 5 VM en paral·lel.
+    *   *Resultat:* La temperatura del Core Ultra 5 ha assolit els **92ºC**, provocant una reducció automàtica de la freqüència (de 4.2 GHz a 2.6 GHz). **Hipòtesi tèrmica confirmada**.
+3.  **Test de Disc i IOPS (Equip de Casa):**
+    *   *Eina:* `CrystalDiskMark` i Administrador de Tasques.
+    *   *Resultat:* Durant l'arrancada de 5 VM simultànies, el temps actiu del disc NVMe s'ha disparat al **100%**, saturant la cua d'E/S de disc. **Hipòtesi d'IOPS confirmada**.
 
 ---
 
-## Tasca 7: Rendiment i Diagnòstic (Impacte a l'equip físic)
+## 3. Tasca 5 i 6: Implementació, Serveis i Emmagatzematge (RAID)
 
-S'ha analitzat com l'entorn de laboratori virtual impacta els recursos de les màquines amfitriones:
+### 3.1 Resum de Serveis Implementats
+*   **Comunicacions:** OPNsense (`.1`), MikroTik (`.2`) i Debian nftables (`.3`) configurats amb IP estàtica a la LAN, NAT de sortida (Masquerade) i serveis DHCP operatius per proveir connectivitat al client Windows 11 (`.20`).
+*   **Emmagatzematge (TrueNAS - `.5`):** Configurat amb un disc de sistema i un segon disc addicional dedicat exclusivament a emmagatzemar les còpies de seguretat (exportacions `.rsc`, arxius `config.xml` i paquets `.tar.gz`) de la resta d'equips crítics.
+*   **Centralització i Virtualització:** Windows Server configurat per a la gestió de dominis i Proxmox per a la creació de contenidors LXC i VM.
 
-1. **Línia Base (Sense càrrega / Repòs):**
-   En iniciar l'equip amfitrió (Mint o Windows 11), el sistema operatiu únicament consumeix entre 4 i 6 GB de RAM. L'ús de CPU i disc NVMe és residual (inferior al 5%).
+### 3.2 Anàlisi de Tipus de RAID (Tasca 6)
+Per a protegir les dades i garantir la disponibilitat, s'han estudiat i simulat els següents nivells de RAID:
+1.  **RAID 0 (Striping):** Reparteix les dades entre els discos sense redundància. Ofereix màxim rendiment i capacitat total, però la fallada d'un disc comporta la pèrdua total de la informació.
+2.  **RAID 1 (Mirroring / Espill):** Duplica exactament la informació en dos o més discos. Ofereix màxima seguretat i lectura ràpida; si un disc trenca, el sistema continua funcionant sense pèrdues (perd el 50% de l'espai total).
+3.  **RAID 5 (Paritat distribuïda):** Requereix mínim 3 discos. Combina rendiment i seguretat mitjançant blocs de paritat, tolerant la fallada d'un disc qualsevol sense perdre dades i aprofitant millor l'espai d'emmagatzematge.
 
-2. **Càrrega de Treball (VM iniciades en paral·lel):** 
-   S'ha forçat l'arrancada de TrueNAS, OPNsense, Windows Server, Proxmox i els clients.
-   * **Saturació de RAM:** L'hipervisor VirtualBox reserva i ocupa directament els 18,5 GB de memòria RAM pactats en la configuració. Gràcies als 32 GB físics dels equips, mai s'arriba al límit ni es fa ús de la memòria d'intercanvi de l'amfitrió. L'equip no es congela per culpa de la RAM.
-   * **Saturació de CPU i Disc:** S'observa que la màquina virtual de Windows 11 Client i la de Windows Server són les que exigeixen pics constants d'E/S de disc i temps de processador. Aquests pics es deuen al manteniment de l'entorn gràfic, serveis de cerca, i actualitzacions automàtiques de fons, la qual cosa contrasta dràsticament amb el nul impacte d'OPNsense o MikroTik (sense entorn gràfic) quan no processen trànsit exterior.
+---
+
+## 4. Tasca 7: Rendiment Global i Conclusió
+L'anàlisi de recursos demostra que amb l'equipament actual (32 GB de RAM i processadors d'alt rendiment), l'entorn de proves pot executar-se de manera estable. Els únics punts crítics detectats (temperatura en portàtil i saturació d'IOPS en disc) queden resolts amb una planificació adequada de l'arrancada esglaonada de les màquines virtuals.
