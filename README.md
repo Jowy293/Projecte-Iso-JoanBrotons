@@ -3,7 +3,6 @@
 **Autor:** Joan Brotons Vidal  
 **Mòduls:** FDM i ISO  
 **Xarxa Assignada:** `192.168.11.0/24` (Grup / Posició 11)  
-**Repositori Git Personal:** `https://github.com/joanbrotons/asix-thinklab-individual`
 
 ---
 
@@ -22,7 +21,7 @@ Per complir amb els requisits de la Tasca 0 i Tasca 4, s'ha dissenyat i implemen
     *   **Windows Server 2022 (Clúster/Domini):** `192.168.11.10/24`
     *   **Proxmox VE:** `192.168.11.15/24`
     *   **Windows 11 (Client Departament):** `192.168.11.20/24`
-    *   **Ubuntu Desktop (Client Linux):** Dinàmica (via DHCP)
+    *   **Ubuntu Desktop (Client Linux):** `192.168.11.25/24`
 
 ### 1.2 Recursos de les Màquines Virtuals (VirtualBox)
 | Màquina Virtual | SO / Versió | RAM Base | CPU (vCores) | Emmagatzematge | Xarxa VirtualBox |
