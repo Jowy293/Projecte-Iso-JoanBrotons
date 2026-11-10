@@ -17,7 +17,7 @@ Per complir amb els requisits de la Tasca 0 i Tasca 4, s'ha dissenyat i implemen
     *   **OPNsense (Tallafocs 1):** `192.168.11.1/24`
     *   **MikroTik (Tallafocs 2):** `192.168.11.2/24`
     *   **Debian (Tallafocs 3 / nftables):** `192.168.11.3/24`
-    *   **TrueNAS (Servidor de Còpies):** `192.168.11.5/24`
+    *   **TrueNAS (Servidor de Còpies):** `192.168.11.55/24`
     *   **Windows Server 2022 (Clúster/Domini):** `192.168.11.10/24`
     *   **Proxmox VE:** `192.168.11.15/24`
     *   **Windows 11 (Client Departament):** `192.168.11.20/24`
