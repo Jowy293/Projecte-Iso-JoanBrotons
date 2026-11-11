@@ -91,5 +91,3 @@ Per a protegir les dades i garantir la disponibilitat, s'han estudiat i simulat 
 
 ---
 
-## 4. Tasca 7: Rendiment Global i Conclusió
-L'anàlisi de recursos demostra que amb l'equipament actual (32 GB de RAM i processadors d'alt rendiment), l'entorn de proves pot executar-se de manera estable. Els únics punts crítics detectats (temperatura en portàtil i saturació d'IOPS en disc) queden resolts amb una planificació adequada de l'arrancada esglaonada de les màquines virtuals.
