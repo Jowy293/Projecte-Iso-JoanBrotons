@@ -80,7 +80,7 @@ S'han executat les proves de rendiment per confirmar empíricament els colls de 
 
 ### 3.1 Resum de Serveis Implementats
 *   **Comunicacions:** OPNsense (`.1`), MikroTik (`.2`) i Debian nftables (`.3`) configurats amb IP estàtica a la LAN, NAT de sortida (Masquerade) i serveis DHCP operatius per proveir connectivitat al client Windows 11 (`.20`).
-*   **Emmagatzematge (TrueNAS - `.5`):** Configurat amb un disc de sistema i un segon disc addicional dedicat exclusivament a emmagatzemar les còpies de seguretat (exportacions `.rsc`, arxius `config.xml` i paquets `.tar.gz`) de la resta d'equips crítics.
+*   **Emmagatzematge (TrueNAS - `.55`):** Configurat amb un disc de sistema i un segon disc addicional dedicat exclusivament a emmagatzemar les còpies de seguretat (exportacions `.rsc`, arxius `config.xml` i paquets `.tar.gz`) de la resta d'equips crítics.
 *   **Centralització i Virtualització:** Windows Server configurat per a la gestió de dominis i Proxmox per a la creació de contenidors LXC i VM.
 
 ### 3.2 Anàlisi de Tipus de RAID (Tasca 6)
