@@ -15,7 +15,7 @@ L'aula em demana identificar els elements. Jo analitzo els dos escenaris on m'ex
 | **Emmagatzematge** | Sabrent SSD NVMe M.2 1TB PCIe 4.0 | SSD NVMe M.2 d'alt rendiment |
 | **Arquitectura de Virtualització** | Intel VT-x | AMD-V |
 
-## 2. Hipòtesi dels Colls d'Ampolla (Apte)
+## 2. Colls de Botella (Apte)
 *   Tenint un total de **32 GB de RAM** disponibles i assignant la quantitat raonable de ~18,5 GB a la suma del meu clúster complet (OPNsense + TrueNAS + Win11 + WinServer + Linux), el coll d'ampolla de memòria està **completament descartat**. Em sobren entre 10-12 GB pel sistema operatiu i aplicacions de l'amfitrió.
 *   **Problema de Portàtil (Thermal Throttling):** Al processador Intel Core Ultra li exigeixo molta paral·lelització en engegar totes les VMs; no obstant, a l'estar ficat en un xassís estret, preveig un augment de temperatura i que l'equip farà baixar freqüències (de 4GHz cap a 2GHz) per protegir-se.
 *   **Problema de Sobretaula (IOPS):** L'AMD Ryzen té dissipació contundent (no hi ha problema tèrmic). Però si inicio l'engegada completa (tots els botons 'start' al mateix segon) provoco un *Boot Storm*: un gran nombre d'Operacions d'Entrada/Sortida (IOPS) farà que l'SSD arribi al seu sostre d'escriptura per un minut i les màquines trigaran molt més a arrencar bloquejades, tot i estar en emmagatzematge PCIe 4.0.
