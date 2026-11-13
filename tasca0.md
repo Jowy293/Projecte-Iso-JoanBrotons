@@ -1,22 +1,25 @@
 # Tasca 0: Muntatge de l'entorn de proves i Planificació
-**Autor:** Joan Brotons Vidal
+**Autor:** Joan Brotons Vidal (Posició/Xarxa 11)
 **Mòdul vinculat:** FDM (RA1)
 
+Aquesta primera tasca és el punt de partida de tota l'activitat on poso les bases del meu entorn individualitzat. A causa de la infraestructura compartida a l'aula (172.16.222.0/24), l'objectiu és aconseguir aïllament i autonomia per al meu propi *departament*.
+
 ## 1. Planificació i Temporalització (Apte)
-Per a garantir l'èxit de la implantació del sistema informàtic, s'ha dissenyat un calendari progressiu d'execució. El treball s'estructura en fases: preparació de l'entorn, instal·lació de l'hipervisor, configuració de xarxes aïllades i desplegament esglaonat de les màquines virtuals (primer els servidors de comunicacions, després emmagatzematge i, finalment, clients i servidors d'infraestructura).
+He estructurat el muntatge utilitzant el següent calendari:
+1.  **Fase 1:** Muntatge del hipervisor i estudi de la xarxa virtual (`redjoan11`).
+2.  **Fase 2:** Inventari exhaustiu de recursos en el portàtil de classe i sobretaula de casa per evitar saturar els sistemes host.
+3.  **Fase 3:** Desplegament seqüencial: Primer els tallafocs per assegurar connexió, després el TrueNAS (emmagatzematge), i finalment l'Active Directory i el client.
 
 ## 2. Preparació de l'entorn propi de proves (Apte)
-He triat **Oracle VM VirtualBox** com a hipervisor de tipus 2 per a l'entorn local, ja que m'ofereix gran flexibilitat tant a l'ordinador de classe (Intel Core Ultra 5, Linux Mint) com al de casa (AMD Ryzen 5 7600X, Windows 11 Pro). 
-S'ha creat una xarxa aïllada anomenada `redjoan11` (192.168.11.0/24) mitjançant la funcionalitat de "Xarxa Interna" de VirtualBox, garantint que el trànsit de proves (DHCP, broadcast, etc.) no interferirà amb la xarxa física de l'aula (`172.16.222.0/24`).
+*   He seleccionat **Oracle VM VirtualBox** com a l'hipervisor de referència. Em permet treballar tant amb el meu portàtil a classe (Linux Mint) com traslladar la topologia a casa amb facilitat cap al meu Windows 11.
+*   Per garantir que el meu DHCP intern no interfereixi amb el de la classe ni els companys, faig ús intensiu de l'opció **"Red Interna"** de VirtualBox. Qualsevol equip que tingui aquesta xarxa s'enviarà paquets aïlladament, actuant com un *switch* només per mi.
+*   L'única sortida a l'exterior de la meva infraestructura la gestiona l'adaptador en mode **"Adaptador Puente" (Bridged)** assignat només a l'OPNsense/MikroTik en la seva interfície WAN, que captura una IP de la xarxa `172.16.222.0/24` de l'institut.
 
-## 3. Identificació de recursos físics i limitacions (Apte)
-Tenint en compte que disposo de 32 GB de RAM en ambdós equips, el laboratori complet (unes 8 màquines virtuals simultànies) consumirà aproximadament uns 18-20 GB de RAM. 
-Les limitacions principals venen donades per:
-* **Nuclis de CPU:** En tenir múltiples servidors (OPNsense, MikroTik, Debian, TrueNAS, Windows Server), és vital no assignar més vCPUs de les que el processador físic pot gestionar eficaçment sense generar un *context-switching* excessiu. S'han assignat 1-2 vCPUs als tallafocs i fins a 4 a Windows Server.
-* **Disc Dur:** La I/O d'emmagatzematge pot saturar-se si s'arrenquen tots els sistemes exactament al mateix segon (boot storm), per la qual cosa l'arrencada es farà de forma seqüencial.
+## 3. Limitacions i problemes previstos (Apte)
+La principal limitació a l'hora de dimensionar les màquines és la RAM. Tot i tenir **32 GB de RAM DDR5** en ambdós entorns (la qual cosa em dóna molt marge), la suma dels requeriments base de Proxmox (mínim 2GB), TrueNAS (mínim 8GB en ZFS real, limitat a 2GB aquí), Windows Server (4GB) i Windows 11 (4GB) suma ja uns 12 GB.
+El coll d'ampolla el provocarà el processador si exigeixo que tots facin accions pesades, generant un coll d'IOPS (Input/Output Operations per Second) sobre el meu NVMe a casa, o problemes de temperatura de portàtil a classe.
 
-## 4. Documentació contínua (Apte+)
-Tota l'estructura de la xarxa, les decisions presses, els dissenys lògics i físics i els problemes trobats durant la instal·lació s'han documentat fent servir **Markdown**. El control de versions es gestiona a través de **Git**, assegurant una traçabilitat completa del projecte i pujant-ho al repositori de **GitHub**.
+## 4. Documentació en Markdown (Apte+)
+He dissenyat la documentació individual per cobrir les exigències i les ampliacions (+). Escric en format **Markdown**, deso les modificacions amb control de versions **Git** i l'envio com a evidència al repositori oficial.
 
-### Evidència de l'estat i lliurament:
-![Evidència Lliurament Tasca 0](image_c774b2.png)
+![Esquema de Xarxa Individual - Tasca 0](watermarked_img_17138891114646049774.jpg)
