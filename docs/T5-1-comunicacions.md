@@ -37,13 +37,14 @@ Llistat complet de hash: [`evidencies/iso-sha256.txt`](../evidencies/iso-sha256.
 | WAN `em0` | DHCP (pont `eno1`) → `172.16.222.184/24`, gw `172.16.222.1` |
 | LAN `em1` | Estàtica `192.168.11.1/24`, sense gateway |
 | NAT | *Outbound* automàtic: `nat on em0 from (em1:network) -> (em0:0)` |
-| DNS | Unbound al port 53 per als clients de la LAN |
+| DNS | Unbound al port 53 per als clients de la LAN, en mode **forwarding** cap als DNS que dona el DHCP de l'aula (10.239.3.7, 172.16.20.1, 10.239.3.8) |
 | DHCP | **Desactivat** (dnsmasq sense rangs) |
 | Regles LAN | 1) `block` TCP/23 amb *log* (prova) · 2) `pass` LAN → any amb *log* |
 
 **Problemes trobats i resolts:**
 1. La LAN tenia la `.50` encara que el `config.xml` deia `.1`: hi havia un `dhclient` llançat per un procés `daemon -r` sobre `em1`, i ho re-aplicava a partir del *lease* guardat a `/var/db/dhclient.leases.em1`. Solució: matar el `daemon`, esborrar el *lease*, reassignar la IP des de la consola (opció 2) i reiniciar per comprovar que es manté.
 2. La ruta per defecte anava pel MikroTik (`192.168.11.2`), també heretada del DHCP. Després de la correcció: `default 172.16.222.1 UGS em0`.
+3. Des del Windows 11, `Resolve-DnsName deb.debian.org -Server 192.168.11.1` donava **SERVFAIL** (també `drill` a l'OPNsense). Unbound fa resolució recursiva (pregunta als servidors arrel) i la xarxa del centre només deixa eixir el DNS cap als seus servidors. Solució: activar el *forwarding* d'Unbound perquè utilitze els DNS rebuts per DHCP a la WAN (`forward-zone "."` → `10.239.3.7`, `172.16.20.1`). Després del canvi, `rcode: NOERROR`.
 
 Extracte de la configuració (sense claus ni hash): [`configs/opnsense-extracte.xml`](../configs/opnsense-extracte.xml)
 
