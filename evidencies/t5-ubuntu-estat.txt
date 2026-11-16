@@ -1,0 +1,18 @@
+ 11:21:52 up 25 min,  1 user,  load average: 0,08, 0,15, 0,21
+Description:	Ubuntu 26.04.1 LTS
+7.0.0-30-generic
+ubuntu-client11
+uid=1000(joan11) gid=1000(joan11) groups=1000(joan11),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),100(users),111(lpadmin),114(lxd)
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+enp0s3           UP             192.168.11.25/24 
+default via 192.168.11.1 dev enp0s3 proto static metric 100 
+192.168.11.0/24 dev enp0s3 proto kernel scope link src 192.168.11.25 metric 100 
+manual
+192.168.11.25/24
+192.168.11.1
+192.168.11.1,192.168.11.3
+active
+md5 : active raid5 sdg[4] sdh[3] sdf[0]
+md1 : active raid1 sde[2] sdd[0]
+md0 : active raid0 sdc[1] sdb[0]
+

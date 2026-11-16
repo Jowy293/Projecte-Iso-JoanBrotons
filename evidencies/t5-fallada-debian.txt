@@ -1,0 +1,8 @@
+10:48:47 FALLADA: s'esborra /etc/nftables.conf i es buida el ruleset
+10:48:59 RECUPERACIO: restaurem nftables.conf des de la copia del TrueNAS
+copia: /mnt/Copias/backups/debian-comms/deb-comms11-etc-20261116-1046.tar.gz
+regles-masquerade: 1
+--- registre del client (Ubuntu .25 sortint per .3):
+10:40:24.505276438 192.168.11.3 OK
+10:40:33.38344389 192.168.11.3 CAIGUT
+10:40:46.240781454 192.168.11.3 OK

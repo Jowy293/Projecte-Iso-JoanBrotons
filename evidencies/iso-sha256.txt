@@ -1,0 +1,18 @@
+# SHA-256 de les ISO d'instal·lació (calculat a l'amfitrió amb sha256sum, 2026-11-16)
+658b28e209b578fe788ec5867deebae57b6aac5fce3692bbb116bab9c65568b3  debian-13.1.0-amd64-netinst.iso
+4bff16b8ee455eb00a0a5f183936fb0ecfd8f2bf3f5ba1ba64773d8375aaec02  mikrotik-7.24.5.iso
+1efd5dc9fa12a1f93571183fe5e3823e22e332872de8417fafb5e4e4d48d5dcd  OPNsense.iso
+4e88fe416df9b527624a175f24c9aa07c714d3332afb1ee3dbf3879573ef2c6c  proxmox-ve_9.2-1.iso
+515a0252e72f1a6c86d603fa4d1661333029fe9a4804d0a7a28d24fe4f63498e  TrueNAS-27.0.0-RC.1.iso
+601e30fbf5d97759367c632e2c33630665039b7e2158fd068403da3ccf1bda1f  ubuntu-26.04.1-desktop-amd64.iso
+5210deedb54d373dccbf4a164be9d8a010ef867af4fc66856443450e89119dc8  w11.iso
+8f27939fbed7bcd6235700fce5f2be9748e46639d329e050a5fe5da4b99041aa  WinServer.iso
+
+# Verificació contra la font oficial (16/11/2026)
+debian-13.1.0-amd64-netinst.iso   COINCIDEIX  https://cdimage.debian.org/cdimage/archive/13.1.0/amd64/iso-cd/SHA256SUMS
+ubuntu-26.04.1-desktop-amd64.iso  COINCIDEIX  https://releases.ubuntu.com/26.04.1/SHA256SUMS
+proxmox-ve_9.2-1.iso              COINCIDEIX  https://enterprise.proxmox.com/iso/SHA256SUMS
+mikrotik-7.24.5.iso               COINCIDEIX  https://download.mikrotik.com/routeros/7.24.5/mikrotik-7.24.5.iso.sha256
+OPNsense.iso                      N/C  OPNsense només publica el hash del fitxer comprimit (OPNsense-26.7-dvd-amd64.iso.bz2 = 95cafedd...). La ISO ja estava descomprimida i reanomenada: caldria tornar a baixar el .bz2 i verificar-lo abans de descomprimir.
+TrueNAS-27.0.0-RC.1.iso           N/C  No s'ha trobat el .sha256 publicat per a la RC. Proposta: comparar amb el hash de la pàgina de descàrrega de truenas.com
+w11.iso / WinServer.iso           N/C  Microsoft no publica el hash de les ISO d'avaluació a la pàgina de descàrrega. Origen: Microsoft Evaluation Center

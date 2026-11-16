@@ -1,0 +1,104 @@
+### Creacio
+mdadm: Defaulting to version 1.2 metadata
+mdadm: array /dev/md0 started.
+mdadm: array /dev/md1 started.
+mdadm: Defaulting to version 1.2 metadata
+mdadm: array /dev/md5 started.
+Esperant sincronitzacio inicial...
+Personalities : [raid0] [raid1] [raid4] [raid5] [raid6] 
+md5 : active raid5 sdh[3] sdg[1] sdf[0]
+      1044480 blocks super 1.2 level 5, 512k chunk, algorithm 2 [3/3] [UUU]
+      
+md1 : active raid1 sde[1] sdd[0]
+      523264 blocks super 1.2 [2/2] [UU]
+      
+md0 : active raid0 sdc[1] sdb[0]
+      1044480 blocks super 1.2 512k chunks
+      
+unused devices: <none>
+
+### Capacitat util (7 discos x 512M)
+S.ficheros     Tamaño Usados  Disp Uso% Montado en
+/dev/md0         986M   276K  919M   1% /mnt/md0
+/dev/md1         463M   152K  427M   1% /mnt/md1
+/dev/md5         986M   276K  919M   1% /mnt/md5
+
+### Rendiment escriptura seqüencial (dd 200M, oflag=direct)
+md0: 209715200 bytes (210 MB, 200 MiB) copiados, 0.13487 s, 1.6 GB/s
+md1: 209715200 bytes (210 MB, 200 MiB) copiados, 0.100216 s, 2.1 GB/s
+md5: 209715200 bytes (210 MB, 200 MiB) copiados, 0.142406 s, 1.5 GB/s
+
+### Dades de prova amb checksum
+054d33b8b39a5b4c798c81d5fa2d421fa8189a81c0635d30454c9d501a3324ba  /mnt/md0/dades.bin
+598bb572a390e1350bdfdfe6098ec68e080424b5b489346c58d2e725e08dda3a  /mnt/md1/dades.bin
+d0004dd2ba4ddd934b8d463c4bc874ea46f1373f1b1275ec54041c230c9906d7  /mnt/md5/dades.bin
+
+### PROVA FALLADA RAID1: marquem /dev/sde com a fallat
+md1 : active raid1 sde[1](F) sdd[0]
+      523264 blocks super 1.2 [2/1] [U_]
+      
+md0 : active raid0 sdc[1] sdb[0]
+      1044480 blocks super 1.2 512k chunks
+      
+unused devices: <none>
+Integritat amb un disc menys: /mnt/md1/dades.bin: OK
+mdadm: hot removed /dev/sde from /dev/md1
+mdadm: added /dev/sde
+Reconstruccio RAID1 completada en 5 s
+             State : clean 
+    Active Devices : 2
+    Failed Devices : 0
+
+### PROVA FALLADA RAID5: marquem /dev/sdg com a fallat
+             State : clean, degraded 
+    Active Devices : 2
+    Failed Devices : 1
+Integritat en mode degradat: /mnt/md5/dades.bin: OK
+mdadm: hot removed /dev/sdg from /dev/md5
+mdadm: added /dev/sdg
+Reconstruccio RAID5 completada en 3 s
+             State : clean 
+    Active Devices : 3
+    Failed Devices : 0
+
+### RAID0: no admet --fail (no hi ha redundancia)
+mdadm: Cannot remove /dev/sdc from /dev/md0, array will be failed.
+
+### Persistencia
+ARRAY /dev/md0 metadata=1.2 UUID=01d4a1f4:e1227c3e:d9023a99:e8480c57
+ARRAY /dev/md1 metadata=1.2 UUID=bc15958d:5ca57853:757de048:071e8ba8
+ARRAY /dev/md5 metadata=1.2 UUID=c5492e31:273bb5ae:0a356723:d21de02c
+
+### Estat final
+Personalities : [raid0] [raid1] [raid4] [raid5] [raid6] 
+md5 : active raid5 sdg[4] sdh[3] sdf[0]
+      1044480 blocks super 1.2 level 5, 512k chunk, algorithm 2 [3/3] [UUU]
+      
+md1 : active raid1 sde[2] sdd[0]
+      523264 blocks super 1.2 [2/2] [UU]
+      
+md0 : active raid0 sdc[1] sdb[0]
+      1044480 blocks super 1.2 512k chunks
+      
+unused devices: <none>
+/dev/md5:
+           Version : 1.2
+     Creation Time : Mon Nov 16 10:37:20 2026
+        Raid Level : raid5
+        Array Size : 1044480 (1020.00 MiB 1069.55 MB)
+     Used Dev Size : 522240 (510.00 MiB 534.77 MB)
+      Raid Devices : 3
+     Total Devices : 3
+       Persistence : Superblock is persistent
+
+       Update Time : Mon Nov 16 10:38:18 2026
+             State : clean 
+    Active Devices : 3
+   Working Devices : 3
+    Failed Devices : 0
+     Spare Devices : 0
+
+            Layout : left-symmetric
+        Chunk Size : 512K
+
+

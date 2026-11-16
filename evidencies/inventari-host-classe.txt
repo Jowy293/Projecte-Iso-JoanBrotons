@@ -1,0 +1,78 @@
+## Data: lun 16 nov 2026 10:22:02 CET
+### Equip
+ASUSTeK COMPUTER INC.
+ASUS EXPERTBOOK B3605CCA
+B3605CCA
+B3605CCA.303
+06/11/2025
+### SO
+PRETTY_NAME="Linux Mint 22.3"
+6.8.0-147-generic
+### CPU
+CPU(s):                                  18
+Model name:                              Intel(R) Core(TM) Ultra 5 125H
+Thread(s) per core:                      2
+Core(s) per socket:                      14
+Socket(s):                               1
+CPU(s) scaling MHz:                      43%
+CPU max MHz:                             4500.0000
+CPU min MHz:                             400.0000
+Virtualization:                          VT-x
+L1d cache:                               448 KiB (12 instances)
+L2 cache:                                14 MiB (7 instances)
+L3 cache:                                18 MiB (1 instance)
+### RAM
+               total       usado       libre  compartido   búf/caché  disponible
+Mem:            30Gi        19Gi       250Mi       650Mi        12Gi        11Gi
+Inter:          15Gi       256Ki        15Gi
+MemTotal:       32083640 kB
+SwapTotal:      16409512 kB
+### Discos
+NAME    MODEL                        SIZE ROTA TRAN   TYPE
+sda     KINGSTON SA400S37480G      447,1G    1 usb    disk
+zram0                                7,6G    0        disk
+nvme0n1 SAMSUNG MZVMA1T0HCLD-00BTW 953,9G    0 nvme   disk
+NAME     SIZE FSTYPE MOUNTPOINT
+sda    447,1G        
+├─sda1   509M vfat   /boot/efi
+├─sda2  58,6G ext4   /
+└─sda3   388G ext4   /home
+
+/:  Bus 002.Port 001: Dev 001, Class=root_hub, Driver=xhci_hcd/4p, 20000M/x2
+    |__ Port 003: Dev 002, If 0, Class=Mass Storage, Driver=uas, 5000M
+1
+### Xarxa
+lo               UNKNOWN        00:00:00:00:00:00 <LOOPBACK,UP,LOWER_UP> 
+eno1             UP             30:c5:99:2b:6b:26 <BROADCAST,MULTICAST,UP,LOWER_UP> 
+wlp1s0           DOWN           50:bb:b5:93:0f:20 <NO-CARRIER,BROADCAST,MULTICAST,UP> 
+docker0          DOWN           6e:d5:f0:ab:ce:48 <NO-CARRIER,BROADCAST,MULTICAST,UP> 
+eno1 speed: 1000 driver: e1000e
+wlp1s0 speed:  driver: rtw89_8852be
+### PCI
+0000:00:02.0 VGA compatible controller: Intel Corporation Meteor Lake-P [Intel Arc Graphics] (rev 08)
+0000:00:0d.0 USB controller: Intel Corporation Meteor Lake-P Thunderbolt 4 USB Controller (rev 10)
+0000:00:0e.0 RAID bus controller: Intel Corporation Volume Management Device NVMe RAID Controller Intel Corporation
+0000:00:14.0 USB controller: Intel Corporation Meteor Lake-P USB 3.2 Gen 2x1 xHCI Host Controller (rev 20)
+0000:00:1f.6 Ethernet controller: Intel Corporation Device 550b (rev 20)
+0000:01:00.0 Network controller: Realtek Semiconductor Co., Ltd. RTL8852BE PCIe 802.11ax Wireless Network Controller
+### Bateria
+ASUS Battery
+Full
+100
+### Temperatures
+acpitz: 27C
+INT3400 Thermal: 20C
+TCPU_PCI: 68C
+x86_pkg_temp: 68C
+SEN1: 35C
+SEN2: 60C
+SEN3: 54C
+SEN4: 55C
+SEN5: 35C
+SEN6: 54C
+SEN7: 46C
+TCPU: 68C
+### Firmware/arrencada
+UEFI
+### VirtualBox
+7.0.20r163906

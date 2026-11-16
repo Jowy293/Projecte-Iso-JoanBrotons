@@ -1,0 +1,30 @@
+
+Warning: Permanently added '192.168.11.17' (ED25519) to the list of known hosts.
+OK  pve1-config-20261116-1106.tar.gz  512  sha256=9ff040bfc0e4c9d4
+-rw-r--r-- 1 backup_user backup_user 13855 Nov 16 11:06 /mnt/Copias/backups/proxmox/pve1-config-20261116-1106.tar.gz
+etc/pve/
+etc/pve/.debug
+etc/pve/.vmlist
+etc/pve/.members
+etc/pve/lxc
+etc/pve/local
+etc/pve/.rrd
+etc/pve/.version
+etc/pve/.clusterlog
+etc/pve/openvz
+etc/pve/qemu-server
+etc/pve/storage.cfg
+etc/pve/user.cfg
+etc/pve/pve-root-ca.pem
+etc/pve/priv/
+etc/pve/priv/pve-root-ca.key
+etc/pve/priv/authorized_keys
+etc/pve/priv/authkey.key
+etc/pve/priv/lock/
+etc/pve/priv/acme/
+etc/pve/priv/pve-root-ca.srl
+etc/pve/virtual-guest/
+etc/pve/firewall/
+etc/pve/sdn/
+etc/pve/vzdump.cron
+

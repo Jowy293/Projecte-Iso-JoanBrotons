@@ -1,0 +1,8 @@
+10:52:55 FALLADA: s'esborra la regla 'Default allow LAN to any' i es recarrega el filtre
+10:53:08 RECUPERACIO: es restaura config.xml des del TrueNAS i es recarrega el filtre
+copia: /mnt/Copias/backups/opnsense/config-opnsense11-20261116-1046.xml
+OK
+--- registre del client (Ubuntu .25 sortint per .1):
+10:52:49.886170549 192.168.11.1 OK
+10:52:59.182366380 192.168.11.1 CAIGUT
+10:53:12.262052529 192.168.11.1 OK

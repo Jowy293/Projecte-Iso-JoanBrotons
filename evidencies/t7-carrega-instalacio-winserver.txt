@@ -1,0 +1,20 @@
+# Mesura host durant instal·lacio Windows Server 2025 + 6 VM enceses (lun 16 nov 2026 10:23:21 CET)
+"MikroTik" {4e34268b-96c7-410e-a642-687a14eeb517}
+"Servidor de Comunicaciones Debian" {bb948842-a301-4a1d-90df-9ba61a596b88}
+"Servidor de Comunicaciones OPNsense" {386f6fab-afd4-4c56-bdd5-bfcb4b2ecd93}
+"Proxmox" {65850067-9471-43ea-8017-be8955600778}
+"WinServer2025-DC" {29ca5c11-b483-4b70-b99f-9a212b5543cc}
+"TrueNas(Datos)" {0005fdf7-0b9e-4fb2-a166-88cd4cdf1722}
+"Ubuntu(Cliente)" {e41c5265-089b-4a2a-888a-14e4afea1c69}
+--procs-- -----------------------memoria---------------------- ---interc-- -----es---- -sistema-- ----------cpu----------
+   r    b         swpd        libre         búf       caché   si   so    bi    bo   in   cs  us  sy  id  wa  st  gu
+   3    1          256       328916       113660     12442568    0    0 13804  4743 7371    7   2   2  94   1   0   0
+   0    0          256       356304       115796     12419504    0    0 289859  3217 19694 30411   2   3  88   7   0   0
+   2    0          256       361732       116836     12410348    0    0 292908  5626 19607 29253   3   7  86   4   0   0
+   5    0          256       381504       117228     12406400    0    0 278679 11720 18201 26902   3   7  88   3   0   0
+   2    0          256       393396       117564     12400648    0    0 253564 21837 19371 29441   2   5  90   3   0   0
+   2    0          256       397520       117820     12399520    0    0 297014  8950 17986 27250   2   5  90   3   0   0
+Utilitzacio sda (io_ms/10s): 85%
+               total       usado       libre  compartido   búf/caché  disponible
+Mem:           31331       19824         384         642       12221       11507
+Inter:         16024           0       16024

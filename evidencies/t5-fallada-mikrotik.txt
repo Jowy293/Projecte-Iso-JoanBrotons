@@ -1,0 +1,6 @@
+10:49:37 FALLADA: /system reset-configuration no-defaults=yes (MikroTik queda en blanc)
+10:51:11 RECUPERACIO: IP temporal + descarrega SFTP de /mnt/Copias/backups/mikrotik/mikrotik11-20261116-1046.rsc des del TrueNAS + /import
+10:52:08 config importada (IP, NAT, 11 regles). Usuaris recreats a ma (no van a l'export)
+10:49:31.186371435 192.168.11.2 OK
+10:49:45.846128185 192.168.11.2 CAIGUT
+10:51:36.852004884 192.168.11.2 OK

@@ -1,0 +1,30 @@
+hora sincronitzada: Mon Nov 16 11:05:46 AM CET 2026
+pve-manager/9.2.2/b9984c6d90a4bd80 (running kernel: 7.0.2-6-pve)
+pve1.joan11.local
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+nic0             UP             
+vmbr0            UP             192.168.11.17/24 fe80::a00:27ff:fe12:6e89/64 
+default via 192.168.11.1 dev vmbr0 proto kernel onlink 
+192.168.11.0/24 dev vmbr0 proto kernel scope link src 192.168.11.17 
+search joan11.local
+nameserver 192.168.11.1
+nameserver 192.168.11.3
+│ administrador11@pam │ Administrador Joan (posicio 11) │                          │ 1      │      0 │           │        │      │          │ pam        │                  │        │             │
+│ root@pam            │                                 │ (correu ocult) │ 1      │      0 │           │        │      │          │ pam        │                  │        │             │
+┌──────┬───────────────┬──────┬─────────────────────┬───────────┐
+│ path │ roleid        │ type │ ugid                │ propagate │
+╞══════╪═══════════════╪══════╪═════════════════════╪═══════════╡
+│ /    │ Administrator │ user │ administrador11@pam │ 1         │
+└──────┴───────────────┴──────┴─────────────────────┴───────────┘
+Name             Type     Status     Total (KiB)      Used (KiB) Available (KiB)        %
+local             dir     active        14125380         4444552         8941500   31.47%
+local-lvm     lvmthin     active        12353536               0        12353536    0.00%
+URIs: http://deb.debian.org/debian/
+Components: main contrib non-free-firmware
+URIs: http://security.debian.org/debian-security/
+Components: main contrib non-free-firmware
+URIs: http://download.proxmox.com/debian/pve
+Components: pve-no-subscription
+130
+Error: Corosync config '/etc/pve/corosync.conf' does not exist - is this node part of a cluster?
+

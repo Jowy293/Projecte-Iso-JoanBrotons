@@ -1,0 +1,38 @@
+] Contraseña: ****    
+================ Passarel·la 192.168.11.1  (2026-11-16 10:25:06)
+default via 192.168.11.1 dev enp0s3 
+default via 192.168.11.1 dev enp0s3 proto static metric 100 
+--- tracepath (primers salts)
+ 1?: [LOCALHOST]                      pmtu 1500
+ 1:  192.168.11.1                                          0.598ms 
+ 1:  192.168.11.1                                          0.288ms 
+ 2:  172.16.222.1                                          0.861ms 
+ 3:  172.18.22.1                                           0.870ms asymm  8 
+--- PERMESA  HTTP deb.debian.org:80 -> OK (HTTP 200) en .512498638s
+--- BLOQUEJADA TCP 1.1.1.1:23 (telnet) -> SENSE RESPOSTA / BLOQUEJADA
+================ Passarel·la 192.168.11.2  (2026-11-16 10:25:12)
+default via 192.168.11.2 dev enp0s3 
+default via 192.168.11.1 dev enp0s3 proto static metric 100 
+--- tracepath (primers salts)
+ 1?: [LOCALHOST]                      pmtu 1500
+ 1:  192.168.11.2                                          0.959ms 
+ 1:  192.168.11.2                                          0.531ms 
+ 2:  172.16.222.1                                          0.933ms 
+ 3:  172.18.22.1                                           0.837ms asymm  8 
+--- PERMESA  HTTP deb.debian.org:80 -> OK (HTTP 200) en .446485979s
+--- BLOQUEJADA TCP 1.1.1.1:23 (telnet) -> SENSE RESPOSTA / BLOQUEJADA
+================ Passarel·la 192.168.11.3  (2026-11-16 10:25:17)
+default via 192.168.11.3 dev enp0s3 
+default via 192.168.11.1 dev enp0s3 proto static metric 100 
+--- tracepath (primers salts)
+ 1?: [LOCALHOST]                      pmtu 1500
+ 1:  192.168.11.3                                          1.265ms 
+ 1:  192.168.11.3                                          0.319ms 
+ 2:  172.16.222.1                                          0.980ms 
+ 3:  172.18.22.1                                           1.188ms asymm  8 
+--- PERMESA  HTTP deb.debian.org:80 -> OK (HTTP 200) en .465538952s
+--- BLOQUEJADA TCP 1.1.1.1:23 (telnet) -> SENSE RESPOSTA / BLOQUEJADA
+== Restaurada passarel·la per defecte:
+default via 192.168.11.1 dev enp0s3 
+default via 192.168.11.1 dev enp0s3 proto static metric 100 
+

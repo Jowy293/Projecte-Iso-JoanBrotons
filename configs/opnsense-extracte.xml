@@ -1,0 +1,93 @@
+<!-- Extracte de /conf/config.xml (OPNsense 26.7) sense certificats, hashes ni claus -->
+<hostname>opnsense11</hostname>
+    
+<domain>internal</domain>
+    
+<interfaces>
+    <wan>
+      <enable>1</enable>
+      <if>em0</if>
+      <mtu />
+      <ipaddr>dhcp</ipaddr>
+      <ipaddrv6>dhcp6</ipaddrv6>
+      <subnet />
+      <gateway />
+      <blockpriv>1</blockpriv>
+      <blockbogons>1</blockbogons>
+      <dhcphostname />
+      <media />
+      <mediaopt />
+      <dhcp6-ia-pd-len>0</dhcp6-ia-pd-len>
+    </wan>
+    <lan>
+      <enable>1</enable>
+      <if>em1</if>
+      <ipaddr>192.168.11.1</ipaddr>
+      <subnet>24</subnet>
+      <ipaddrv6 />
+      <subnetv6 />
+      <media />
+      <mediaopt />
+      <gateway />
+      <gatewayv6 />
+    </lan>
+    <lo0>
+      <internal_dynamic>1</internal_dynamic>
+      <descr>Loopback</descr>
+      <enable>1</enable>
+      <if>lo0</if>
+      <ipaddr>127.0.0.1</ipaddr>
+      <ipaddrv6>::1</ipaddrv6>
+      <subnet>8</subnet>
+      <subnetv6>128</subnetv6>
+      <type>none</type>
+      <virtual>1</virtual>
+    </lo0>
+  </interfaces>
+  
+<nat>
+    <outbound>
+      <mode>automatic</mode>
+    </outbound>
+  </nat>
+  
+<rule uuid="5cabc572-aba3-46fa-89f8-98fb9448971f"><enabled>1</enabled>
+            <sequence>0</sequence>
+            <action>block</action>
+            <interface>lan</interface>
+            <direction>in</direction>
+            <ipprotocol>inet</ipprotocol>
+            <protocol>TCP</protocol>
+            <source_net>lan</source_net>
+            <destination_net>any</destination_net>
+            <destination_port>23</destination_port>
+            <log>1</log>
+            <description>PROVA: connexio bloquejada (Telnet) amb registre</description>
+          </rule>
+<rule uuid="949c6a24-4baf-4da6-83e2-9eeddc72519b"><enabled>1</enabled>
+            <sequence>1</sequence>
+            <action>pass</action>
+            <interface>lan</interface>
+            <direction>in</direction>
+            <ipprotocol>inet</ipprotocol>
+            <protocol>any</protocol>
+            <source_net>lan</source_net>
+            <destination_net>any</destination_net>
+            <destination_port />
+            <log>1</log>
+            <description>Default allow LAN to any rule</description>
+          </rule>
+<rule uuid="6939c830-9e83-482b-85c9-44368bc92a45"><enabled>1</enabled>
+            <sequence>11</sequence>
+            <action>pass</action>
+            <interface>lan</interface>
+            <direction>in</direction>
+            <ipprotocol>inet6</ipprotocol>
+            <protocol>any</protocol>
+            <source_net>lan</source_net>
+            <destination_net>any</destination_net>
+            <destination_port />
+            <log>0</log>
+            <description>Default allow LAN IPv6 to any rule</description>
+          </rule>
+

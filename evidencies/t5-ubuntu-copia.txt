@@ -1,0 +1,6 @@
+OK ubuntu-client11-20261116-1107.tar.gz 8.0K + llista de paquets
+
+total 1
+-rw-r--r-- 1 backup_user backup_user 43633 Nov 16 11:07 paquets-20261116-1107.txt
+-rw-r--r-- 1 backup_user backup_user  6822 Nov 16 11:07 ubuntu-client11-20261116-1107.tar.gz
+
