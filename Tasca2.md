@@ -30,17 +30,28 @@ Obtingut el 16/11/2026 amb `lscpu`, `free`, `lsblk`, `lsusb -t`, `lspci`, `/sys/
 | Temperatura en repòs amb 5 VM | CPU 68 °C (`x86_pkg_temp`) |
 
 ### 1.2 Equip de casa
-> **N/C — a completar per l'alumne.** No he tingut accés al PC de casa. Les dades del README antic no tenien cap evidència al darrere i no s'han copiat. Per a obtindre-les, cal executar [`scripts/inventari-casa.ps1`](scripts/inventari-casa.ps1) en PowerShell com a administrador. Genera `inventari-casa.txt` amb el model, la CPU, els mòduls de RAM, els discos (tipus i bus), la xarxa, el TPM i el Secure Boot, i a més executa `winsat` de disc, memòria i CPU. Després cal pujar el fitxer a `evidencies/` i omplir la taula.
+
+Dades aportades per l'alumne (16/11/2026). Encara no hi ha la sortida d'una eina que les confirme: el model exacte del disc, la velocitat de la RAM, la xarxa i el TPM queden **N/C** fins a executar [`scripts/inventari-casa.ps1`](scripts/inventari-casa.ps1) com a administrador.
 
 | Component | Equip de casa |
 |---|---|
-| Model / placa | N/C |
-| SO | N/C |
-| CPU (nuclis/fils, virtualització) | N/C |
-| RAM (mòduls, velocitat) | N/C |
-| Discos (model, NVMe/SATA, bus) | N/C |
+| Format | **Sobretaula** (sense bateria: un tall de llum l'apaga si no té SAI) |
+| SO | Windows 11 Pro |
+| Plataforma | AMD **AM5** (DDR5 i PCIe 5.0) |
+| CPU | **AMD Ryzen 5 7600X** · 6 nuclis / 12 fils · virtualització AMD-V (SVM) |
+| RAM | **32 GB DDR5** (mòduls i velocitat: N/C) |
+| Disc | **SSD NVMe** intern (model i generació PCIe: N/C) |
 | Xarxa | N/C |
-| TPM / Secure Boot | N/C |
+| TPM / Secure Boot | N/C (les plataformes AM5 porten fTPM 2.0, necessari per a Windows 11) |
+
+### 1.3 Comparativa
+
+| Recurs | Classe (portàtil ASUS) | Casa (sobretaula) | Qui guanya per a l'entorn de VM |
+|---|---|---|---|
+| CPU | Core Ultra 5 125H · 14 nuclis / **18 fils** · portàtil (límit de consum i temperatura) | Ryzen 5 7600X · 6 nuclis / **12 fils** · sobretaula, més freqüència per nucli | Empat pràctic: les 8 VM sumen 11 vCPU i caben a tots dos. El de casa és més ràpid per nucli i no té límit tèrmic de portàtil; el de classe té més fils |
+| RAM | 32 GB | 32 GB DDR5 | **Empat**: el mateix límit de VM simultànies (~18,5 GB per a les 8 VM) |
+| **Disc de les VM** | SSD **SATA dins d'una caixa USB 3.0** (~290 MB/s reals) | SSD **NVMe intern** (un NVMe actual passa de 3.000 MB/s) | **Casa, de molt.** És el coll de botella que limita el de classe |
+| Alimentació | Bateria (fa de SAI) | Sense bateria | Classe |
 
 ## 2. Colls de botella
 
@@ -60,7 +71,16 @@ Obtingut el 16/11/2026 amb `lscpu`, `free`, `lsblk`, `lsusb -t`, `lspci`, `/sys/
 4. Millora de maquinari recomanada: treballar en un **SSD NVMe en caixa USB 3.2 Gen 2 (10 Gbit/s)** o en un SSD intern. És el que donaria més rendiment per euro invertit, molt per davant de més RAM o més CPU.
 
 ### 2.2 Equip de casa
-> N/C fins que hi haja l'inventari. Guia d'anàlisi: si té ≥16 GB de RAM i un SSD NVMe intern, el coll de botella previst serà la RAM, si s'encenen totes les VM, i no el disc. Si té HDD, el disc serà molt pitjor que a classe.
+| Recurs | Previsió | Conclusió provisional |
+|---|---|---|
+| Disc | NVMe intern: 10 vegades més ràpid que l'SSD USB de classe | **No hauria de ser coll de botella.** Les instal·lacions i arrencades de Windows no bloquejarien la resta de VM |
+| **RAM** | 32 GB, igual que a classe. Amb les 8 VM (18,5 GB) i Windows 11 + navegador (~6-8 GB) queda poc marge | **Coll de botella previst** si s'encenen totes les VM alhora |
+| CPU | 12 fils per a 11 vCPU | Just si totes les VM treballen alhora, però les VM d'aquest entorn passen la major part del temps en repòs. No previst |
+| Alimentació | Sense bateria | Risc de corrompre els discos de les VM en un tall de llum |
+
+**Solucions proposades:** ajustar la RAM de cada VM al consum real i guardar en estat les VM que no s'utilitzen. Si calguera més, ampliar a 64 GB, perquè AM5 té 4 ranures DDR5. Per al risc del tall de llum, un SAI xicotet o, almenys, no deixar VM enceses sense supervisió.
+
+> **Pendent (Apte+):** confirmar aquestes previsions amb els tests de l'equip de casa (`winsat disk`, `winsat mem`, diagnòstic de memòria i xarxa), executant [`scripts/inventari-casa.ps1`](scripts/inventari-casa.ps1).
 
 ## 3. Proves de diagnòstic a l'equip de classe (Apte+)
 
