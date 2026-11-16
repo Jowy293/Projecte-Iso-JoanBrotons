@@ -1,0 +1,28 @@
+# fio 3.36 · disc USB Kingston A400 (pont JMS561U, UAS 5 Gbit/s) · equip de casa · VM aturades · fitxer 2 GB a /home (ext4) · direct=1 libaio · 20 s per prova · 2026-11-16 15:18:06
+## seq-read (rw=read bs=1M iodepth=16)
+  read: IOPS=400, BW=401MiB/s (420MB/s)(8035MiB/20039msec)
+     lat (usec): min=5549, max=74260, avg=39820.22, stdev=1447.12
+   READ: bw=401MiB/s (420MB/s), 401MiB/s-401MiB/s (420MB/s-420MB/s), io=8035MiB (8425MB), run=20039-20039msec
+  sda: ios=16034/18, sectors=16418816/376, merge=0/12, ticks=627245/1756, in_queue=629223, util=97.51%
+## seq-write (rw=write bs=1M iodepth=16)
+  write: IOPS=392, BW=392MiB/s (412MB/s)(7866MiB/20042msec); 0 zone resets
+     lat (usec): min=2891, max=77608, avg=40758.79, stdev=4204.54
+  sda: ios=2/15676, sectors=288/15986768, merge=0/71, ticks=89/645654, in_queue=645901, util=96.57%
+## rand-read-4k-qd32 (rw=randread bs=4k iodepth=32)
+  read: IOPS=20.3k, BW=79.1MiB/s (83.0MB/s)(1583MiB/20002msec)
+     lat (usec): min=384, max=5375, avg=1579.41, stdev=196.75
+   READ: bw=79.1MiB/s (83.0MB/s), 79.1MiB/s-79.1MiB/s (83.0MB/s-83.0MB/s), io=1583MiB (1660MB), run=20002-20002msec
+  sda: ios=402948/36, sectors=3223688/448, merge=2/15, ticks=631756/78, in_queue=631849, util=90.63%
+## rand-write-4k-qd32 (rw=randwrite bs=4k iodepth=32)
+  write: IOPS=32.6k, BW=127MiB/s (133MB/s)(2544MiB/20003msec); 0 zone resets
+     lat (usec): min=280, max=118839, avg=982.51, stdev=1519.48
+  sda: ios=0/646735, sectors=0/5174680, merge=0/100, ticks=0/620944, in_queue=620958, util=68.72%
+## rand-read-4k-qd1 (rw=randread bs=4k iodepth=1)
+  read: IOPS=3618, BW=14.1MiB/s (14.8MB/s)(283MiB/20001msec)
+     lat (usec): min=131, max=3697, avg=275.94, stdev=57.94
+   READ: bw=14.1MiB/s (14.8MB/s), 14.1MiB/s-14.1MiB/s (14.8MB/s-14.8MB/s), io=283MiB (296MB), run=20001-20001msec
+  sda: ios=71996/11, sectors=576216/200, merge=0/9, ticks=19447/4, in_queue=19454, util=97.69%
+## rand-write-4k-qd1 (rw=randwrite bs=4k iodepth=1)
+  write: IOPS=8657, BW=33.8MiB/s (35.5MB/s)(676MiB/20001msec); 0 zone resets
+     lat (usec): min=64, max=8813, avg=115.21, stdev=106.59
+  sda: ios=0/172184, sectors=0/1377648, merge=0/22, ticks=0/18457, in_queue=18465, util=93.08%

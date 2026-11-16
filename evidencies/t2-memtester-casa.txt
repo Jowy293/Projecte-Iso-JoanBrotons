@@ -1,0 +1,32 @@
+# memtester 4.6.0 · 4096 MB · 1 passada · equip de casa · VM aturades · inici 2026-11-16 15:23:05
+               total       usado       libre  compartido   búf/caché  disponible
+Mem:           31250        3234       26198          84        2295       28015
+Inter:         16004           0       16004
+memtester version 4.6.0 (64-bit)
+Copyright (C) 2001-2020 Charles Cazabon.
+Licensed under the GNU General Public License version 2 (only).
+pagesize is 4096
+pagesizemask is 0xfffffffffffff000
+want 4096MB (4294967296 bytes)
+got  3906MB (4096012288 bytes), trying mlock ...locked.
+Loop 1/1:
+  Stuck Address       : ok
+  Random Value        : ok
+  Compare XOR         : ok
+  Compare SUB         : ok
+  Compare MUL         : ok
+  Compare DIV         : ok
+  Compare OR          : ok
+  Compare AND         : ok
+  Sequential Increment: ok
+  Solid Bits          : ok
+  Block Sequential    : ok
+  Checkerboard        : ok
+  Bit Spread          : ok
+  Bit Flip            : ok
+  Walking Ones        : ok
+  Walking Zeroes      : ok
+  8-bit Writes        : ok
+  16-bit Writes       : ok
+Done.
+# fi 2026-11-16 15:29:08 · durada 363 s

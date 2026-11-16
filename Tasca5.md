@@ -375,19 +375,24 @@ Script: [`scripts/copia-windows.ps1`](scripts/copia-windows.ps1), executat com a
 
 ### 5.1 Windows 11 (`192.168.11.20`)
 
-Evidència: [`evidencies/t5-win11-estat.txt`](evidencies/t5-win11-estat.txt)
+> La primera instal·lació va quedar inservible per la incidència del §5.3 i s'ha **reinstal·lat el 16/11/2026**. Les dades d'aquesta taula són de la VM actual. Evidència: [`evidencies/t5-win11-estat.txt`](evidencies/t5-win11-estat.txt)
 
 | Ítem | Valor |
 |---|---|
 | Versió | **Windows 11 Pro 23H2**, build `10.0.22631`, 64 bits (`Get-ComputerInfo`) |
-| ISO | `w11.iso` · SHA-256 `5210deed…9dc8` (N/C contra la font oficial: Microsoft no publica el hash de la ISO) |
-| VM | 2 vCPU, 4 GB, 80 GB, **UEFI**, Guest Additions 7.0.20 |
-| TPM / Secure Boot | **No** (la VM no té TPM virtual i `Confirm-SecureBootUEFI` → no suportat). Windows 11 exigeix TPM 2.0 i Secure Boot: es va instal·lar saltant-se la comprovació. **Conseqüència:** Microsoft no garanteix les actualitzacions de característiques en equips sense TPM. **Correcció recomanada:** a VirtualBox 7, *Configuració → Sistema → TPM 2.0* i *Secure Boot*, abans de la propera reinstal·lació |
-| Nom d'equip | `W11-CLIENT11` (abans `DESKTOP-BTD8EEA`). El canvi de nom estava pendent de reinici i, en reiniciar, va aparéixer la incidència del §5.3 |
-| Usuaris | `Administracion11` (administrador local) · `Cliente11` (usuari) · `Administrador` integrat desactivat |
-| Xarxa | IP manual `192.168.11.20/24`, gw `192.168.11.1`, DNS `192.168.11.10` (DC) i `192.168.11.1`, **DHCP: no** ([`evidencies/t4-win11.txt`](evidencies/t4-win11.txt)). Abans tenia `192.168.11.53` per DHCP del MikroTik |
-| Actualitzacions | Últim paquet instal·lat: **KB5033375 (04/12/2023)**. Està **desactualitzat** |
+| ISO i llicència | `w11.iso` (es-ES, conté totes les edicions; s'ha triat l'índex 6, *Pro*) · SHA-256 `5210deed…9dc8` (N/C contra la font oficial: Microsoft no publica el hash de la ISO). Instal·lada amb la clau genèrica d'instal·lació de Pro, que **no activa** Windows: per a un ús real caldria una llicència Pro (o volum/KMS en una empresa) |
+| Mètode | Instal·lació desatesa de VirtualBox (`VBoxManage unattended install`): idioma, zona horària, nom d'equip i usuari d'administració |
+| VM | 2 vCPU, 4 GB, disc de 80 GB (VDI amb `nonrotational on` i `discard off`, vegeu la [Tasca 7](Tasca7.md)), **UEFI**, Guest Additions 7.0.20 |
+| Particionat | GPT: recuperació (0,3 GB), EFI (0,1 GB), MSR (0,1 GB) i `C:` NTFS de 79,5 GB |
+| **TPM / Secure Boot** | **TPM 2.0** virtual (`TpmPresent/Ready/Enabled: True`) i **Secure Boot actiu** (`Confirm-SecureBootUEFI: True`), amb les claus de Microsoft carregades a la NVRAM de la VM (`VBoxManage modifynvram ... enrollmssignatures / enrollorclpk`). Ara compleix els requisits oficials de Windows 11, cosa que la primera instal·lació no feia |
+| Nom d'equip | `W11-CLIENT11` |
+| Usuaris | `Administracion11` (administrador local) · `Cliente11` (usuari estàndard) · `Administrador` integrat **desactivat** |
+| Teclat | Espanyol (es-ES) |
+| Xarxa | IP manual `192.168.11.20/24`, gw `192.168.11.1` (OPNsense), DNS `192.168.11.10` (DC) i `192.168.11.1`, **DHCP: no**. Respon el ping al tallafocs i al TrueNAS i té eixida a Internet (`Test-NetConnection www.gva.es -Port 443` → `True`) |
 | Domini | No s'uneix al domini en aquesta fase (opcional a la rúbrica; correspon a RA4/RA5). El DNS ja apunta al DC per a quan s'unisca |
+| Actualitzacions | Vegeu el §5.4 |
+
+![TPM 2.0 i Secure Boot actius](evidencies/captures/t5-w11-07-tpm-secureboot.png)
 
 ### 5.2 Ubuntu (`192.168.11.25`)
 
@@ -421,8 +426,11 @@ Evidència: [`evidencies/t5-ubuntu-estat.txt`](evidencies/t5-ubuntu-estat.txt)
 | Hipòtesi 2: una actualització a mitges | `c000021a` vol dir que ha mort un procés crític (winlogon o csrss). Els binaris crítics tenen les dates originals (2022-2023), però existeix **`C:\Windows\WinSxS\pending.xml` amb data 16/11/2026 12:24**, l'hora exacta del reinici. És a dir, Windows Update havia deixat operacions de manteniment pendents i el sistema falla en aplicar-les durant l'arrencada. **Probable** |
 | Solució aplicada (1r intent) | `dism /Image:C:\ /Cleanup-Image /RevertPendingActions` → *"La operación se completó correctamente"*. El DISM programa la reversió per a l'arrencada següent |
 | Resultat | **Encara no arrenca.** L'arrencada següent torna a acabar en "Tu PC no se inició correctamente" |
-| Pròxims passos (pendent) | 1) Comprovar si la reversió ha esborrat `pending.xml`. 2) Si no, *Desinstalar las actualizaciones* des de WinRE o tornar a un punt de restauració. 3) `sfc /scannow /offbootdir=C:\ /offwindir=C:\Windows` per reparar fitxers del sistema |
-| Retorn | El client no té dades úniques: la configuració es pot refer amb els paràmetres documentats aquí. Si cap reparació funciona, es reinstal·la des de la ISO |
+| Comprovació (2n intent, 16/11 a la tarda) | Des de la consola de WinRE: `pending.xml` **torna a existir**, amb data 12:32 (l'ha regenerat la mateixa reversió del DISM). Es reanomena a `pending.xml.bak` (no s'esborra, per poder tornar enrere) |
+| Resultat | **Continua sense arrancar** ("Tu PC no se inició correctamente"). Per tant, `pending.xml` no era l'única causa |
+| 3r intent | WinRE → *Desinstalar las actualizaciones* → *Desinstalar la última actualización de calidad* → **"Surgió un problema y no será posible desinstalar la última actualización"**. Sense punts de restauració ni instantània de la VM, no queden més vies de reparació raonables |
+| **Solució final** | **Reinstal·lació** des de la ISO (el client no té dades úniques i la configuració està documentada). El disc avariat es conserva com a `Win11-avariat-c000021a.vdi` per si calguera recuperar-ne algun fitxer. Aprofitant la reinstal·lació, s'afig a la VM **TPM 2.0 i Secure Boot**, que eren la mancança detectada al §5.1 |
+| Retorn | Abans de cada intent es va fer una instantània de la VM (`abans-reparacio-c000021a`). A la VM nova es fa una instantània just després de configurar-la, que és la via de recuperació davant d'una actualització fallida (punt 4 de la tasca) |
 
 | | |
 |---|---|
@@ -430,14 +438,37 @@ Evidència: [`evidencies/t5-ubuntu-estat.txt`](evidencies/t5-ubuntu-estat.txt)
 | Símptoma | Causa registrada a `SrtTrail.txt` |
 | ![pending.xml a l'hora del reinici](evidencies/captures/t5-w11-03-pending-xml.png) | ![DISM RevertPendingActions](evidencies/captures/t5-w11-04-dism-revert.png) |
 | `pending.xml` creat a les 12:24 | Reversió de les accions pendents amb DISM |
+| ![pending.xml regenerat](evidencies/captures/t5-w11-05-pending-regenerat.png) | ![Desinstal·lar l'actualització falla](evidencies/captures/t5-w11-06-desinstal-falla.png) |
+| `pending.xml` regenerat a les 12:32 | No es pot desinstal·lar l'última actualització |
 
 **Lliçó apresa:** el `Restart-Computer -Force` reinicia encara que Windows Update estiga treballant en segon pla. En un equip que fa temps que no s'actualitza (l'últim paquet era de desembre de 2023), abans de reiniciar s'ha de comprovar que no hi ha cap actualització en curs (*Configuración → Windows Update*), o fer una instantània de la VM abans d'un canvi.
 
-### 5.4 Còpies dels clients (què es copia i què no)
+### 5.4 Actualització del Windows 11 i via de recuperació (punt 4 de la tasca)
+
+Després de la incidència del §5.3, l'actualització es fa amb una via de retorn preparada i comprovant que no queda cap operació pendent abans de reiniciar.
+
+| Pas | Detall |
+|---|---|
+| Via de recuperació | Instantània de la VM `w11-configurat-abans-actualitzar` (equip configurat i amb la còpia al TrueNAS ja feta). Si l'actualització falla, es torna a aquest estat en segons |
+| Eina | [`scripts/actualitza-windows.ps1`](scripts/actualitza-windows.ps1): utilitza l'API de Windows Update (`Microsoft.Update.Session`), instal·la les actualitzacions de qualitat i de seguretat i **omet les de característiques** (canvi de versió), i ho registra tot amb l'hora |
+| 1a ronda (16:45-16:52) | 5 actualitzacions, totes amb codi 2 (correcte): plataforma de Windows Security KB5007651, eina d'eliminació de programari maliciós KB890830, definicions de Defender 1.463.329.0, KB4023057 i l'acumulativa 2023-12 KB5033375. No demana reinici |
+| Comprovació | Reinici i arrencada correcta (16:53), `pending.xml` no existeix, la xarxa i l'accés al NAS funcionen. Windows Update ofereix 2 actualitzacions més: plataforma de Defender KB4052623 i l'**acumulativa 2025-11 KB5068865** |
+| Comprovació abans de reiniciar | Abans de reiniciar es comprova que no hi ha operacions pendents (`pending.xml`, clau `RebootRequired`) i que el servei de manteniment (`TrustedInstaller`/`TiWorker`) ha acabat. **Error meu en la 1a ronda:** vaig llançar el reinici en la mateixa ordre que la comprovació i `TiWorker` encara treballava. Com que era un reinici normal (no `-Force`), Windows va acabar el manteniment en apagar-se i va arrencar bé, però és justament el que va provocar la incidència del §5.3 |
+| 2a ronda (16:59-17:30) | Nova instantània `w11-abans-acumulativa-2025-11`. Plataforma de Defender KB4052623 i **acumulativa 2025-11 KB5068865**, totes dues amb codi 2. Aquesta vegada **sí demana reinici** |
+| Comprovació final | Reinici normal (`shutdown /r`) a les 17:30 i arrencada correcta a les 17:33. **Build 22631.6199** (abans 22631.2861). En arrencar, `pending.xml` encara existeix (tasques de manteniment posteriors al reinici); es deixa acabar **sense tornar a reiniciar** i a les 17:41 ja no hi és. Xarxa, accés al TrueNAS i Guest Additions funcionen |
+| Resultat | L'equip queda amb l'última acumulativa publicada per a 23H2 (el suport de 23H2 Pro va acabar el novembre de 2025). El pas següent seria l'actualització de característiques a 24H2/25H2, que s'ha omés de manera conscient: és un canvi de versió i no forma part d'aquesta fase |
+
+Evidència: [`evidencies/t5-win11-actualitzacio.txt`](evidencies/t5-win11-actualitzacio.txt)
+
+### 5.5 Còpies dels clients (què es copia i què no)
 
 | Client | Mètode | Es copia | No es copia (i per què) |
 |---|---|---|---|
 | Ubuntu | **Push** per SCP amb clau, `copia-client-linux.sh` → `ubuntu/` | Connexions de xarxa (NM i netplan), `hosts`, `fstab`, `mdadm.conf`, `sshd_config`, repositoris, perfil i documents de l'usuari, **llista de paquets** (`dpkg --get-selections`) per a reinstal·lar-los d'una vegada | El sistema sencer: es reinstal·la des de la ISO en ~15 min i se li apliquen la configuració i la llista de paquets |
-| Windows 11 | **Push** per SMB a `\\192.168.11.5\backups\win11` amb [`scripts/copia-windows.ps1`](scripts/copia-windows.ps1) (el mateix que el servidor, §4.4) | La imatge completa del disc (~25 GB usats) no cap al pool de 5 GB |
+| Windows 11 | **Push** per SMB a `\\192.168.11.5\backups\win11` amb [`scripts/copia-windows.ps1`](scripts/copia-windows.ps1) (el mateix que el servidor, §4.4) | Configuració de xarxa i rutes, usuaris locals i administradors, actualitzacions, programari instal·lat, tallafocs (`.wfw`, reimportable amb `netsh advfirewall import`) i polítiques de seguretat locals | La imatge completa del disc (~19 GB usats) no cap al pool de 5 GB. Com s'ha vist al §5.3, reinstal·lar i aplicar aquesta configuració és el camí de recuperació |
+
+Evidència Windows 11 (després de la reinstal·lació): [`evidencies/t5-win11-copia.txt`](evidencies/t5-win11-copia.txt): `W11-CLIENT11-config-20261116-1640.zip` (35,5 KB) amb el **mateix SHA-256 a l'equip i al NAS**.
+
+![Còpia del Windows 11 al TrueNAS](evidencies/captures/t5-w11-08-copia-truenas.png)
 
 Evidència Ubuntu: [`evidencies/t5-ubuntu-copia.txt`](evidencies/t5-ubuntu-copia.txt): `ubuntu-client11-20261116-1107.tar.gz` (6,8 KB) + `paquets-20261116-1107.txt` (43 KB).

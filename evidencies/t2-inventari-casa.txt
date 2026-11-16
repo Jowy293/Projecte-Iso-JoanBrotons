@@ -1,0 +1,82 @@
+# Inventari equip de casa · 2026-11-16 15:17:28 · arrencat des del disc USB de classe (Linux Mint 22.3)
+## Placa / firmware
+sys_vendor: ASUS
+board_vendor: ASUSTeK COMPUTER INC.
+board_name: PRIME B650M-A II
+bios_vendor: American Megatrends Inc.
+bios_version: 3287
+bios_date: 09/20/2025
+Arrencada: UEFI
+Secure Boot: SecureBoot enabled
+TPM: tpm0 versió 2
+## CPU
+CPU(s):                                  12
+Model name:                              AMD Ryzen 5 7600X 6-Core Processor
+Thread(s) per core:                      2
+Core(s) per socket:                      6
+Socket(s):                               1
+CPU(s) scaling MHz:                      86%
+CPU max MHz:                             5453.0000
+CPU min MHz:                             545.0000
+Virtualization:                          AMD-V
+L1d cache:                               192 KiB (6 instances)
+L2 cache:                                6 MiB (6 instances)
+L3 cache:                                32 MiB (1 instance)
+## RAM
+               total       usado       libre  compartido   búf/caché  disponible
+Mem:            30Gi       3,2Gi        25Gi       130Mi       1,9Gi        27Gi
+Inter:          15Gi          0B        15Gi
+MemTotal:       32000116 kB
+SwapTotal:      16388632 kB
+zram:  7,6G
+## Discos
+NAME          SIZE MODEL                      TRAN   ROTA FSTYPE MOUNTPOINT
+sda         447,1G KINGSTON SA400S37480G      usb       1        
+├─sda1        509M                                      1 vfat   /boot/efi
+├─sda2       58,6G                                      1 ext4   /
+└─sda3        388G                                      1 ext4   /home
+zram0         7,6G                                      0        [SWAP]
+nvme0n1     931,5G KIOXIA-EXCERIA PLUS G3 SSD nvme      0        
+├─nvme0n1p1   200M                            nvme      0 vfat   
+├─nvme0n1p2    16M                            nvme      0        
+├─nvme0n1p3 930,4G                            nvme      0 ntfs   
+└─nvme0n1p4   902M                            nvme      0 ntfs   
+nvme0n1: KIOXIA-EXCERIA PLUS G3 SSD               firmware ELFA01.2
+Enllaç PCIe NVMe: 16.0 GT/s PCIe x4 (màx 16.0 GT/s PCIe x4)
+Disc USB: ID_BUS=ata ID_USB_DRIVER=uas 
+/:  Bus 006.Port 001: Dev 001, Class=root_hub, Driver=xhci_hcd/2p, 10000M
+    |__ Port 002: Dev 002, If 0, Class=Mass Storage, Driver=uas, 5000M
+## Xarxa
+lo               UNKNOWN        00:00:00:00:00:00 <LOOPBACK,UP,LOWER_UP> 
+eno1             UP             a0:ad:9f:da:ad:a8 <BROADCAST,MULTICAST,UP,LOWER_UP> 
+docker0          DOWN           fa:e6:9c:ed:0c:c1 <NO-CARRIER,BROADCAST,MULTICAST,UP> 
+eno1: 1000 Mbit/s full driver r8169
+08:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL8125 2.5GbE Controller (rev 05)
+## GPU / altres PCI
+01:00.0 VGA compatible controller: NVIDIA Corporation Device 2d04 (rev a1)
+01:00.1 Audio device: NVIDIA Corporation Device 22eb (rev a1)
+0a:00.0 USB controller: Advanced Micro Devices, Inc. [AMD] 600 Series Chipset USB 3.2 Controller (rev 01)
+0c:00.0 VGA compatible controller: Advanced Micro Devices, Inc. [AMD/ATI] Raphael (rev c7)
+0c:00.1 Audio device: Advanced Micro Devices, Inc. [AMD/ATI] Rembrandt Radeon High Definition Audio Controller
+0c:00.3 USB controller: Advanced Micro Devices, Inc. [AMD] Device 15b6
+0c:00.4 USB controller: Advanced Micro Devices, Inc. [AMD] Device 15b7
+0c:00.6 Audio device: Advanced Micro Devices, Inc. [AMD] Family 17h/19h HD Audio Controller
+0d:00.0 USB controller: Advanced Micro Devices, Inc. [AMD] Device 15b8
+## Perifèrics USB
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 001 Device 002: ID 0b05:19af ASUSTek Computer, Inc. AURA LED Controller
+Bus 001 Device 003: ID 320f:5078 Evision RGB Keyboard
+Bus 001 Device 004: ID 046d:0adf Logitech, Inc. G435 Wireless Gaming Headset
+Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 003 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 003 Device 002: ID 046d:c53f Logitech, Inc. USB Receiver
+Bus 004 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 005 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 005 Device 002: ID 258a:002a SINO WEALTH Gaming KB 
+Bus 006 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 006 Device 002: ID 152d:1561 JMicron Technology Corp. / JMicron USA Technology Corp. JMS561U two ports SATA 6Gb/s bridge
+Bus 007 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 007 Device 002: ID 0a67:c006 Medeli Electronics Co., Ltd K66
+## Sensors
+Composite:    +25.9°C  (low  =  -0.1°C, high = +82.8°C)
+Tctl:         +40.1°C  

@@ -11,4 +11,6 @@ n1=$(awk '/eno1/{print $2+$10}' /proc/net/dev)
 echo "Disc sda (USB): lectura $(( (r1-r0)*512/T/1048576 )) MB/s, escriptura $(( (w1-w0)*512/T/1048576 )) MB/s, utilització $(( (io1-io0)/(T*10) ))%"
 echo "Xarxa eno1: $(( (n1-n0)/T/1024 )) KB/s"
 free -m | awk '/Mem/{printf "RAM: usada %d MB, disponible %d MB de %d MB\n",$3,$7,$2} /Inter|Swap/{printf "Swap usada: %d MB\n",$3}'
-awk '/x86_pkg_temp/{f=FILENAME}' /dev/null; for z in /sys/class/thermal/thermal_zone*; do [ "$(cat $z/type)" = x86_pkg_temp ] && echo "Temperatura CPU: $(( $(cat $z/temp)/1000 )) C"; done
+t=""; for z in /sys/class/thermal/thermal_zone*; do [ -r "$z/type" ] && [ "$(cat $z/type)" = x86_pkg_temp ] && t=$(( $(cat $z/temp)/1000 )); done
+for h in /sys/class/hwmon/hwmon*; do [ "$(cat $h/name 2>/dev/null)" = k10temp ] && t=$(( $(cat $h/temp1_input)/1000 )); done
+[ -n "$t" ] && echo "Temperatura CPU: $t C"

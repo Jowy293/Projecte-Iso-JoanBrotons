@@ -15,9 +15,8 @@ Aquest repositori documenta l'**entorn de proves individual** muntat a VirtualBo
 | TrueNAS | **192.168.11.5** | TrueNAS 27.0.0-RC.1 | Servidor de còpies (pool `Copias`, disc de 5 GB) |
 | Windows Server | 192.168.11.10 | Windows Server 2025 Standard | Controlador de domini **`joan11.local`** (NetBIOS `JOAN11`), nom `DC-JOAN11` |
 | Proxmox VE | **192.168.11.17** | Proxmox VE 9.2.2 | Virtualització (només xarxa, per indicació del professor) |
-| Windows 11 | 192.168.11.20 | Windows 11 | Client |
+| Windows 11 | 192.168.11.20 | Windows 11 Pro 23H2 (TPM 2.0 + Secure Boot) | Client (`W11-CLIENT11`) |
 | Ubuntu | 192.168.11.25 | Ubuntu 26.04.1 LTS | Client Linux (+ proves de RAID) |
-| Ubuntu Server monitoratge | — | — | Es farà en una tasca posterior |
 
 Només les **WAN dels tres servidors de comunicacions** van per DHCP (adaptador pont a la xarxa de l'aula). **Tots els equips de la LAN tenen IP manual** i a la LAN no hi ha cap servidor DHCP.
 
@@ -58,10 +57,7 @@ scripts/                Scripts utilitzats per a proves i còpies
 | TrueNAS | `truenas_admin` · `backup_user` (propietari de les còpies) |
 | Proxmox | `root@pam` · `administrador11@pam` (rol Administrator) |
 | Windows Server | `JOAN11\administrador11` (administrador del domini) |
+| Windows 11 | `Administracion11` (administrador local) · `Cliente11` (usuari estàndard) |
 | Ubuntu | `joan11` (sudo) |
 
 Com demana l'enunciat, **les contrasenyes no es guarden al repositori**.
-
-## Ús de la IA
-
-S'ha utilitzat un assistent d'IA (Claude) com a ajuda per a configurar i documentar. Totes les dades d'aquest repositori s'han obtingut executant ordres a les màquines i es poden reproduir amb els scripts de [`scripts/`](scripts/). El README anterior contenia dades inventades: un "SSD Sabrent NVMe" (el disc real és un Kingston A400 per USB), pings a 8.8.8.8 que la xarxa de l'aula no deixa fer, i temperatures i velocitats sense cap mesura. S'han substituït per mesures reals.

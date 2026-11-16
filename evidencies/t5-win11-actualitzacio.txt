@@ -1,0 +1,31 @@
+# Actualització del Windows 11 (W11-CLIENT11) · 16/11/2026 · scripts/actualitza-windows.ps1
+# Via de recuperació: instantànies 'w11-configurat-abans-actualitzar' (abans de la 1a ronda) i 'w11-abans-acumulativa-2025-11' (abans de la 2a)
+
+16:45:34 Inici. Build: 10.0.22631.0
+16:45:38 Trobada: Actualización de Windows Security platform: KB5007651 (versión 10.0.29680.1000) (22 MB)
+16:45:38 Trobada: Herramienta de eliminación de software malintencionado de Windows x64, v5.147 (KB890830) (87 MB)
+16:45:38 Trobada: Actualización de inteligencia de seguridad para Microsoft Defender Antivirus - KB2267602 (versión 1.463.329.0) - Canal actual (ampliado) (211 MB)
+16:45:38 Trobada: 2023-11 Actualización de Windows 11 Version 23H2 para x64 sistemas basados en (KB4023057) (3 MB)
+16:45:38 Trobada: 2023-12 Actualización acumulativa para Windows 11 Version 23H2 para sistemas basados en x64 (KB5033375) (mida que reporta l'API: 130923 MB, és el total de paquets express; la descàrrega real és molt menor)
+16:45:38 Descarregant 5...
+16:49:09 Descàrrega: codi 2
+16:49:09 Instal·lant...
+16:52:25   Actualización de Windows Security platform: KB5007651 (versión 10.0.29680.1000) -> codi 2
+16:52:25   Herramienta de eliminación de software malintencionado de Windows x64, v5.147 (KB890830) -> codi 2
+16:52:25   Actualización de inteligencia de seguridad para Microsoft Defender Antivirus - KB2267602 (versión 1.463.329.0) - Canal actual (ampliado) -> codi 2
+16:52:25   2023-11 Actualización de Windows 11 Version 23H2 para x64 sistemas basados en (KB4023057) -> codi 2
+16:52:25   2023-12 Actualización acumulativa para Windows 11 Version 23H2 para sistemas basados en x64 (KB5033375) -> codi 2
+16:52:25 Fi. Codi global 2 (2=correcte, 3=amb errors). Cal reiniciar: False
+16:59:04 Inici. Build: 10.0.22631.0
+16:59:09 Trobada: Actualización para la plataforma antimalware Microsoft Defender Antivirus: KB4052623 (versión 4.18.26100.4) - Canal actual (ampliado) (39 MB)
+16:59:09 Trobada: 2025-11 Actualización acumulativa para Windows 11 Version 23H2 para sistemas basados en x64 (KB5068865) (131332 MB segons l'API, paquets express)
+16:59:09 Descarregant 2...
+17:06:42 Descàrrega: codi 2
+17:06:42 Instal·lant...
+17:29:58   Actualización para la plataforma antimalware Microsoft Defender Antivirus: KB4052623 (versión 4.18.26100.4) - Canal actual (ampliado) -> codi 2
+17:29:58   2025-11 Actualización acumulativa para Windows 11 Version 23H2 para sistemas basados en x64 (KB5068865) -> codi 2
+17:29:58 Fi. Codi global 2 (2=correcte, 3=amb errors). Cal reiniciar: True
+
+## Comprovació després del reinici de la 2a ronda
+Arrencada: 16/11/2026 17:33:17 · Build: 22631.6199 (abans 22631.2861)
+pending.xml: True en arrencar (manteniment posterior al reinici) -> False a les 17:41, sense tornar a reiniciar

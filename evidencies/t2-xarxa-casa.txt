@@ -1,0 +1,22 @@
+# Prova de xarxa · equip de casa · 2026-11-16 15:23:03
+## Enllaç
+NIC: Realtek RTL8125 2.5GbE (driver r8169)
+velocitat negociada eno1: 1000 Mbit/s, duplex full
+    RX:  bytes packets errors dropped  missed   mcast           
+      13771128   21308      0       0       0     139 
+    TX:  bytes packets errors dropped carrier collsns           
+      33707973   32639      0       0       0       0 
+## Latència i pèrdua al router de casa 192.168.18.1 (100 paquets, 0,2 s)
+100 packets transmitted, 100 received, 0% packet loss, time 20582ms
+rtt min/avg/max/mdev = 0.464/0.545/0.781/0.042 ms
+## Latència a Internet (1.1.1.1, 20 paquets)
+20 packets transmitted, 20 received, 0% packet loss, time 5716ms
+rtt min/avg/max/mdev = 7.768/7.961/8.211/0.113 ms
+## DNS
+resolució www.gva.es: 0.018901 s
+resolució www.gva.es: 0.001372 s
+resolució www.gva.es: 0.001658 s
+## Descàrrega HTTP (a /dev/null)
+http://deb.debian.org/debian/ls-lR.gz -> 16222575 bytes en 0.222383 s = 72948809 B/s (codi 200)
+http://archive.ubuntu.com/ubuntu/ls-lR.gz -> 39886757 bytes en 0.627609 s = 63553513 B/s (codi 200)
+https://cdimage.debian.org/.../debian-13.7.0-amd64-DVD-1.iso (tallat a 12 s) -> 738207967 bytes en 11.999125 s = 61521816 B/s (codi 200)

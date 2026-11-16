@@ -1,0 +1,15 @@
+# fio 3.36 · NVMe intern KIOXIA EXCERIA PLUS G3 1 TB (PCIe 4.0 x4, enllaç 16 GT/s x4) · equip de casa · NTFS muntat en NOMÉS LECTURA (no s'escriu res al disc de Windows) · 2026-11-16 15:22:31
+# ntfs3 no respecta O_DIRECT, així que cada prova llig un fitxer diferent que no s'ha llegit abans (fred) i amb una durada curta perquè no torne a llegir dades ja a la memòria cau. Es comprova amb /proc/diskstats que les dades venen del disc.
+Ocupació de la partició: /dev/nvme0n1p3   931G   803G  128G  87% /media/batoi/940E7D2C0E7D088E
+## seq-read (--rw=read --bs=1M --iodepth=16) · fitxer pakchunk10-WindowsClient.ucas · 4s
+  read: IOPS=971, BW=972MiB/s (1019MB/s)(3887MiB/4001msec)
+     lat (usec): min=984, max=51011, avg=16320.01, stdev=1474.91
+   llegit realment del disc (diskstats): 3890 MiB
+## rand-read-4k-qd32 (--rw=randread --bs=4k --iodepth=32) · fitxer pakchunk1-WindowsClient.ucas · 6s
+  read: IOPS=10.5k, BW=41.0MiB/s (43.0MB/s)(246MiB/6001msec)
+     lat (usec): min=100, max=22535, avg=3040.30, stdev=774.79
+   llegit realment del disc (diskstats): 246 MiB
+## rand-read-4k-qd1 (--rw=randread --bs=4k --iodepth=1) · fitxer pakchunk0-WindowsClient.ucas · 6s
+  read: IOPS=10.6k, BW=41.6MiB/s (43.6MB/s)(250MiB/6001msec)
+     lat (usec): min=10, max=3456, avg=93.67, stdev=42.82
+   llegit realment del disc (diskstats): 252 MiB

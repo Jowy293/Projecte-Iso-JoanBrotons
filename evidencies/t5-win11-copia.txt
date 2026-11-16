@@ -1,0 +1,22 @@
+# Còpia de la configuració del Windows 11 reinstal·lat al TrueNAS · 2026-11-16 16:41 · scripts/copia-windows.ps1 -Desti win11
+Fitxer al TrueNAS : \\192.168.11.5\backups\win11\W11-CLIENT11-config-20261116-1640.zip
+Mida              : 35.5 KB
+SHA-256 local     : 8A883DE0509C50E9D430764655BA085F71CDEC961688515E4D72F3A093EA027F
+SHA-256 al NAS    : 8A883DE0509C50E9D430764655BA085F71CDEC961688515E4D72F3A093EA027F
+
+Name                         Length
+----                         ------
+actualitzacions.txt            1146
+administradors.txt              490
+politiques-seguretat.inf      16608
+programari.csv                  290
+sistema.txt                     450
+tallafocs.wfw                286720
+tcpip.reg                     12928
+usuaris-locals.txt             1058
+xarxa-dns.txt                  1572
+xarxa-ipconfig.txt             2382
+xarxa-netipconfiguration.txt   2318
+xarxa-rutes.txt                4484
+
+
