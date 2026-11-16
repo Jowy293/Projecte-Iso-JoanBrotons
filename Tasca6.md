@@ -4,8 +4,8 @@
 
 | Què demana l'enunciat (individual) | On està |
 |---|---|
-| **Obligatori:** apartat 2 — crear almenys 3 tipus de RAID en un dels equips, verificar-ne el funcionament i explicar què guanyem amb cadascun | §1 a §4 |
-| **Apte+:** punt 3 — investigar com crear un RAID en espill entre 2 discos de 2 equips diferents, indicar una funcionalitat on siga interessant i dur-la a terme | §5 |
+| **Obligatori:** apartat 2 — crear almenys 3 tipus de RAID en un dels equips, verificar-ne el funcionament i explicar què guanyem amb cadascun | apartats 1 a 4 |
+| **Apte+:** punt 3 — investigar com crear un RAID en espill entre 2 discos de 2 equips diferents, indicar una funcionalitat on siga interessant i dur-la a terme | apartat 5 |
 
 ---
 
@@ -36,7 +36,7 @@ md1 : active raid1 sde[1] sdd[0]             523264 blocks  ... [2/2] [UU]
 md0 : active raid0 sdc[1] sdb[0]             1044480 blocks ... 512k chunks
 ```
 
-> Després de les proves, el RAID 0 (`md0`) s'ha aturat per a reutilitzar `sdb` a l'espill remot (§5). `md1` i `md5` continuen actius.
+> Després de les proves, el RAID 0 (`md0`) s'ha aturat per a reutilitzar `sdb` a l'espill remot (apartat 5). `md1` i `md5` continuen actius.
 
 Persistència: arrays a `/etc/mdadm/mdadm.conf` (`mdadm --detail --scan`), `update-initramfs -u` i muntatge a `/etc/fstab` per etiqueta amb `nofail` (si un array no arrenca, el sistema no es queda bloquejat a l'arrencada).
 

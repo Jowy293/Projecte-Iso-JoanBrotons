@@ -5,8 +5,8 @@
 
 | Què demana l'enunciat (individual) | On està |
 |---|---|
-| **Obligatori:** esquema de xarxa del sistema de prova amb la configuració que es crearà, el muntatge a VirtualBox i la xarxa utilitzada. La IP del servidor de comunicacions pot ser per DHCP i la xarxa és la `192.168.XX.0/24` (XX = posició) | §1, §2, §3 |
-| **Apte+:** implementar l'esquema a VirtualBox i verificar la connectivitat entre totes les màquines i cap a l'exterior, amb evidències (ping, traceroute, taula d'encaminament i configuració de cada interfície) | §4 |
+| **Obligatori:** esquema de xarxa del sistema de prova amb la configuració que es crearà, el muntatge a VirtualBox i la xarxa utilitzada. La IP del servidor de comunicacions pot ser per DHCP i la xarxa és la `192.168.XX.0/24` (XX = posició) | apartats 1, 2 i 3 |
+| **Apte+:** implementar l'esquema a VirtualBox i verificar la connectivitat entre totes les màquines i cap a l'exterior, amb evidències (ping, traceroute, taula d'encaminament i configuració de cada interfície) | apartat 4 |
 
 ---
 
@@ -21,7 +21,7 @@ flowchart TB
     subgraph LAN["Xarxa interna VirtualBox «redjoan11» · 192.168.11.0/24 · totes les IP manuals, sense DHCP"]
         SW{{"commutador virtual<br/>(xarxa interna)"}}
         TN["TrueNAS 27 · .5<br/>servidor de còpies"]
-        WS["Windows Server 2025 · .10<br/>DC joan11.local + DNS"]
+        WS["Windows Server 2025 · .10<br/>DC joan11.local"]
         PVE["Proxmox VE 9.2 · .17<br/>virtualització"]
         W11["Windows 11 · .20<br/>client"]
         UB["Ubuntu 26.04 · .25<br/>client"]
@@ -46,7 +46,6 @@ flowchart TB
 | Xarxa LAN | `192.168.11.0/24` (11 = la meua posició a l'aula) |
 | Màscara | `255.255.255.0` |
 | Passarel·la per defecte de la LAN | **`192.168.11.1`** (OPNsense). El MikroTik (`.2`) i el Debian (`.3`) són passarel·les alternatives per a contingència i proves |
-| DNS | `192.168.11.1` (Unbound a l'OPNsense) i `192.168.11.3` (dnsmasq al Debian). Els Windows fan servir primer el DC `192.168.11.10` |
 | Mètode d'assignació | **Manual a tota la LAN.** Només les WAN dels servidors de comunicacions van per DHCP |
 | Reserva | `.1-.3` comunicacions · `.5` NAS · `.10` DC · `.17` Proxmox · `.20-.29` clients |
 
@@ -55,13 +54,13 @@ flowchart TB
 | Equip | Interfície | Adaptador VirtualBox | Mètode | IP / màscara | Passarel·la | DNS |
 |---|---|---|---|---|---|---|
 | OPNsense | em0 (WAN) | Pont `eno1` | DHCP | 172.16.222.184/24\* | 172.16.222.1 | DNS de l'aula |
-| | em1 (LAN) | Interna `redjoan11` | Estàtica | 192.168.11.1/24 | — | Unbound local |
+| | em1 (LAN) | Interna `redjoan11` | Estàtica | 192.168.11.1/24 | — | 127.0.0.1 |
 | MikroTik | ether1 (WAN) | Pont `eno1` | DHCP | 172.16.222.213/24\* | 172.16.222.1 | DNS de l'aula |
 | | ether2 (LAN) | Interna `redjoan11` | Estàtica | 192.168.11.2/24 | — | — |
 | Debian comms | enp0s3 (WAN) | Pont `eno1` | DHCP | 172.16.222.195/24\* | 172.16.222.1 | DNS de l'aula |
-| | enp0s8 (LAN) | Interna `redjoan11` | Estàtica | 192.168.11.3/24 | — | 127.0.0.1 (dnsmasq) |
+| | enp0s8 (LAN) | Interna `redjoan11` | Estàtica | 192.168.11.3/24 | — | 127.0.0.1 |
 | TrueNAS | enp0s3 | Interna `redjoan11` | Estàtica | 192.168.11.5/24 | 192.168.11.1 | .1, .3 |
-| Windows Server 2025 | Ethernet | Interna `redjoan11` | Estàtica | 192.168.11.10/24 | 192.168.11.1 | 127.0.0.1 (DNS del DC), .1 |
+| Windows Server 2025 | Ethernet | Interna `redjoan11` | Estàtica | 192.168.11.10/24 | 192.168.11.1 | 127.0.0.1, 192.168.11.1 |
 | Proxmox | vmbr0 (pont sobre nic0) | Interna `redjoan11` | Estàtica | 192.168.11.17/24 | 192.168.11.1 | .1, .3 |
 | Windows 11 | Ethernet | Interna `redjoan11` | Estàtica | 192.168.11.20/24 | 192.168.11.1 | .10, .1 |
 | Ubuntu client | enp0s3 (connexió `lan-estatica`) | Interna `redjoan11` | Estàtica | 192.168.11.25/24 | 192.168.11.1 | .1, .3 |
@@ -75,7 +74,7 @@ Script: [`scripts/t4-connectivitat.sh`](scripts/t4-connectivitat.sh) · Eixida c
 
 ### 4.1 Configuració de cada interfície (comprovada)
 
-Les IP, màscares i passarel·les de la taula del §3 coincideixen amb el que retornen els equips:
+Les IP, màscares i passarel·les de la taula de l'apartat 3 coincideixen amb el que retornen els equips:
 
 | Equip | Ordre | Resultat (extracte) |
 |---|---|---|
@@ -92,7 +91,7 @@ Les IP, màscares i passarel·les de la taula del §3 coincideixen amb el que re
 
 | Equip | Ruta per defecte | Altres rutes |
 |---|---|---|
-| OPNsense | `default 172.16.222.1 UGS em0` | `192.168.11.0/24 link#2 em1`. Rutes de host als DNS de l'aula (`10.239.3.7`, `10.239.3.8`, `172.16.20.1`) per la WAN |
+| OPNsense | `default 172.16.222.1 UGS em0` | `192.168.11.0/24 link#2 em1` |
 | MikroTik | `DAd 0.0.0.0/0 172.16.222.1` (apresa per DHCP) | `DAc 192.168.11.0/24 ether2` (connectada) |
 | Debian | `default via 172.16.222.1 dev enp0s3 proto dhcp` | `192.168.11.0/24 dev enp0s8` |
 | TrueNAS / Proxmox / Ubuntu | `default via 192.168.11.1` | `192.168.11.0/24` directament connectada |

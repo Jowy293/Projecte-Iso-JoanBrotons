@@ -4,9 +4,9 @@
 
 | Què demana l'enunciat (individual) | On està |
 |---|---|
-| **Obligatori:** configurar al meu entorn de proves els mateixos sistemes que el grup: servidors de comunicacions (MikroTik, OPNsense, Debian amb nftables), TrueNAS, Proxmox, Windows Server 2025 i clients Windows 11 i GNU/Linux, cadascun amb les tasques de l'enunciat (usuari d'administració, xarxa, Internet per a la LAN, còpia al servidor de còpies, errada i recuperació…) | §1 a §5 |
+| **Obligatori:** configurar al meu entorn de proves els mateixos sistemes que el grup: servidors de comunicacions (MikroTik, OPNsense, Debian amb nftables), TrueNAS, Proxmox, Windows Server 2025 i clients Windows 11 i GNU/Linux, cadascun amb les tasques de l'enunciat (usuari d'administració, xarxa, Internet per a la LAN, còpia al servidor de còpies, errada i recuperació…) | apartats 1 a 5 |
 | Per a cada sistema: requisits, llicència i origen/integritat de la ISO; firmware i arrencada; versió; actualització i via de recuperació; una incidència d'instal·lació o arrencada real (símptoma, hipòtesi, comprovació, solució i retorn); una connexió permesa i una de bloquejada amb el registre | Dins de cada apartat |
-| **Apte+:** implementar un sistema per a fer còpies de la configuració dels servidors crítics de l'entorn | §2 (TrueNAS) i §6 |
+| **Apte+:** implementar un sistema per a fer còpies de la configuració dels servidors crítics de l'entorn | apartats 2 (TrueNAS) i 6 |
 
 ---
 
@@ -18,9 +18,9 @@ Els tres servidors de comunicacions comparteixen la mateixa xarxa interna `redjo
 
 | Equip | LAN (estàtica) | WAN | Rol |
 |---|---|---|---|
-| OPNsense 26.7 | `192.168.11.1/24` | DHCP de l'aula (`172.16.222.x`, adaptador pont) | **Passarel·la per defecte** de tots els equips + DNS (Unbound) |
+| OPNsense 26.7 | `192.168.11.1/24` | DHCP de l'aula (`172.16.222.x`, adaptador pont) | **Passarel·la per defecte** de tots els equips |
 | MikroTik RouterOS 7.24.5 | `192.168.11.2/24` | DHCP de l'aula | Passarel·la alternativa (contingència) |
-| Debian 13 + nftables | `192.168.11.3/24` | DHCP de l'aula | Passarel·la alternativa + DNS secundari (dnsmasq) |
+| Debian 13 + nftables | `192.168.11.3/24` | DHCP de l'aula | Passarel·la alternativa |
 
 - **Només les WAN dels servidors de comunicacions van per DHCP.** Tota la resta d'equips té IP manual (vegeu [Tasca 4](Tasca4.md)).
 - **Cap servidor fa DHCP a la LAN.** Al principi el MikroTik repartia el rang `.5-.55`. Això provocava que el TrueNAS acabara a la `.55` i que el **propi OPNsense** agafara la `.50` a la seua LAN, amb la ruta per defecte cap al MikroTik. Amb tres passarel·les a la mateixa LAN, si hi ha més d'un DHCP, cada client acaba amb una passarel·la diferent a l'atzar.
@@ -47,14 +47,12 @@ Llistat complet de hash: [`evidencies/iso-sha256.txt`](evidencies/iso-sha256.txt
 | WAN `em0` | DHCP (pont `eno1`) → `172.16.222.184/24`, gw `172.16.222.1` |
 | LAN `em1` | Estàtica `192.168.11.1/24`, sense gateway |
 | NAT | *Outbound* automàtic: `nat on em0 from (em1:network) -> (em0:0)` |
-| DNS | Unbound al port 53 per als clients de la LAN, en mode **forwarding** cap als DNS que dona el DHCP de l'aula (10.239.3.7, 172.16.20.1, 10.239.3.8) |
-| DHCP | **Desactivat** (dnsmasq sense rangs) |
+| DHCP | **Desactivat** |
 | Regles LAN | 1) `block` TCP/23 amb *log* (prova) · 2) `pass` LAN → any amb *log* |
 
 **Problemes trobats i resolts:**
 1. La LAN tenia la `.50` encara que el `config.xml` deia `.1`: hi havia un `dhclient` llançat per un procés `daemon -r` sobre `em1`, i ho re-aplicava a partir del *lease* guardat a `/var/db/dhclient.leases.em1`. Solució: matar el `daemon`, esborrar el *lease*, reassignar la IP des de la consola (opció 2) i reiniciar per comprovar que es manté.
 2. La ruta per defecte anava pel MikroTik (`192.168.11.2`), també heretada del DHCP. Després de la correcció: `default 172.16.222.1 UGS em0`.
-3. Des del Windows 11, `Resolve-DnsName deb.debian.org -Server 192.168.11.1` donava **SERVFAIL** (també `drill` a l'OPNsense). Unbound fa resolució recursiva (pregunta als servidors arrel) i la xarxa del centre només deixa eixir el DNS cap als seus servidors. Solució: activar el *forwarding* d'Unbound perquè utilitze els DNS rebuts per DHCP a la WAN (`forward-zone "."` → `10.239.3.7`, `172.16.20.1`). Després del canvi, `rcode: NOERROR`.
 
 Extracte de la configuració (sense claus ni hash): [`configs/opnsense-extracte.xml`](configs/opnsense-extracte.xml)
 
@@ -68,7 +66,6 @@ Extracte de la configuració (sense claus ni hash): [`configs/opnsense-extracte.
 | WAN `ether1` | Client DHCP → `172.16.222.213/24` |
 | LAN `ether2` | `192.168.11.2/24` |
 | NAT | `srcnat out-interface-list=WAN action=masquerade` (**no existia: per això no hi havia Internet a través del MikroTik**) |
-| DNS | `allow-remote-requests=yes` (servidors dinàmics del DHCP de l'aula) |
 | DHCP | Servidor `dhcp1` **desactivat**; pool reduït a `.200-.220` per si cal activar-lo en contingència |
 | Firewall | input: establertes, ICMP, LAN, SSH/Winbox només des de 172.16.222.0/24, resta WAN *drop+log* · forward: establertes, **Telnet LAN→fora *drop+log* (`MK-BLOQ-TELNET`)**, LAN→WAN *accept*, WAN→LAN *drop+log* |
 
@@ -87,8 +84,7 @@ Configuració exportada (sense dades sensibles): [`configs/mikrotik-export.rsc`]
 | LAN `enp0s8` | `192.168.11.3/24` estàtica |
 | Encaminament | `net.ipv4.ip_forward=1` persistent a `/etc/sysctl.d/99-router.conf` |
 | Tallafocs | `/etc/nftables.conf` → [`configs/debian-nftables.conf`](configs/debian-nftables.conf) (input i forward amb política `drop`, NAT `masquerade`, bloqueig de Telnet amb *log* `DEB-BLOQ-TELNET`) |
-| Serveis | Arrenca en mode text (`multi-user.target`): s'han desactivat l'escriptori GNOME (`gdm`), `cups`, `avahi` i `ModemManager`, que no calen en un tallafocs. Arrencada de 1 min 6 s a 4,9 s i RAM de 639 a 276 MB ([Tasca 7 §4.2](Tasca7.md)) |
-| DNS | `dnsmasq` només com a DNS per a la LAN (`no-dhcp-interface`) |
+| Serveis | Arrenca en mode text (`multi-user.target`): s'han desactivat l'escriptori GNOME (`gdm`), `cups`, `avahi` i `ModemManager`, que no calen en un tallafocs. Arrencada de 1 min 6 s a 4,9 s i RAM de 639 a 276 MB ([Tasca 7, apartat 4.2](Tasca7.md)) |
 | SSH | `openssh-server` instal·lat (no ho estava) |
 
 **Problemes trobats i resolts:**
@@ -124,13 +120,13 @@ Nota: el `ping 8.8.8.8` **no funciona des de cap equip de l'aula** (ni des de l'
 
 ### 1.6 Còpia de la configuració al servidor de còpies
 
-La còpia es fa **manualment** quan la configuració està acabada: `copia-servidors.sh`, executat al TrueNAS, va a buscar la configuració per SSH amb clau. Detall a [§2](#2-truenas-servidor-de-còpies-192168115).
+La còpia es fa **manualment** quan la configuració està acabada: `copia-servidors.sh`, executat al TrueNAS, va a buscar la configuració per SSH amb clau. Detall a l'[apartat 2](#2-truenas-servidor-de-còpies-192168115).
 
 | Equip | Què es copia | Fitxer al TrueNAS | Mida |
 |---|---|---|---|
 | OPNsense | `/conf/config.xml` (tota la configuració en un fitxer) | `opnsense/config-opnsense11-20261116-1046.xml` | 38 KB |
 | MikroTik | `/export show-sensitive` (text, reimportable) | `mikrotik/mikrotik11-20261116-1052.rsc` | 2,4 KB |
-| Debian | `tar` de `/etc/nftables.conf`, `interfaces`, `dnsmasq.d`, `sysctl.d`, `sshd_config`, `hosts`, NM i el *timer* d'hora | `debian-comms/deb-comms11-etc-…tar.gz` | 3,7 KB |
+| Debian | `tar` de `/etc/nftables.conf`, `interfaces`, `sysctl.d`, `sshd_config`, `hosts`, NM i el *timer* d'hora | `debian-comms/deb-comms11-etc-…tar.gz` | 3,7 KB |
 
 **Què NO es copia i per què:** la imatge sencera del disc (OPNsense 25 GB, Debian 20 GB) no cap al pool de 5 GB i no cal: reinstal·lar des de la ISO verificada + restaurar la configuració és més ràpid i ocupa uns quants KB.
 
@@ -205,11 +201,11 @@ sudo -u backup_user /mnt/Copias/backups/scripts/copia-servidors.sh tots     # o 
 L'script verifica que el fitxer no estiga buit i mostra la mida i el `sha256`. Si una còpia ix buida, l'esborra i diu `ERROR`. Va passar de veritat després del reset del MikroTik: havia canviat la clau de host.
 
 ### 2.3 Recuperació provada
-Les tres recuperacions de la [§1.7](#1-servidors-de-comunicacions-opnsense-mikrotik-i-debian--nftables) s'han fet **a partir d'aquestes còpies**: el MikroTik es va descarregar la seua per SFTP (`/tool fetch mode=sftp ... user=backup_user`), i al Debian i a l'OPNsense el TrueNAS els va retornar el fitxer per SSH.
+Les tres recuperacions de l'[apartat 1.7](#1-servidors-de-comunicacions-opnsense-mikrotik-i-debian--nftables) s'han fet **a partir d'aquestes còpies**: el MikroTik es va descarregar la seua per SFTP (`/tool fetch mode=sftp ... user=backup_user`), i al Debian i a l'OPNsense el TrueNAS els va retornar el fitxer per SSH.
 
 ## 3. Proxmox VE (192.168.11.17)
 
-> **Abast acordat amb el professorat:** a l'entorn individual, el Proxmox **només ha de tenir configurada la xarxa** (i l'administració). No s'hi creen màquines dins perquè el portàtil no té recursos per a virtualització imbricada amb un Windows Server a dins. Per això el Windows Server 2025 s'ha instal·lat com a VM de VirtualBox independent ([§4](#4-windows-server-2025-controlador-de-domini-joan11local-1921681110)).
+> **Abast acordat amb el professorat:** a l'entorn individual, el Proxmox **només ha de tenir configurada la xarxa** (i l'administració). No s'hi creen màquines dins perquè el portàtil no té recursos per a virtualització imbricada amb un Windows Server a dins. Per això el Windows Server 2025 s'ha instal·lat com a VM de VirtualBox independent ([apartat 4](#4-windows-server-2025-controlador-de-domini-joan11local-1921681110)).
 
 Evidències: [`evidencies/t5-proxmox-estat.txt`](evidencies/t5-proxmox-estat.txt) · [`evidencies/t5-proxmox-copia.txt`](evidencies/t5-proxmox-copia.txt)
 
@@ -244,7 +240,6 @@ iface vmbr0 inet static
 ```
 
 - `vmbr0` és el pont Linux on es connectarien les VM i contenidors: tindrien IP a la mateixa LAN 192.168.11.0/24.
-- DNS: `192.168.11.1` (OPNsense) i `192.168.11.3` (Debian), domini de cerca `joan11.local` (abans `joan.com`).
 - Canvis aplicats amb `ifreload -a`, sense reiniciar.
 
 ### 3.4 Repositoris i actualització
@@ -317,9 +312,8 @@ Què aporta a l'empresa de l'enunciat (direcció, administració, comercial, pro
 | Els permisos de les carpetes compartides s'han de repetir a cada servidor | Permisos per **grups** (G_Comercial, G_Direccio…) aplicats a tots els recursos |
 | Configuració manual de cada PC | **GPO**: fons, unitats de xarxa mapades, bloqueig d'USB, actualitzacions, contrasenyes segures… aplicades automàticament per OU |
 | No hi ha registre central de qui entra on | Auditoria centralitzada d'inicis de sessió |
-| — | DNS intern integrat (`joan11.local`) |
 
-**Inconvenients acceptats:** el DC es converteix en un punt crític. Si cau, no es pot iniciar sessió en equips nous i el DNS intern deixa de respondre. A producció en caldrien dos, i aquí només n'hi ha un. També costa llicències (CAL) i administració.
+**Inconvenients acceptats:** el DC es converteix en un punt crític. Si cau, no es pot iniciar sessió en equips nous. A producció en caldrien dos, i aquí només n'hi ha un. També costa llicències (CAL) i administració.
 
 L'enunciat diu que la implantació completa de dominis i polítiques (OU, GPO, unió de clients) correspon a fases posteriors (RA4/RA5). El professor va indicar que el domini es podia crear si volíem: **s'ha creat i es deixa preparat**, sense OU ni GPO.
 
@@ -328,8 +322,8 @@ L'enunciat diu que la implantació completa de dominis i polítiques (OU, GPO, u
 | Ítem | Valor (comprovat el 16/11/2026) |
 |---|---|
 | Nom d'equip | `DC-JOAN11` (abans `WIN-7CG1O7V1DFS`, el nom aleatori de la instal·lació; canviat amb `Rename-Computer` i reinici) |
-| Xarxa | IP manual `192.168.11.10/24`, porta d'enllaç `192.168.11.1`, **DHCP: no**. En promocionar a DC, Windows posa com a DNS el propi servidor (`::1`) i l'OPNsense (`192.168.11.1`) com a reenviador |
-| Rols | **Serveis de domini d'Active Directory** i **Servidor DNS** (`Install-WindowsFeature AD-Domain-Services,DNS -IncludeManagementTools` → `Success=True`) |
+| Xarxa | IP manual `192.168.11.10/24`, porta d'enllaç `192.168.11.1`, **DHCP: no** |
+| Rols | **Serveis de domini d'Active Directory** (`Install-WindowsFeature AD-Domain-Services,DNS -IncludeManagementTools` → `Success=True`) |
 | Domini | **`joan11.local`**, NetBIOS `JOAN11`, bosc i domini nivell Windows Server 2016 (`Install-ADDSForest`). Un sol DC, que fa també de catàleg global |
 | Usuari d'administració | `JOAN11\administrador11`, membre d'**Admins. del dominio** i d'**Administradores** (Builtin). En promocionar, l'usuari local passa a ser del domini però **no** entra sol a *Admins. del dominio*: s'hi ha afegit a mà (`Add-ADGroupMember`). El compte `Administrador` integrat continua desactivat |
 | Contrasenya del mode de restauració (DSRM) | Definida en la promoció i guardada fora del repositori |
@@ -340,15 +334,13 @@ Evidència: [`evidencies/t5-winserver-domini-copia.txt`](evidencies/t5-winserver
 DNSRoot           : joan11.local          NetBIOSName : JOAN11
 DomainMode        : Windows2016Domain     PDCEmulator : DC-JOAN11.joan11.local
 HostName          : DC-JOAN11.joan11.local   IPv4Address : 192.168.11.10   IsGlobalCatalog : True
-Serveis: ADWS, DNS, KDC, Netlogon, NTDS → Running
-Zones DNS: joan11.local i _msdcs.joan11.local (Primary, integrades a AD)
-Registre SRV _ldap._tcp.dc._msdcs.joan11.local → dc-joan11.joan11.local:389
+Serveis: ADWS, KDC, Netlogon, NTDS → Running
 ```
 
 | | |
 |---|---|
-| ![Rols instal·lats](evidencies/captures/t5-ws-01-rols-instal-lats.png) | ![Administrador del servidor amb AD DS i DNS](evidencies/captures/t5-ws-02-dc-rols-adds-dns.png) |
-| Instal·lació dels rols AD DS i DNS i canvi de nom | El servidor ja com a DC: 3 rols (AD DS, DNS, Serveis de fitxers) en estat correcte |
+| ![Rols instal·lats](evidencies/captures/t5-ws-01-rols-instal-lats.png) | ![Administrador del servidor amb els rols del domini](evidencies/captures/t5-ws-02-dc-rols-adds-dns.png) |
+| Instal·lació dels rols i canvi de nom | El servidor ja com a DC, amb els rols en estat correcte |
 
 ![administrador11 a Admins. del dominio](evidencies/captures/t5-ws-04-admins-domini.png)
 
@@ -358,7 +350,7 @@ Script: [`scripts/copia-windows.ps1`](scripts/copia-windows.ps1), executat com a
 
 | Es copia | Per què |
 |---|---|
-| `ipconfig /all`, `Get-NetIPConfiguration`, rutes, DNS | Per a refer la xarxa igual |
+| `ipconfig /all`, `Get-NetIPConfiguration`, rutes | Per a refer la xarxa igual |
 | Nom, versió, usuaris i administradors | Per a saber qui administrava l'equip |
 | Rols i característiques instal·lats | Per a reinstal·lar els mateixos rols amb una sola ordre |
 | Actualitzacions (`Get-HotFix`) i programari instal·lat | Per a deixar l'equip al mateix nivell |
@@ -376,7 +368,7 @@ Script: [`scripts/copia-windows.ps1`](scripts/copia-windows.ps1), executat com a
 
 ### 5.1 Windows 11 (`192.168.11.20`)
 
-> La primera instal·lació va quedar inservible per la incidència del §5.3 i s'ha **reinstal·lat el 16/11/2026**. Les dades d'aquesta taula són de la VM actual. Evidència: [`evidencies/t5-win11-estat.txt`](evidencies/t5-win11-estat.txt)
+> La primera instal·lació va quedar inservible per la incidència de l'apartat 5.3 i s'ha **reinstal·lat el 16/11/2026**. Les dades d'aquesta taula són de la VM actual. Evidència: [`evidencies/t5-win11-estat.txt`](evidencies/t5-win11-estat.txt)
 
 | Ítem | Valor |
 |---|---|
@@ -390,8 +382,8 @@ Script: [`scripts/copia-windows.ps1`](scripts/copia-windows.ps1), executat com a
 | Usuaris | `Administracion11` (administrador local) · `Cliente11` (usuari estàndard) · `Administrador` integrat **desactivat** |
 | Teclat | Espanyol (es-ES) |
 | Xarxa | IP manual `192.168.11.20/24`, gw `192.168.11.1` (OPNsense), DNS `192.168.11.10` (DC) i `192.168.11.1`, **DHCP: no**. Respon el ping al tallafocs i al TrueNAS i té eixida a Internet (`Test-NetConnection www.gva.es -Port 443` → `True`) |
-| Domini | No s'uneix al domini en aquesta fase (opcional a la rúbrica; correspon a RA4/RA5). El DNS ja apunta al DC per a quan s'unisca |
-| Actualitzacions | Vegeu el §5.4 |
+| Domini | No s'uneix al domini en aquesta fase (opcional a la rúbrica; correspon a RA4/RA5). |
+| Actualitzacions | Vegeu l'apartat 5.4 |
 
 ![TPM 2.0 i Secure Boot actius](evidencies/captures/t5-w11-07-tpm-secureboot.png)
 
@@ -414,7 +406,7 @@ Evidència: [`evidencies/t5-ubuntu-estat.txt`](evidencies/t5-ubuntu-estat.txt)
 1. **Sense xarxa en arrencar**: la connexió esperava DHCP i a la LAN ja no n'hi ha. `nmcli con mod` sobre la connexió generada per netplan no es mantenia, i per això s'ha creat la connexió pròpia `lan-estatica`.
 2. **`apt update`: "El fitxer de publicació no és vàlid encara"**: rellotge endarrerit en reprendre la VM. Es corregeix l'hora per HTTP.
 3. **Arrencava l'instal·lador d'Ubuntu**: la ISO seguia al lector amb prioritat d'arrencada. ISO extreta i ordre `disk` primer.
-4. **`sudo` tardava minuts**: després de canviar el hostname no estava a `/etc/hosts` i `sudo` esperava el DNS. Afegit `127.0.1.1 ubuntu-client11` (de minuts a 0,4 s).
+4. **`sudo` tardava minuts**: després de canviar el hostname, el nom nou no estava a `/etc/hosts` i `sudo` esperava fins a esgotar el temps de cerca del nom. Afegit `127.0.1.1 ubuntu-client11` (de minuts a 0,4 s).
 
 ### 5.3 Incidència d'arrencada real al Windows 11 (punt 5 de la tasca)
 
@@ -430,7 +422,7 @@ Evidència: [`evidencies/t5-ubuntu-estat.txt`](evidencies/t5-ubuntu-estat.txt)
 | Comprovació (2n intent, 16/11 a la tarda) | Des de la consola de WinRE: `pending.xml` **torna a existir**, amb data 12:32 (l'ha regenerat la mateixa reversió del DISM). Es reanomena a `pending.xml.bak` (no s'esborra, per poder tornar enrere) |
 | Resultat | **Continua sense arrancar** ("Tu PC no se inició correctamente"). Per tant, `pending.xml` no era l'única causa |
 | 3r intent | WinRE → *Desinstalar las actualizaciones* → *Desinstalar la última actualización de calidad* → **"Surgió un problema y no será posible desinstalar la última actualización"**. Sense punts de restauració ni instantània de la VM, no queden més vies de reparació raonables |
-| **Solució final** | **Reinstal·lació** des de la ISO (el client no té dades úniques i la configuració està documentada). El disc avariat es conserva com a `Win11-avariat-c000021a.vdi` per si calguera recuperar-ne algun fitxer. Aprofitant la reinstal·lació, s'afig a la VM **TPM 2.0 i Secure Boot**, que eren la mancança detectada al §5.1 |
+| **Solució final** | **Reinstal·lació** des de la ISO (el client no té dades úniques i la configuració està documentada). El disc avariat es conserva com a `Win11-avariat-c000021a.vdi` per si calguera recuperar-ne algun fitxer. Aprofitant la reinstal·lació, s'afig a la VM **TPM 2.0 i Secure Boot**, que eren la mancança detectada a l'apartat 5.1 |
 | Retorn | Abans de cada intent es va fer una instantània de la VM (`abans-reparacio-c000021a`). A la VM nova es fa una instantània just després de configurar-la, que és la via de recuperació davant d'una actualització fallida (punt 4 de la tasca) |
 
 | | |
@@ -446,7 +438,7 @@ Evidència: [`evidencies/t5-ubuntu-estat.txt`](evidencies/t5-ubuntu-estat.txt)
 
 ### 5.4 Actualització del Windows 11 i via de recuperació (punt 4 de la tasca)
 
-Després de la incidència del §5.3, l'actualització es fa amb una via de retorn preparada i comprovant que no queda cap operació pendent abans de reiniciar.
+Després de la incidència de l'apartat 5.3, l'actualització es fa amb una via de retorn preparada i comprovant que no queda cap operació pendent abans de reiniciar.
 
 | Pas | Detall |
 |---|---|
@@ -454,7 +446,7 @@ Després de la incidència del §5.3, l'actualització es fa amb una via de reto
 | Eina | [`scripts/actualitza-windows.ps1`](scripts/actualitza-windows.ps1): utilitza l'API de Windows Update (`Microsoft.Update.Session`), instal·la les actualitzacions de qualitat i de seguretat i **omet les de característiques** (canvi de versió), i ho registra tot amb l'hora |
 | 1a ronda (16:45-16:52) | 5 actualitzacions, totes amb codi 2 (correcte): plataforma de Windows Security KB5007651, eina d'eliminació de programari maliciós KB890830, definicions de Defender 1.463.329.0, KB4023057 i l'acumulativa 2023-12 KB5033375. No demana reinici |
 | Comprovació | Reinici i arrencada correcta (16:53), `pending.xml` no existeix, la xarxa i l'accés al NAS funcionen. Windows Update ofereix 2 actualitzacions més: plataforma de Defender KB4052623 i l'**acumulativa 2025-11 KB5068865** |
-| Comprovació abans de reiniciar | Abans de reiniciar es comprova que no hi ha operacions pendents (`pending.xml`, clau `RebootRequired`) i que el servei de manteniment (`TrustedInstaller`/`TiWorker`) ha acabat. **Error meu en la 1a ronda:** vaig llançar el reinici en la mateixa ordre que la comprovació i `TiWorker` encara treballava. Com que era un reinici normal (no `-Force`), Windows va acabar el manteniment en apagar-se i va arrencar bé, però és justament el que va provocar la incidència del §5.3 |
+| Comprovació abans de reiniciar | Abans de reiniciar es comprova que no hi ha operacions pendents (`pending.xml`, clau `RebootRequired`) i que el servei de manteniment (`TrustedInstaller`/`TiWorker`) ha acabat. **Error meu en la 1a ronda:** vaig llançar el reinici en la mateixa ordre que la comprovació i `TiWorker` encara treballava. Com que era un reinici normal (no `-Force`), Windows va acabar el manteniment en apagar-se i va arrencar bé, però és justament el que va provocar la incidència de l'apartat 5.3 |
 | 2a ronda (16:59-17:30) | Nova instantània `w11-abans-acumulativa-2025-11`. Plataforma de Defender KB4052623 i **acumulativa 2025-11 KB5068865**, totes dues amb codi 2. Aquesta vegada **sí demana reinici** |
 | Comprovació final | Reinici normal (`shutdown /r`) a les 17:30 i arrencada correcta a les 17:33. **Build 22631.6199** (abans 22631.2861). En arrencar, `pending.xml` encara existeix (tasques de manteniment posteriors al reinici); es deixa acabar **sense tornar a reiniciar** i a les 17:41 ja no hi és. Xarxa, accés al TrueNAS i Guest Additions funcionen |
 | Resultat | L'equip queda amb l'última acumulativa publicada per a 23H2 (el suport de 23H2 Pro va acabar el novembre de 2025). El pas següent seria l'actualització de característiques a 24H2/25H2, que s'ha omés de manera conscient: és un canvi de versió i no forma part d'aquesta fase |
@@ -466,7 +458,7 @@ Evidència: [`evidencies/t5-win11-actualitzacio.txt`](evidencies/t5-win11-actual
 | Client | Mètode | Es copia | No es copia (i per què) |
 |---|---|---|---|
 | Ubuntu | **Push** per SCP amb clau, `copia-client-linux.sh` → `ubuntu/` | Connexions de xarxa (NM i netplan), `hosts`, `fstab`, `mdadm.conf`, `sshd_config`, repositoris, perfil i documents de l'usuari, **llista de paquets** (`dpkg --get-selections`) per a reinstal·lar-los d'una vegada | El sistema sencer: es reinstal·la des de la ISO en ~15 min i se li apliquen la configuració i la llista de paquets |
-| Windows 11 | **Push** per SMB a `\\192.168.11.5\backups\win11` amb [`scripts/copia-windows.ps1`](scripts/copia-windows.ps1) (el mateix que el servidor, §4.4) | Configuració de xarxa i rutes, usuaris locals i administradors, actualitzacions, programari instal·lat, tallafocs (`.wfw`, reimportable amb `netsh advfirewall import`) i polítiques de seguretat locals | La imatge completa del disc (~19 GB usats) no cap al pool de 5 GB. Com s'ha vist al §5.3, reinstal·lar i aplicar aquesta configuració és el camí de recuperació |
+| Windows 11 | **Push** per SMB a `\\192.168.11.5\backups\win11` amb [`scripts/copia-windows.ps1`](scripts/copia-windows.ps1) (el mateix que el servidor, apartat 4.4) | Configuració de xarxa i rutes, usuaris locals i administradors, actualitzacions, programari instal·lat, tallafocs (`.wfw`, reimportable amb `netsh advfirewall import`) i polítiques de seguretat locals | La imatge completa del disc (~19 GB usats) no cap al pool de 5 GB. Com s'ha vist a l'apartat 5.3, reinstal·lar i aplicar aquesta configuració és el camí de recuperació |
 
 Evidència Windows 11 (després de la reinstal·lació): [`evidencies/t5-win11-copia.txt`](evidencies/t5-win11-copia.txt): `W11-CLIENT11-config-20261116-1640.zip` (35,5 KB) amb el **mateix SHA-256 a l'equip i al NAS**.
 

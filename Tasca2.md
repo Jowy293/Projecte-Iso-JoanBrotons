@@ -4,8 +4,8 @@
 
 | Què demana l'enunciat (individual) | On està |
 |---|---|
-| **Obligatori:** inventari de l'equip de classe i del de casa, comparativa, colls de botella i possibles solucions | §1, §2 |
-| **Apte+:** tests de diagnòstic de memòria, disc i xarxa als dos equips (eina, condicions i resultat), justificant amb les dades si els colls de botella es confirmen o no | §3 |
+| **Obligatori:** inventari de l'equip de classe i del de casa, comparativa, colls de botella i possibles solucions | apartats 1 i 2 |
+| **Apte+:** tests de diagnòstic de memòria, disc i xarxa als dos equips (eina, condicions i resultat), justificant amb les dades si els colls de botella es confirmen o no | apartat 3 |
 
 ---
 
@@ -53,7 +53,7 @@ Obtingut el 16/11/2026 arrencant l'equip de casa amb el mateix disc USB de class
 |---|---|---|---|
 | CPU | Core Ultra 5 125H · 14 nuclis / **18 fils** · fins a 4,5 GHz · portàtil (límit de consum i temperatura) | Ryzen 5 7600X · 6 nuclis / **12 fils** · fins a 5,45 GHz · sobretaula | Empat pràctic: les 8 VM sumen 11 vCPU i caben a tots dos. El de casa és més ràpid per nucli i no té límit tèrmic de portàtil; el de classe té més fils |
 | RAM | 32 GB | 32 GB DDR5 | **Empat**: el mateix límit de VM simultànies (~18,5 GB per a les 8 VM) |
-| **Disc de les VM** | SSD **SATA dins d'una caixa USB 3.0** · `fio`: 401 MB/s seqüencial, 20,3k IOPS 4K | **NVMe PCIe 4.0 intern** · lectura mesurada ≥ 972 MB/s (límit del controlador NTFS de Linux, vegeu §3.2) i latència 4K de 94 µs davant de 276 µs | **Casa, de molt**, però només si les VM es guarden al NVMe. Si s'arrenca el disc USB de classe, el coll de botella és el mateix |
+| **Disc de les VM** | SSD **SATA dins d'una caixa USB 3.0** · `fio`: 401 MB/s seqüencial, 20,3k IOPS 4K | **NVMe PCIe 4.0 intern** · lectura mesurada ≥ 972 MB/s (límit del controlador NTFS de Linux, vegeu l'apartat 3.2) i latència 4K de 94 µs davant de 276 µs | **Casa, de molt**, però només si les VM es guarden al NVMe. Si s'arrenca el disc USB de classe, el coll de botella és el mateix |
 | Xarxa | Intel 1 Gbit/s · Internet del centre compartit (81-101 Mbit/s) | Realtek 2,5 Gbit/s (a 1 Gbit/s) · Internet de casa (~490 Mbit/s) | Casa |
 | Firmware | UEFI | UEFI · Secure Boot · TPM 2.0 | Empat (tots dos compleixen els requisits de Windows 11) |
 | Alimentació | Bateria (fa de SAI) | Sense bateria | Classe |
@@ -63,7 +63,7 @@ Obtingut el 16/11/2026 arrencant l'equip de casa amb el mateix disc USB de class
 ### 2.1 Equip de classe
 | Recurs | Previsió | Comprovació | Conclusió |
 |---|---|---|---|
-| **Disc** | Les VM viuen en un SSD SATA connectat per USB 3.0. El límit teòric és ~450 MB/s (5 Gbit/s menys la sobrecàrrega de UAS) i, en la pràctica, el que done l'A400 | Prova de disc (§3) + mesura durant la instal·lació del Windows Server: **~290 MB/s de lectura sostinguda amb el disc al 85-90 % d'utilització** ([`t7-carrega-instalacio-winserver.txt`](evidencies/t7-carrega-instalacio-winserver.txt)) | **CONFIRMAT, és el coll de botella principal.** Quan una VM fa E/S intensiva (instal·lació, actualitzacions), la resta van lentes |
+| **Disc** | Les VM viuen en un SSD SATA connectat per USB 3.0. El límit teòric és ~450 MB/s (5 Gbit/s menys la sobrecàrrega de UAS) i, en la pràctica, el que done l'A400 | Prova de disc (apartat 3) + mesura durant la instal·lació del Windows Server: **~290 MB/s de lectura sostinguda amb el disc al 85-90 % d'utilització** ([`t7-carrega-instalacio-winserver.txt`](evidencies/t7-carrega-instalacio-winserver.txt)) | **CONFIRMAT, és el coll de botella principal.** Quan una VM fa E/S intensiva (instal·lació, actualitzacions), la resta van lentes |
 | RAM | 18,5 GB per a totes les VM + ~6 GB de l'amfitrió (navegador, editor) | Amb 5 VM enceses: 19,8 GB usats, 11,5 GB disponibles, swap 0 | No és coll de botella fins a ~8 VM. A partir d'ahí l'amfitrió es queda sense memòria cau i augmenta l'E/S de disc |
 | CPU | 18 fils sobrats per a VM de 1-2 vCPU | Amb 5-6 VM: **86-91 % de CPU lliure** | **DESCARTAT** |
 | Tèrmic | Portàtil prim amb càrrega sostinguda | 68 °C amb 5 VM i una instal·lació en curs, sense *throttling* observat | No observat amb aquesta càrrega (al README antic es parlava de 92 °C sense cap mesura) |
@@ -76,7 +76,7 @@ Obtingut el 16/11/2026 arrencant l'equip de casa amb el mateix disc USB de class
 4. Millora de maquinari recomanada: treballar en un **SSD NVMe en caixa USB 3.2 Gen 2 (10 Gbit/s)** o en un SSD intern. És el que donaria més rendiment per euro invertit, molt per davant de més RAM o més CPU.
 
 ### 2.2 Equip de casa
-| Recurs | Previsió | Comprovació (§3.2) | Conclusió |
+| Recurs | Previsió | Comprovació (apartat 3.2) | Conclusió |
 |---|---|---|---|
 | Disc | NVMe intern molt més ràpid que l'SSD USB | `fio`: el disc USB dona 401 MB/s i 20,3k IOPS a l'equip de casa, pràcticament el mateix que a classe. El NVMe llig a ≥ 972 MB/s amb latència 4K tres vegades menor | **Confirmat:** si s'arrenca el disc USB de classe, el coll de botella és el **disc USB**, no l'equip. El port de la placa admet 10 Gbit/s però la caixa només negocia 5 Gbit/s |
 | Disc (espai) | — | La partició del NVMe està al **87 %** (128 GB lliures) | **Coll de botella nou detectat.** Les 8 VM ocupen ~190 GB a `/home`: no caben al NVMe sense alliberar espai. A més, un SSD ple perd rendiment d'escriptura |
@@ -105,7 +105,7 @@ Les eines s'han descarregat dels repositoris d'Ubuntu (`apt-get download`) i s'h
 | **Xarxa (Internet)** | `curl` descarregant fitxers grans de `deb.debian.org` i `archive.ubuntu.com` a `/dev/null` (sense escriure al disc) | **81-101 Mbit/s** | Un enllaç Gigabit podria donar ~940 Mbit/s: el límit és l'eixida a Internet del centre, compartida per tota l'aula, no el portàtil. Evidència: [`evidencies/t2-xarxa-classe.txt`](evidencies/t2-xarxa-classe.txt) |
 | **Disc** | Mesura amb `/proc/diskstats` durant una càrrega real (instal·lació del Windows Server amb 6 VM enceses) | **~290 MB/s de lectura sostinguda amb el disc al 85-90 % d'utilització** | Confirma el coll de botella: és el màxim pràctic de l'SSD SATA dins de la caixa USB 3.0. Evidència: [`evidencies/t7-carrega-instalacio-winserver.txt`](evidencies/t7-carrega-instalacio-winserver.txt) |
 
-| **Disc (sintètica)** | `fio 3.36` sobre el mateix disc USB, amb les VM aturades (fet a l'equip de casa, §3.2) | 401 MB/s de lectura i 392 MB/s d'escriptura seqüencial | El disc no pot donar més: a classe, durant la instal·lació del Windows Server, ja n'usava el 72 % (290 MB/s) |
+| **Disc (sintètica)** | `fio 3.36` sobre el mateix disc USB, amb les VM aturades (fet a l'equip de casa, apartat 3.2) | 401 MB/s de lectura i 392 MB/s d'escriptura seqüencial | El disc no pot donar més: a classe, durant la instal·lació del Windows Server, ja n'usava el 72 % (290 MB/s) |
 
 ### 3.2 Equip de casa
 Totes les proves s'han fet el 16/11/2026, amb l'equip de casa arrencat des del disc USB de classe i **amb les VM aturades**. Les eines són les mateixes que a classe (descarregades amb `apt-get download` i executades des d'una carpeta d'usuari).
