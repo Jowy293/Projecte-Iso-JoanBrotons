@@ -87,6 +87,7 @@ Configuració exportada (sense dades sensibles): [`configs/mikrotik-export.rsc`]
 | LAN `enp0s8` | `192.168.11.3/24` estàtica |
 | Encaminament | `net.ipv4.ip_forward=1` persistent a `/etc/sysctl.d/99-router.conf` |
 | Tallafocs | `/etc/nftables.conf` → [`configs/debian-nftables.conf`](configs/debian-nftables.conf) (input i forward amb política `drop`, NAT `masquerade`, bloqueig de Telnet amb *log* `DEB-BLOQ-TELNET`) |
+| Serveis | Arrenca en mode text (`multi-user.target`): s'han desactivat l'escriptori GNOME (`gdm`), `cups`, `avahi` i `ModemManager`, que no calen en un tallafocs. Arrencada de 1 min 6 s a 4,9 s i RAM de 639 a 276 MB ([Tasca 7 §4.2](Tasca7.md)) |
 | DNS | `dnsmasq` només com a DNS per a la LAN (`no-dhcp-interface`) |
 | SSH | `openssh-server` instal·lat (no ho estava) |
 

@@ -28,13 +28,14 @@ Línia base de l'amfitrió (portàtil ASUS B3605CCA, Core Ultra 5 125H, 32 GB, S
 | Instal·lació del Windows Server | 7 (WS instal·lant) | 86-90 % | 11,5 GB | **~290 MB/s de lectura, 85 % d'ús** | — | [`t7-carrega-instalacio-winserver.txt`](evidencies/t7-carrega-instalacio-winserver.txt) |
 | **Totes les VM enceses** (WS i W11 arrencant) | **8** | 87,5 % (wa 4,4 %) | **6,3 GB** de 31,3 GB · swap 0 | 25 MB/s d'escriptura, **87 % d'ús** | 73 °C | [`t7-8vm-enceses.txt`](evidencies/t7-8vm-enceses.txt) |
 | WS congelat per TRIM (vegeu §4) | 6 | ~92 % | 12,9 GB | **277 MB/s de lectura, 91 % d'ús** | — | [`t7-optimitzacio-discard.txt`](evidencies/t7-optimitzacio-discard.txt) |
+| Equip de casa: Windows 11 instal·lant l'acumulativa 2025-11 | 3 (W11, OPNsense, TrueNAS) | 92,7 % | 17,4 GB | 9 MB/s de lectura + 15 MB/s d'escriptura, **81 % d'ús** | 42 °C | [`t7-casa-win11-actualitzant.txt`](evidencies/t7-casa-win11-actualitzant.txt) |
 
 ## 3. Informe: què se satura i quantes VM es poden fer servir
 
 **Què se satura:**
 - **El disc és l'únic recurs que se satura.** En tots els escenaris amb càrrega arriba al 85-91 % d'utilització. La CPU continua al 86-92 % lliure, i la RAM no arriba mai a la swap.
-- **Les VM que més disc consumeixen són les Windows** (Server 2025 i 11). En instal·lar, arrencar, actualitzar o fer TRIM fan lectures sostingudes de prop de 300 MB/s, que és el màxim de l'SSD per USB. Mentre passa això, la resta de VM i l'escriptori de l'amfitrió van lents.
-- **Les que més RAM ocupen** són també les Windows (3 i 4 GB) i l'OPNsense (3 GB). Les Linux, el TrueNAS i el MikroTik estan entre 512 MB i 2 GB.
+- **Les VM que més disc consumeixen són les Windows** (Server 2025 i 11). En instal·lar, arrencar, actualitzar o fer TRIM fan lectures sostingudes de prop de 300 MB/s, que és el màxim de l'SSD per USB. Mentre passa això, la resta de VM i l'escriptori de l'amfitrió van lents. A casa, una actualització de Windows deixa el disc USB al 81 % d'ús movent només 24 MB/s: són operacions petites i aleatòries, i les limita la latència de l'SSD per USB (276 µs per operació, vegeu la [Tasca 2](Tasca2.md)), no el cabal.
+- **Les que més RAM ocupen de veritat són les Windows**: n'ocupen tota l'assignada (4,3 GB el Windows 11). L'OPNsense té 3 GB assignats però n'ocupa ~0,5 GB a l'amfitrió (§4.3). Les Linux, el TrueNAS i el MikroTik tenen entre 512 MB i 2 GB assignats i n'ocupen menys.
 - **La CPU no és mai el problema:** 18 fils per a 11 vCPU en total.
 
 **Quantes VM es poden arrancar:**
@@ -56,6 +57,49 @@ Línia base de l'amfitrió (portàtil ASUS B3605CCA, Core Ultra 5 125H, 32 GB, S
 
 Evidència: [`evidencies/t7-optimitzacio-discard.txt`](evidencies/t7-optimitzacio-discard.txt)
 
-### 4.2 Optimització 2
+### 4.2 Optimització 2: arrencada i serveis dels servidors de comunicacions
 
-> **Pendent de mesurar.** Proposta: ajustar la RAM assignada al consum real de cada VM (mesurat des de dins de cada sistema) i fer arrencar per torns, per reduir la RAM ocupada amb totes les VM enceses i deixar més memòria cau de disc a l'amfitrió. Es demostrarà amb la mateixa mesura de l'escenari "8 VM" abans i després.
+Mesurat el 16/11/2026 a l'**equip de casa** (el mateix disc USB arrencat al sobretaula, vegeu la [Tasca 2](Tasca2.md)), amb les mateixes VM enceses de fons abans i després (OPNsense, TrueNAS i Windows 11 en repòs) i el disc de l'amfitrió en repòs (2 % d'ús).
+
+| | Detall |
+|---|---|
+| **Problema detectat** | Totes les VM BIOS tenien l'ordre d'arrencada *disquet → DVD → disc*, el menú F12 de VirtualBox i controladors d'àudio i USB que un servidor no necessita. A més, el **Debian que fa de tallafocs tenia instal·lat l'escriptori GNOME**: arrancava en mode gràfic (`graphical.target`), amb `gdm`, impressió (`cups`), `avahi` i `ModemManager`, i el GRUB esperava 5 s. `systemd-analyze`: **1 min 6 s** fins a acabar l'arrencada, dels quals 30,9 s eren `plymouth-quit-wait` (l'espera de l'escriptori), i **639 MB de RAM** usats |
+| **Canvis a VirtualBox** (Debian i MikroTik) | `VBoxManage modifyvm ... --boot1 disk --boot2 none --bios-boot-menu disabled --audio-enabled off --usb-ohci off --usb-ehci off --usb-xhci off` |
+| **Canvis dins del Debian** | `systemctl set-default multi-user.target` (sense escriptori) · `systemctl disable --now cups cups.socket cups.path cups-browsed avahi-daemon avahi-daemon.socket ModemManager` · `GRUB_TIMEOUT=1` + `update-grub` |
+| **Com es mesura** | [`scripts/temps-arrencada.sh`](scripts/temps-arrencada.sh): engega la VM en fred i compta els segons fins que la seua WAN (en pont amb la xarxa de casa) respon al ping; després l'apaga per ACPI. 3 repeticions per VM. A més, `systemd-analyze` i `free -m` dins del Debian |
+
+**Resultats:**
+
+| VM | Abans | Després | Diferència |
+|---|---|---|---|
+| Debian · fins al ping a la WAN (3 proves) | 20,8 / 21,4 / 22,4 s → **21,5 s** | 17,1 / 18,1 / 16,3 s → **17,2 s** | **−4,3 s (−20 %)** |
+| Debian · arrencada completa (`systemd-analyze`) | **1 min 6,4 s** (fins a `graphical.target`) | **4,9 s** (fins a `multi-user.target`) | **−61 s** |
+| Debian · RAM usada (`free -m`) | **639 MB** | **276 MB** | **−363 MB (−57 %)** |
+| MikroTik · fins al ping a la WAN (3 proves) | 18,4 / 18,4 / 17,8 s → **18,2 s** | 18,3 / 18,1 / 20,7 s → **19,0 s** | Cap millora (dins de la variació entre proves) |
+
+Evidències: [`t7-arrencada-abans.txt`](evidencies/t7-arrencada-abans.txt) · [`t7-arrencada-despres.txt`](evidencies/t7-arrencada-despres.txt)
+
+| | |
+|---|---|
+| ![Debian abans](evidencies/captures/t7-deb-01-abans.png) | ![Debian després](evidencies/captures/t7-deb-02-despres.png) |
+| Abans: 1 min 6 s, `graphical.target`, 639 MB | Després: 4,9 s, `multi-user.target`, 276 MB |
+
+**Interpretació:**
+- **Els canvis de VirtualBox no aporten res mesurable:** el MikroTik, que només ha tingut aquests canvis, tarda el mateix. Amb el disquet i el DVD buits, la BIOS els salta en mil·lisegons. Es mantenen perquè eviten arrencar per error una ISO que s'haja quedat al lector, però no són una optimització de rendiment.
+- **La millora ve de dins del sistema:** traure l'escriptori i els serveis innecessaris i reduir l'espera del GRUB. Al ping es guanyen ~4 s (la xarxa ja s'aixecava abans que l'escriptori), però el sistema queda **completament arrancat en 5 s en lloc d'1 minut** i allibera més de la meitat de la RAM. Un tallafocs amb menys serveis també té menys superfície d'atac.
+- **Comprovació funcional després del canvi:** `nftables` es carrega (664 ms a `systemd-analyze blame`), el Debian surt a Internet (`ping 1.1.1.1`) i, des del Windows 11, respon el ping a `192.168.11.3` i resol DNS amb el seu `dnsmasq`.
+- **Inconvenient acceptat:** el Debian ja no té entorn gràfic. S'administra per SSH o per consola, que és el normal en un servidor.
+
+### 4.3 Observació sobre la RAM (per què no s'ha optimitzat retallant-la)
+
+La proposta inicial era reduir la RAM assignada. Abans d'aplicar-la s'ha mesurat quanta RAM ocupa realment cada VM a l'amfitrió ([`scripts/ram-vm.sh`](scripts/ram-vm.sh), RSS del procés `VBoxHeadless`) després d'arrancar en fred:
+
+| VM | Assignada | Ocupada realment a l'amfitrió |
+|---|---|---|
+| Windows 11 | 4.096 MB | **4.368 MB** |
+| OPNsense | 3.096 MB | **497 MB** |
+| TrueNAS | 2.048 MB | **652 MB** |
+
+VirtualBox només reserva la memòria que el sistema convidat toca. Els Linux/BSD n'usen poca i, per tant, retallar-los la RAM assignada **no allibera gairebé res** a l'amfitrió. En canvi, Windows inicialitza tota la memòria en arrancar i n'ocupa tota l'assignada. Per tant, la RAM la saturen les VM Windows, i només baixar-los la RAM es notaria, però el Windows 11 ja està al mínim oficial (4 GB). Per això s'ha optat per l'optimització del §4.2, que sí té una millora mesurable.
+
+**Nota:** a les mesures de classe (§2) les VM es reprenien des d'estat guardat, i això carrega tota la memòria que tenien en guardar-se.

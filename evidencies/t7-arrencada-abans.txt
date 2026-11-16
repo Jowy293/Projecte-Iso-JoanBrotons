@@ -1,0 +1,9 @@
+# ABANS de l'optimització · 2026-11-16 17:42:35 · equip de casa · VM enceses de fons: OPNsense, TrueNAS, Windows 11 (en repòs)
+## Servidor de Comunicaciones Debian: bootmenu="messageandmenu" boot1="floppy" boot2="dvd" boot3="disk" audio="default" usb="on" 
+## MikroTik: bootmenu="messageandmenu" boot1="floppy" boot2="dvd" boot3="disk" audio="default" usb="on" 
+Servidor de Comunicaciones Debian · prova 1: 20.8 s fins a respondre el ping a 192.168.18.120
+Servidor de Comunicaciones Debian · prova 2: 21.4 s fins a respondre el ping a 192.168.18.120
+Servidor de Comunicaciones Debian · prova 3: 22.4 s fins a respondre el ping a 192.168.18.120
+MikroTik · prova 1: 18.4 s fins a respondre el ping a 192.168.18.119
+MikroTik · prova 2: 18.4 s fins a respondre el ping a 192.168.18.119
+MikroTik · prova 3: 17.8 s fins a respondre el ping a 192.168.18.119

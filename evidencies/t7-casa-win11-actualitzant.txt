@@ -1,0 +1,8 @@
+===== Equip de casa · Win11 descarregant/instal·lant l'acumulativa KB5068865 + OPNsense + TrueNAS  (2026-11-16 16:59:45, 60 s)
+VM enceses: Servidor de Comunicaciones OPNsense,TrueNas(Datos),Windows 11 (Cliente)
+CPU mitjana: us=1,3% sy=4,7% id=92,7% wa=1,0% | pic us+sy=22%
+Disc sda (USB): lectura 9 MB/s, escriptura 15 MB/s, utilització 81%
+Xarxa eno1: 1645 KB/s
+RAM: usada 13832 MB, disponible 17417 MB de 31250 MB
+Swap usada: 0 MB
+Temperatura CPU: 42 C

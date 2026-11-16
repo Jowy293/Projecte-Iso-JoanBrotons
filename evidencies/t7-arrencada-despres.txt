@@ -1,0 +1,10 @@
+# DESPRÉS de l'optimització · 2026-11-16 17:51:38 · equip de casa · mateixes VM de fons (OPNsense, TrueNAS, Windows 11 en repòs)
+## Servidor de Comunicaciones Debian: bootmenu="disabled" boot1="disk" boot2="none" boot3="none" audio="none" usb="off" 
+## MikroTik: bootmenu="disabled" boot1="disk" boot2="none" boot3="none" audio="none" usb="off" 
+## Debian (dins): default.target=multi-user, gdm/cups/avahi/ModemManager desactivats, GRUB_TIMEOUT=1
+Servidor de Comunicaciones Debian · prova 1: 17.1 s fins a respondre el ping a 192.168.18.120
+Servidor de Comunicaciones Debian · prova 2: 18.1 s fins a respondre el ping a 192.168.18.120
+Servidor de Comunicaciones Debian · prova 3: 16.3 s fins a respondre el ping a 192.168.18.120
+MikroTik · prova 1: 18.3 s fins a respondre el ping a 192.168.18.119
+MikroTik · prova 2: 18.1 s fins a respondre el ping a 192.168.18.119
+MikroTik · prova 3: 20.7 s fins a respondre el ping a 192.168.18.119

@@ -34,7 +34,7 @@ flowchart LR
             TN["TrueNAS<br/>1 vCPU · 2 GB · 18 GB + 5 GB"]
             PVE["Proxmox VE<br/>1 vCPU · 2 GB · 30 GB · VT-x imbricat"]
             WS["Windows Server 2025<br/>2 vCPU · 3 GB · 50 GB"]
-            W11["Windows 11<br/>2 vCPU · 4 GB · 80 GB · EFI"]
+            W11["Windows 11<br/>2 vCPU · 4 GB · 80 GB · EFI · TPM 2.0"]
             UB["Ubuntu 26.04<br/>1 vCPU · 2 GB · 25 GB + 7×512 MB"]
         end
     end
@@ -51,7 +51,7 @@ Dades tretes de `VBoxManage showvminfo` el 16/11/2026:
 | TrueNas(Datos) | TrueNAS 27.0.0-RC.1 | 1 | 2 GB | 18 GB (sistema) + **5 GB (còpies)** | BIOS | interna `redjoan11` |
 | Proxmox | Proxmox VE 9.2 | 1 | 2 GB | 30 GB | BIOS, **VT-x imbricat** | interna `redjoan11` |
 | WinServer2025-DC | Windows Server 2025 Standard (escriptori) | 2 | 3 GB | 50 GB (SSD, **sense discard**) | BIOS | interna `redjoan11` |
-| Windows 11 (Cliente) | Windows 11 Pro 23H2 | 2 | 4 GB | 80 GB | **EFI** | interna `redjoan11` |
+| Windows 11 (Cliente) | Windows 11 Pro 23H2 | 2 | 4 GB | 80 GB | **EFI + Secure Boot + TPM 2.0** | interna `redjoan11` |
 | Ubuntu(Cliente) | Ubuntu 26.04.1 LTS | 1 | 2 GB | 25 GB + 7 × 512 MB (RAID, Tasca 6) | BIOS | interna `redjoan11` |
 | **Total** | | **11** | **18,5 GB** | ~255 GB reservats (VDI dinàmics) | | |
 
@@ -90,6 +90,8 @@ Dades reals (`lscpu`, `free`, `lsblk`, `lsusb -t`, `/sys`): [`evidencies/inventa
 | 6 | Contrasenyes desconegudes (OPNsense, Proxmox, Windows Server antic) | No estaven documentades | Restabliment pels mecanismes oficials (opció 3 de la consola de l'OPNsense, `chpasswd` des de la consola de Proxmox) i reinstal·lació del Windows Server, que no tenia res configurat |
 | 7 | La instal·lació del Windows Server amb EFI es quedava al 18 % i la VM no s'aturava | El procés de la VM estava bloquejat en una E/S de l'amfitrió | Reinstal·lació amb BIOS aplicant la imatge amb DISM ([Tasca 5 §4.1](Tasca5.md#41-installació)) |
 | 8 | **El Windows Server es congelava** a la fase *specialize*, al primer inici de sessió i a l'escriptori (pantalla quieta i rellotge aturat), mentre el disc de l'amfitrió llegia a ~277 MB/s | El disc virtual tenia **discard/TRIM activat sobre un VDI dinàmic**. Quan Windows llança el TRIM, VirtualBox llig el fitxer `.vdi` sencer per compactar-lo | `VBoxManage storageattach … --discard off`. Després del canvi, la instal·lació dels rols ha anat sense cap bloqueig. Detall a la [Tasca 7](Tasca7.md) |
+| 9 | El Windows 11 no arrencava després d'un reinici (aturada `c000021a`) | Un reinici forçat mentre Windows Update tenia operacions pendents | No es va poder reparar des de WinRE i es va reinstal·lar, ara amb **TPM 2.0 i Secure Boot**. Abans d'actualitzar es fa una instantània ([Tasca 5 §5.3-5.4](Tasca5.md)) |
+| 10 | En arrancar el disc de classe a l'equip de casa, les VM guardades no es reprenien (`VERR_SSM_LOAD_CPUID_MISMATCH`) | L'estat guardat conté les característiques de la CPU on es va guardar (Intel del portàtil) i el sobretaula és AMD | Es descarta l'estat guardat i la VM arrenca en fred. Per a canviar d'equip, les VM s'han d'**apagar** (no guardar en estat) |
 
 ## 5. Repositori
 
