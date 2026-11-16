@@ -1,0 +1,208 @@
+# Tasca 4 · Evidències de connectivitat — 16/11/2026 12:09
+
+================ Ubuntu client (.25) ================
+  administrador11@172.16.222.195's  
+  joan11@192.168.11.25's  
+  ubuntu-client11
+  -- interfícies
+  lo               UNKNOWN        127.0.0.1/8 ::1/128 
+  enp0s3           UP             192.168.11.25/24 
+  -- rutes
+  default via 192.168.11.1 dev enp0s3 proto static metric 100 
+  192.168.11.0/24 dev enp0s3 proto kernel scope link src 192.168.11.25 metric 100 
+  -- DNS
+  Link 2 (enp0s3): 192.168.11.1 192.168.11.3
+  -- ping a la LAN
+    192.168.11.1   OK
+    192.168.11.2   OK
+    192.168.11.3   OK
+    192.168.11.5   OK
+    192.168.11.10  OK
+    192.168.11.17  OK
+    192.168.11.20  OK
+    192.168.11.25  OK
+  -- eixida a Internet
+  193.145.206.124 pro-csvs0-gva-sede-portales-ext.gva.es www.gva.es
+  bash: línea 1: curl: orden no encontrada
+  -- traceroute (TCP 443) a www.gva.es
+   1?: [LOCALHOST]                      pmtu 1500
+   1:  192.168.11.1                                          0.443ms 
+   1:  192.168.11.1                                          0.629ms 
+   2:  172.16.222.1                                          0.926ms 
+   3:  172.18.22.1                                           1.020ms asymm  8 
+   4:  no reply
+   5:  81.46.22.5                                           14.212ms 
+   6:  81.46.22.6                                           14.985ms asymm  9 
+   7:  no reply
+   8:  no reply
+       Too many hops: pmtu 1500
+       Resume: pmtu 1500 
+  
+
+================ Debian nftables (.3) ================
+  administrador11@172.16.222.195's  
+  administrador11@192.168.11.3's  
+  deb-comms11
+  lo               UNKNOWN        127.0.0.1/8 ::1/128 
+  enp0s3           UP             172.16.222.195/24 fe80::70fe:9ad1:2c80:a6fc/64 
+  enp0s8           UP             192.168.11.3/24 fe80::a00:27ff:fe59:b7ad/64 
+  default via 172.16.222.1 dev enp0s3 proto dhcp src 172.16.222.195 metric 1002 
+  172.16.222.0/24 dev enp0s3 proto dhcp scope link src 172.16.222.195 metric 1002 
+  192.168.11.0/24 dev enp0s8 proto kernel scope link src 192.168.11.3 
+    192.168.11.1   OK
+    192.168.11.2   OK
+    192.168.11.3   OK
+    192.168.11.5   OK
+    192.168.11.10  OK
+    192.168.11.17  OK
+    192.168.11.20  OK
+    192.168.11.25  OK
+  bash: línea 1: tracepath: orden no encontrada
+  
+
+================ OPNsense (.1) ================
+  administrador11@172.16.222.195's  
+  (root@192.168.11.1) 
+  opnsense11.internal
+  em0: flags=1008843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST,LOWER_UP> metric 0 mtu 1500
+  	inet 172.16.222.184 netmask 0xffffff00 broadcast 172.16.222.255
+  em1: flags=1008843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST,LOWER_UP> metric 0 mtu 1500
+  	inet 192.168.11.1 netmask 0xffffff00 broadcast 192.168.11.255
+  lo0: flags=1008049<UP,LOOPBACK,RUNNING,MULTICAST,LOWER_UP> metric 0 mtu 16384
+  	inet 127.0.0.1 netmask 0xff000000
+  Routing tables
+  
+  Internet:
+  Destination        Gateway            Flags         Netif Expire
+  default            172.16.222.1       UGS             em0
+  10.239.3.7         172.16.222.1       UGHS            em0
+  10.239.3.8         172.16.222.1       UGHS            em0
+  127.0.0.1          link#3             UH              lo0
+  172.16.20.1        172.16.222.1       UGHS            em0
+  172.16.222.0/24    link#1             U               em0
+  172.16.222.184     link#3             UHS             lo0
+  192.168.11.0/24    link#2             U               em1
+  192.168.11.1       link#3             UHS             lo0
+    192.168.11.1   OK
+    192.168.11.2   OK
+    192.168.11.3   OK
+    192.168.11.5   OK
+    192.168.11.10  OK
+    192.168.11.17  OK
+    192.168.11.20  OK
+    192.168.11.25  OK
+  -- traceroute
+  traceroute to 193.145.206.124 (193.145.206.124), 6 hops max, 40 byte packets
+   1  172.16.222.1  0.460 ms  0.370 ms  0.373 ms
+   2  172.18.22.1  0.404 ms  0.401 ms  0.427 ms
+   3  * * *
+   4  81.46.22.5  13.410 ms  12.705 ms  12.638 ms
+   5  81.46.22.6  13.037 ms  13.335 ms  15.849 ms
+   6  172.27.111.46  11.161 ms  11.294 ms  12.612 ms
+  
+
+================ MikroTik (.2) ================
+  administrador11@172.16.222.195's  
+  administrador11@192.168.11.2's  
+    name: MikroTik-11
+  
+  Flags: D - DYNAMIC
+  Columns: ADDRESS, NETWORK, INTERFACE, VRF
+  #   ADDRESS            NETWORK       INTERFACE  VRF 
+  0   192.168.11.2/24    192.168.11.0  ether2     main
+  1 D 172.16.222.213/24  172.16.222.0  ether1     main
+  
+  Flags: D - DYNAMIC; A - ACTIVE; c - CONNECT, d - DHCP
+  Columns: DST-ADDRESS, GATEWAY, ROUTING-TABLE, DISTANCE
+      DST-ADDRESS      GATEWAY       ROUTING-TABLE  DISTANCE
+  DAd 0.0.0.0/0        172.16.222.1  main                  1
+  DAc 172.16.222.0/24  ether1        main                  0
+  DAc 192.168.11.0/24  ether2        main                  0
+  
+    SEQ HOST                                     SIZE TTL TIME       STATUS      
+      0 192.168.11.1                               56  64 279us     
+      1 192.168.11.1                               56  64 460us     
+      sent=2 received=2 packet-loss=0% min-rtt=279us avg-rtt=369us 
+     max-rtt=460us 
+  
+  192.168.11.1 -> 2/2 respostes
+    SEQ HOST                                     SIZE TTL TIME       STATUS      
+      0 192.168.11.3                               56  64 359us     
+      1 192.168.11.3                               56  64 320us     
+      sent=2 received=2 packet-loss=0% min-rtt=320us avg-rtt=339us 
+     max-rtt=359us 
+  
+  192.168.11.3 -> 2/2 respostes
+    SEQ HOST                                     SIZE TTL TIME       STATUS      
+      0 192.168.11.5                               56  64 802us     
+      1 192.168.11.5                               56  64 471us     
+      sent=2 received=2 packet-loss=0% min-rtt=471us avg-rtt=636us 
+     max-rtt=802us 
+  
+  192.168.11.5 -> 2/2 respostes
+    SEQ HOST                                     SIZE TTL TIME       STATUS      
+      0 192.168.11.10                              56 128 770us     
+      1 192.168.11.10                              56 128 448us     
+      sent=2 received=2 packet-loss=0% min-rtt=448us avg-rtt=609us 
+     max-rtt=770us 
+  
+  192.168.11.10 -> 2/2 respostes
+    SEQ HOST                                     SIZE TTL TIME       STATUS      
+      0 192.168.11.17                              56  64 504us     
+      1 192.168.11.17                              56  64 623us     
+      sent=2 received=2 packet-loss=0% min-rtt=504us avg-rtt=563us 
+     max-rtt=623us 
+  
+  192.168.11.17 -> 2/2 respostes
+    SEQ HOST                                     SIZE TTL TIME       STATUS      
+      0 192.168.11.20                              56 128 703us     
+      1 192.168.11.20                              56 128 794us     
+      sent=2 received=2 packet-loss=0% min-rtt=703us avg-rtt=748us 
+     max-rtt=794us 
+  
+  192.168.11.20 -> 2/2 respostes
+    SEQ HOST                                     SIZE TTL TIME       STATUS      
+      0 192.168.11.25                              56  64 750us     
+      1 192.168.11.25                              56  64 422us     
+      sent=2 received=2 packet-loss=0% min-rtt=422us avg-rtt=586us 
+     max-rtt=750us 
+  
+  192.168.11.25 -> 2/2 respostes
+  
+
+================ Proxmox (.17) ================
+  administrador11@172.16.222.195's  
+  root@192.168.11.17's  
+  pve1
+  lo               UNKNOWN        127.0.0.1/8 ::1/128 
+  nic0             UP             
+  vmbr0            UP             192.168.11.17/24 fe80::a00:27ff:fe12:6e89/64 
+  default via 192.168.11.1 dev vmbr0 proto kernel onlink 
+  192.168.11.0/24 dev vmbr0 proto kernel scope link src 192.168.11.17 
+    192.168.11.1   OK
+    192.168.11.2   OK
+    192.168.11.3   OK
+    192.168.11.5   OK
+    192.168.11.10  OK
+    192.168.11.17  OK
+    192.168.11.20  OK
+    192.168.11.25  OK
+  
+
+================ TrueNAS (.5) ================
+  administrador11@172.16.222.195's  
+  (truenas_admin@192.168.11.5)  
+  truenas11
+  lo               UNKNOWN        127.0.0.1/8 ::1/128 
+  enp0s3           UP             192.168.11.5/24 fe80::a00:27ff:fe2b:af1/64 
+  default via 192.168.11.1 dev enp0s3 proto static 
+  192.168.11.0/24 dev enp0s3 proto kernel scope link src 192.168.11.5 
+    192.168.11.1   OK
+    192.168.11.2   OK
+    192.168.11.3   OK
+    192.168.11.5   OK
+    192.168.11.10  OK
+    192.168.11.17  OK
+    192.168.11.20  OK
+    192.168.11.25  OK
+  

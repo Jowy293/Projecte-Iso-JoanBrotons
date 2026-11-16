@@ -1,0 +1,22 @@
+# Prova de xarxa · equip de classe · 2026-11-16 12:20:47
+## Enllaç
+velocitat negociada eno1: 1000 Mbit/s
+duplex: full
+    RX:  bytes packets errors dropped  missed   mcast           
+    2925943972 2327137      0       0       0   38839 
+    TX:  bytes packets errors dropped carrier collsns           
+     245708174 1091309      0       0       0       0 
+
+## Latència i pèrdua al router de l'aula (100 paquets, 0,2 s)
+100 packets transmitted, 100 received, 0% packet loss, time 20591ms
+rtt min/avg/max/mdev = 0.439/0.504/0.641/0.031 ms
+
+## DNS
+resolució www.gva.es: 0.04 s
+resolució www.gva.es: 0.01 s
+resolució www.gva.es: 0.01 s
+
+## Descàrrega HTTP (a /dev/null)
+http://archive.ubuntu.com/ubuntu/ls-lR.gz -> 39862641 bytes en 3.444990 s = 11571192 B/s (codi 206)
+http://deb.debian.org/debian/dists/trixie/main/Contents-amd64.gz -> 12698511 bytes en 1.006998 s = 12610264 B/s (codi 200)
+http://archive.ubuntu.com/ubuntu/ls-lR.gz -> 39862641 bytes en 3.929121 s = 10145434 B/s (codi 200)

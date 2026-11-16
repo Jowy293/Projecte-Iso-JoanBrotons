@@ -1,0 +1,61 @@
+# Windows Server DC-JOAN11 · domini i còpia · 16/11/2026 12:38 (PowerShell com a administrador)
+===== DOMINI (Tasca 5) =====
+DNSRoot           : joan11.local
+NetBIOSName       : JOAN11
+DomainMode        : Windows2016Domain
+PDCEmulator       : DC-JOAN11.joan11.local
+DistinguishedName : DC=joan11,DC=local
+Name           : joan11.local
+ForestMode     : Windows2016Forest
+SchemaMaster   : DC-JOAN11.joan11.local
+GlobalCatalogs : {DC-JOAN11.joan11.local}
+HostName        : DC-JOAN11.joan11.local
+IPv4Address     : 192.168.11.10
+Site            : Default-First-Site-Name
+IsGlobalCatalog : True
+OperatingSystem : Windows Server 2025 Standard Evaluation
+Name      Status
+----      ------
+ADWS     Running
+DNS      Running
+KDC      Running
+Netlogon Running
+NTDS     Running
+ZoneName            ZoneType IsDsIntegrated
+--------            -------- --------------
+_msdcs.joan11.local Primary            True
+0.in-addr.arpa      Primary           False
+127.in-addr.arpa    Primary           False
+255.in-addr.arpa    Primary           False
+joan11.local        Primary            True
+IPAddress : 192.168.11.1
+Name          SamAccountName
+----          --------------
+Administrador Administrador 
+===== COPIA (Tasca 5) =====
+Get-LocalGroupMember : No se encontró el grupo S-1-5-32-544.
+En C:\Users\Public\copia-windows.ps1: 19 Carácter: 1
++ Get-LocalGroupMember -SID S-1-5-32-544 | Out-String                   ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (S-1-5-32-544:SecurityIdentifier) [Get-LocalGroupMember], Grou 
+   pNotFoundException
+    + FullyQualifiedErrorId : GroupNotFound,Microsoft.PowerShell.Commands.GetLocalGroupMemberCommand
+Fitxer al TrueNAS : \\192.168.11.5\backups\winserver\DC-JOAN11-config-20261116-1239.zip
+Mida              : 29 KB
+SHA-256 local     : 688A8913B16DE7C7842E48275AFCB7DFBE3C45E43C68C203F7B978BE42EA47CB
+SHA-256 al NAS    : 688A8913B16DE7C7842E48275AFCB7DFBE3C45E43C68C203F7B978BE42EA47CB
+Name                         Length
+----                         ------
+actualitzacions.txt             958
+administradors.txt                6
+politiques-seguretat.inf      18104
+programari.csv                  253
+rols-caracteristiques.txt      4948
+sistema.txt                     550
+tallafocs.wfw                225280
+tcpip.reg                     16446
+usuaris-locals.txt              762
+xarxa-dns.txt                  1572
+xarxa-ipconfig.txt             2472
+xarxa-netipconfiguration.txt   2328
+xarxa-rutes.txt                4464

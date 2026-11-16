@@ -1,0 +1,22 @@
+# Tasca 7 · Optimització 1: discard/TRIM desactivat al disc del Windows Server (16/11/2026)
+
+## ABANS (discard=on, VDI dinàmic) — 11:54-11:58, WS congelat a l'escriptori
+Pantalla de la VM idèntica en dues captures separades 20 s (md5 be453bca…), rellotge aturat a les 11:49
+Disc sda de l'amfitrió (10 s, /proc/diskstats): lect 276,9 MB/s · escr 1,4 MB/s · utilització 91%
+vmstat: bi 250883 / 290512 blocs/s (lectura contínua)
+E/S del disc virtual del WS (VBoxManage debugvm statistics /Public/Storage/*/BytesRead, 5 s): 0 MB/s
+Procés VBoxHeadless del WS: 43,9 % CPU
+=> L'amfitrió llig ~277 MB/s però la VM no llig res: la lectura la fa VirtualBox, no el sistema convidat
+
+## Comprovació de la causa
+kill -9 del procés VBoxHeadless del WS -> lectura de sda: 245 MB/s -> 0 MB/s
+VBoxManage showvminfo: "SATA-discard-0-0"="on", "SATA-nonrotational-0-0"="on", disc "Format variant: dynamic default"
+Cap altra VM tenia discard=on
+
+## Canvi aplicat
+VBoxManage storageattach WinServer2025-DC --storagectl SATA --port 0 --device 0 --type hdd --medium WinServer2025-DC.vdi --nonrotational on --discard off
+
+## DESPRÉS (discard=off)
+12:08:52 Instal·lació dels rols AD DS + DNS en curs (92 %): lectura de sda 28 MB/s, VM responent
+12:10:32 Instal·lació dels rols acabada (Success=True) sense cap bloqueig
+12:20-12:35 Promoció a controlador de domini + 2 reinicis sense cap bloqueig

@@ -1,0 +1,45 @@
+DESKTOP-BTD8EEA
+
+   Descripción . . . . . . . . . . . . . . . : Intel(R) PRO/1000 MT Desktop Adapter
+   Dirección física. . . . . . . . . . . . . : 08-00-27-88-8D-09
+   DHCP habilitado . . . . . . . . . . . . . : no
+   Dirección IPv4. . . . . . . . . . . . . . : 192.168.11.20(Preferido) 
+   Máscara de subred . . . . . . . . . . . . : 255.255.255.0
+   Puerta de enlace predeterminada . . . . . : 192.168.11.1
+   Servidores DNS. . . . . . . . . . . . . . : 192.168.11.10
+          0.0.0.0          0.0.0.0     192.168.11.1    192.168.11.20    281
+     192.168.11.0    255.255.255.0      En vínculo     192.168.11.20    281
+    192.168.11.20  255.255.255.255      En vínculo     192.168.11.20    281
+   192.168.11.255  255.255.255.255      En vínculo     192.168.11.20    281
+        224.0.0.0        240.0.0.0      En vínculo         127.0.0.1    331
+        224.0.0.0        240.0.0.0      En vínculo     192.168.11.20    281
+  255.255.255.255  255.255.255.255      En vínculo     192.168.11.20    281
+          0.0.0.0          0.0.0.0     192.168.11.1  Predeterminada 
+192.168.11.1 -> OK
+192.168.11.2 -> SENSE RESPOSTA
+192.168.11.3 -> OK
+192.168.11.5 -> OK
+192.168.11.10 -> SENSE RESPOSTA
+192.168.11.17 -> SENSE RESPOSTA
+192.168.11.25 -> OK
+
+Traza a 193.145.206.124 sobre caminos de 6 saltos como máximo.
+
+  1    <1 ms    <1 ms    <1 ms  192.168.11.1 
+  2    <1 ms    <1 ms    <1 ms  172.16.222.1 
+  3    <1 ms    <1 ms    <1 ms  172.18.22.1 
+  4    <1 ms    <1 ms    <1 ms  81.46.23.237 
+  5    12 ms    12 ms    12 ms  81.46.22.5 
+  6    13 ms    13 ms    13 ms  81.46.22.6 
+
+Traza completa.
+
+
+
+
+ComputerName     : www.gva.es
+RemoteAddress    : 195.77.20.91
+TcpTestSucceeded : True
+
+
+

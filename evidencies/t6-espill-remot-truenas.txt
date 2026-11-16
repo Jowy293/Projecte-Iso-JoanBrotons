@@ -1,0 +1,7 @@
+
+basename: iqn.2005-10.org.freenas.ctl
+target: mirror11 portal=1 initiator=1 extent=1
+{"state":"RUNNING","enable":true}
+NAME                   VOLSIZE   USED
+Copias/iscsi-mirror11     600M   600M
+

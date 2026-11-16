@@ -1,0 +1,46 @@
+### lun 16 nov 2026 11:42:01 CET
+### 1. Alliberem sdb (abans era part del RAID0 md0, ja provat)
+mdadm: stopped /dev/md0
+disc local: /dev/sdb
+### 2. Iniciador iSCSI
+192.168.11.5:3260,1 iqn.2005-10.org.freenas.ctl:mirror11
+Login to [iface: default, target: iqn.2005-10.org.freenas.ctl:mirror11, portal: 192.168.11.5,3260] successful.
+disc remot: /dev/disk/by-path/ip-192.168.11.5:3260-iscsi-iqn.2005-10.org.freenas.ctl:mirror11-lun-0 -> /dev/sdi
+NAME  SIZE TRAN   MODEL
+sdb   512M sata   VBOX HARDDISK
+sdi   600M iscsi  iSCSI Disk
+### 3. RAID1 local + remot (el remot en write-mostly: les lectures es fan del disc local)
+mdadm: Note: this array has metadata at the start and
+    may not be suitable as a boot device.  If you plan to
+    store '/boot' on this device please ensure that
+    your boot-loader understands md/v1.x metadata, or use
+    --metadata=0.90
+mdadm: largest drive (/dev/sdi) exceeds size (523264K) by more than 1%
+mdadm: Defaulting to version 1.2 metadata
+mdadm: array /dev/md10 started.
+md10 : active raid1 sdi[1](W) sdb[0]
+      523264 blocks super 1.2 [2/2] [UU]
+      bitmap: 1/1 pages [4KB], 65536KB chunk
+
+8f73acb1aa1f0d0404adfc222fa4ec2cf5353853fe674d2c050d965d6bba36b2  dades.bin
+### 4. FALLADA: cau l'equip remot (logout iSCSI = el TrueNAS deixa de ser accessible)
+Logging out of session [sid: 1, target: iqn.2005-10.org.freenas.ctl:mirror11, portal: 192.168.11.5,3260]
+Logout of [sid: 1, target: iqn.2005-10.org.freenas.ctl:mirror11, portal: 192.168.11.5,3260] successful.
+             State : clean, degraded 
+    Active Devices : 1
+   Working Devices : 1
+    Failed Devices : 1
+Lectura de les dades amb només el disc local: dades.bin: OK
+### 5. RECUPERACIÓ: torna l'equip remot
+Login to [iface: default, target: iqn.2005-10.org.freenas.ctl:mirror11, portal: 192.168.11.5,3260] successful.
+Resincronització en 7 s (bitmap intern: només copia els blocs canviats)
+     Intent Bitmap : Internal
+             State : clean 
+    Active Devices : 2
+   Working Devices : 2
+    Failed Devices : 0
+md10 : active raid1 sdj[1](W) sdb[0]
+      523264 blocks super 1.2 [2/2] [UU]
+      bitmap: 1/1 pages [4KB], 65536KB chunk
+
+

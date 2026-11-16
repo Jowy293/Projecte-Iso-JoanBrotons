@@ -1,0 +1,8 @@
+===== 8 VM enceses (totes) + escriptori WS carregant  (2026-11-16 12:17:58, 30 s)
+VM enceses: MikroTik,Servidor de Comunicaciones Debian,Servidor de Comunicaciones OPNsense,Proxmox,WinServer2025-DC,TrueNas(Datos),Windows 11 (Cliente),Ubuntu(Cliente)
+CPU mitjana: us=2,8% sy=5,2% id=87,5% wa=4,4% | pic us+sy=10%
+Disc sda (USB): lectura 0 MB/s, escriptura 25 MB/s, utilització 87%
+Xarxa eno1: 3 KB/s
+RAM: usada 25036 MB, disponible 6295 MB de 31331 MB
+Swap usada: 0 MB
+Temperatura CPU: 73 C

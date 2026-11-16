@@ -13,7 +13,7 @@ Aquest repositori documenta l'**entorn de proves individual** muntat a VirtualBo
 | MikroTik | 192.168.11.2 | RouterOS 7.24.5 | Passarel·la alternativa (contingència) |
 | Debian + nftables | 192.168.11.3 | Debian 13.1 | Passarel·la alternativa, DNS secundari |
 | TrueNAS | **192.168.11.5** | TrueNAS 27.0.0-RC.1 | Servidor de còpies (pool `Copias`, disc de 5 GB) |
-| Windows Server | 192.168.11.10 | Windows Server 2025 Standard | Controlador de domini **`joan11.local`** (NetBIOS `JOAN11`) |
+| Windows Server | 192.168.11.10 | Windows Server 2025 Standard | Controlador de domini **`joan11.local`** (NetBIOS `JOAN11`), nom `DC-JOAN11` |
 | Proxmox VE | **192.168.11.17** | Proxmox VE 9.2.2 | Virtualització (només xarxa, per indicació del professor) |
 | Windows 11 | 192.168.11.20 | Windows 11 | Client |
 | Ubuntu | 192.168.11.25 | Ubuntu 26.04.1 LTS | Client Linux (+ proves de RAID) |
@@ -21,27 +21,31 @@ Aquest repositori documenta l'**entorn de proves individual** muntat a VirtualBo
 
 Només les **WAN dels tres servidors de comunicacions** van per DHCP (adaptador pont a la xarxa de l'aula). **Tots els equips de la LAN tenen IP manual** i a la LAN no hi ha cap servidor DHCP.
 
-## Documentació per tasques (part individual)
+## Lliurament per tasques (part individual)
+
+Un fitxer per cada lliurament d'Aules:
 
 | Tasca | Què es demana (individual) | Document |
 |---|---|---|
-| 0 | Entorn propi, recursos físics i limitacions · Apte+: documentar en Markdown/Git | [docs/T0-entorn-proves.md](docs/T0-entorn-proves.md) |
-| 2 | Inventari equip de classe i de casa, colls de botella · Apte+: tests de memòria, disc i xarxa | [docs/T2-inventari-diagnostic.md](docs/T2-inventari-diagnostic.md) |
-| 4 | Esquema de xarxa individual i interfícies · Apte+: connectivitat amb proves | [docs/T4-xarxa.md](docs/T4-xarxa.md) |
-| 5 | Els mateixos sistemes que el grup al meu entorn | [5.1 Comunicacions](docs/T5-1-comunicacions.md) · [5.2 TrueNAS i còpies](docs/T5-2-truenas-copies.md) · [5.3 Proxmox](docs/T5-3-proxmox.md) · [5.4 Windows Server](docs/T5-4-windows-server.md) · [5.5 Clients](docs/T5-5-clients.md) |
-| 6 | Almenys 3 tipus de RAID verificats | [docs/T6-emmagatzematge-raid.md](docs/T6-emmagatzematge-raid.md) |
-| 7 | Anàlisi de recursos de la màquina física amb les VM · Apte+: 2 optimitzacions mesurades | [docs/T7-rendiment.md](docs/T7-rendiment.md) |
-| 8 | Cas pràctic final i qüestionari | Es fa a classe el 25/11 |
+| 0 | Entorn de proves propi · Apte+: documentar-lo en Markdown/Git (esquema de VM, recursos i problemes) | [Tasca0.md](Tasca0.md) |
+| 1 | *No té part individual* | [Tasca1.md](Tasca1.md) |
+| 2 | Inventari de l'equip de classe i de casa i colls de botella · Apte+: tests de memòria, disc i xarxa | [Tasca2.md](Tasca2.md) |
+| 3 | *No té part individual* | [Tasca3.md](Tasca3.md) |
+| 4 | Esquema de xarxa individual · Apte+: verificar la connectivitat amb evidències | [Tasca4.md](Tasca4.md) |
+| 5 | Els mateixos sistemes que el grup al meu entorn · Apte+: sistema de còpies dels servidors crítics | [Tasca5.md](Tasca5.md) |
+| 6 | Almenys 3 tipus de RAID · Apte+: RAID 1 entre discos de dos equips | [Tasca6.md](Tasca6.md) |
+| 7 | Anàlisi de recursos de la màquina física · Apte+: dues optimitzacions mesurades | [Tasca7.md](Tasca7.md) |
 
-Les tasques 1 i 3 són només de grup i no formen part d'aquest repositori individual.
+La Tasca 8 (cas pràctic i qüestionari) es fa a classe el 25/11.
 
 ## Estructura del repositori
 
 ```text
-docs/         Documentació de cada tasca
-evidencies/   Eixides reals d'ordres (logs, proves, mesures)
-configs/      Configuracions exportades (sense contrasenyes ni claus privades)
-scripts/      Scripts utilitzats per a proves i còpies
+Tasca0.md … Tasca7.md   Un document per lliurament
+evidencies/             Eixides reals d'ordres (logs, proves, mesures)
+evidencies/captures/    Captures de pantalla de les VM
+configs/                Configuracions exportades (sense contrasenyes ni claus privades)
+scripts/                Scripts utilitzats per a proves i còpies
 ```
 
 ## Usuaris d'administració
@@ -53,7 +57,7 @@ scripts/      Scripts utilitzats per a proves i còpies
 | Debian | `administrador11` (sudo) · `root` |
 | TrueNAS | `truenas_admin` · `backup_user` (propietari de les còpies) |
 | Proxmox | `root@pam` · `administrador11@pam` (rol Administrator) |
-| Windows Server | `administrador11` (administrador local → administrador del domini) |
+| Windows Server | `JOAN11\administrador11` (administrador del domini) |
 | Ubuntu | `joan11` (sudo) |
 
 Com demana l'enunciat, **les contrasenyes no es guarden al repositori**.
