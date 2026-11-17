@@ -17,6 +17,7 @@ Aquest repositori documenta l'**entorn de proves individual** muntat a VirtualBo
 | Proxmox VE (pve1, pve2, pve3) | **192.168.11.17**, .18, .19 | Proxmox VE 9.2.2 | Clúster de virtualització `clusterjoan11` de 3 nodes (sense màquines a dins) |
 | Windows 11 | 192.168.11.20 | Windows 11 Pro 23H2 (TPM 2.0 + Secure Boot) | Client (`W11-CLIENT11`), unit al domini `joan11.local` |
 | Ubuntu | 192.168.11.25 | Ubuntu 26.04.1 LTS | Client Linux unit al domini `joan11.local` (+ proves de RAID) |
+| Servidor d'infraestructura | 192.168.11.30 | Debian 13 | Servidor GNU/Linux `infra11` preparat (usuari, xarxa i còpia); la funció es decidirà més endavant |
 
 Només les **WAN dels tres servidors de comunicacions** van per DHCP (adaptador pont a la xarxa de l'aula). **Tots els equips de la LAN tenen IP manual** i a la LAN no hi ha cap servidor DHCP.
 
@@ -57,5 +58,6 @@ configs/                Configuracions exportades (sense contrasenyes ni claus p
 | Windows Server | `JOAN11\administrador11` (administrador del domini) |
 | Windows 11 | `Administracion11` (administrador local) · `Cliente11` (usuari estàndard) |
 | Ubuntu | `joan11` (sudo) |
+| Servidor d'infraestructura | `administrador11` (sudo) · `root` |
 
 Com demana l'enunciat, **les contrasenyes no es guarden al repositori**.

@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" font-family="Segoe UI, Helvetica, Arial, sans-serif">
-  <rect width="1200" height="900" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1000" viewBox="0 0 1200 1000" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <rect width="1200" height="1000" fill="#ffffff"/>
   <defs>
     <style>
       .t{fill:#1f2937}.s{fill:#4b5563;font-size:13px}.h{font-weight:700;font-size:16px;fill:#111827}
@@ -96,21 +96,31 @@
   <text x="1100" y="606" text-anchor="middle" class="h">Ubuntu 26.04</text>
   <text x="1100" y="630" text-anchor="middle" class="t" font-size="15" font-weight="700">192.168.11.25</text>
   <text x="1100" y="652" text-anchor="middle" class="s">ubuntu-client11</text>
-  <text x="1100" y="670" text-anchor="middle" class="s">+ proves de RAID</text>
+  <text x="1100" y="670" text-anchor="middle" class="s">membre del domini</text>
+  <text x="1100" y="686" text-anchor="middle" class="s">+ proves de RAID</text>
 
   <!-- relació de domini -->
   <path d="M945 700 C 945 760, 355 760, 355 700" class="ln" stroke-dasharray="5 4"/>
-  <text x="650" y="755" text-anchor="middle" class="tag">el Windows 11 s'autentica contra el controlador de domini</text>
+  <path d="M1100 700 C 1100 800, 355 800, 355 700" class="ln" stroke-dasharray="5 4"/>
+  <text x="760" y="812" text-anchor="middle" class="tag">els dos clients s'autentiquen contra el controlador de domini</text>
+
+  <!-- servidor d'infraestructura -->
+  <polyline points="48,524 48,780 60,780" class="lnb"/>
+  <rect x="60" y="725" width="190" height="110" rx="10" class="srv"/>
+  <text x="155" y="750" text-anchor="middle" class="h">Debian 13</text>
+  <text x="155" y="769" text-anchor="middle" class="s">Servidor d'infraestructura</text>
+  <text x="155" y="793" text-anchor="middle" class="t" font-size="15" font-weight="700">192.168.11.30</text>
+  <text x="155" y="815" text-anchor="middle" class="s">infra11</text>
 
   <!-- llegenda -->
   <g font-size="13">
-    <rect x="60" y="800" width="18" height="14" class="com"/><text x="86" y="812" class="t">Comunicacions</text>
-    <rect x="210" y="800" width="18" height="14" class="srv"/><text x="236" y="812" class="t">Servidors</text>
-    <rect x="335" y="800" width="18" height="14" class="vir"/><text x="361" y="812" class="t">Virtualització</text>
-    <rect x="485" y="800" width="18" height="14" class="cli"/><text x="511" y="812" class="t">Clients</text>
-    <line x1="600" y1="807" x2="640" y2="807" class="lnb"/><text x="648" y="812" class="t">LAN interna</text>
-    <line x1="760" y1="807" x2="800" y2="807" class="ln"/><text x="808" y="812" class="t">Xarxa de l'aula</text>
+    <rect x="60" y="900" width="18" height="14" class="com"/><text x="86" y="912" class="t">Comunicacions</text>
+    <rect x="210" y="900" width="18" height="14" class="srv"/><text x="236" y="912" class="t">Servidors</text>
+    <rect x="335" y="900" width="18" height="14" class="vir"/><text x="361" y="912" class="t">Virtualització</text>
+    <rect x="485" y="900" width="18" height="14" class="cli"/><text x="511" y="912" class="t">Clients</text>
+    <line x1="600" y1="907" x2="640" y2="907" class="lnb"/><text x="648" y="912" class="t">LAN interna</text>
+    <line x1="760" y1="907" x2="800" y2="907" class="ln"/><text x="808" y="912" class="t">Xarxa de l'aula</text>
   </g>
-  <text x="60" y="845" class="s">* Les IP WAN les dona el DHCP de l'aula i poden canviar (16/11/2026: OPNsense .184, MikroTik .213, Debian .195).</text>
-  <text x="60" y="866" class="s">Reserva d'adreces: .1-.3 comunicacions · .5 NAS · .10 controlador de domini · .17-.19 Proxmox · .20-.29 clients.</text>
+  <text x="60" y="945" class="s">* Les IP WAN les dona el DHCP de l'aula i poden canviar (per exemple OPNsense .184, MikroTik .213, Debian .195).</text>
+  <text x="60" y="966" class="s">Reserva d'adreces: .1-.3 comunicacions · .5 NAS · .10 controlador de domini · .17-.19 Proxmox · .20-.29 clients · .30 infraestructura.</text>
 </svg>

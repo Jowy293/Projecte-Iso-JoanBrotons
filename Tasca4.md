@@ -50,6 +50,7 @@
 | Proxmox3 (pve3) | vmbr0 (pont sobre nic0) | Interna `redjoan11` | Estàtica | 192.168.11.19/24 | 192.168.11.1 |
 | Windows 11 | Ethernet | Interna `redjoan11` | Estàtica | 192.168.11.20/24 | 192.168.11.1 |
 | Ubuntu client | enp0s3 (connexió `lan-estatica`) | Interna `redjoan11` | Estàtica | 192.168.11.25/24 | 192.168.11.1 |
+| Servidor d'infraestructura (infra11) | enp0s3 | Interna `redjoan11` | Estàtica | 192.168.11.30/24 | 192.168.11.1 |
 
 \* IP donada pel DHCP de l'aula; pot canviar.
 

@@ -4,7 +4,7 @@
 
 | Què demana l'enunciat (individual) | On està |
 |---|---|
-| **Obligatori:** configurar al meu entorn de proves els mateixos sistemes que el grup: servidors de comunicacions (MikroTik, OPNsense, Debian amb nftables), TrueNAS, Proxmox, Windows Server 2025 i clients Windows 11 i GNU/Linux, cadascun amb les tasques de l'enunciat (usuari d'administració, xarxa, Internet per a la LAN, còpia al servidor de còpies, errada i recuperació…) | apartats 1 a 5 |
+| **Obligatori:** configurar al meu entorn de proves els mateixos sistemes que el grup: servidors de comunicacions (MikroTik, OPNsense, Debian amb nftables), TrueNAS, Proxmox, Windows Server 2025, servidor d'infraestructura GNU/Linux i clients Windows 11 i GNU/Linux, cadascun amb les tasques de l'enunciat (usuari d'administració, xarxa, Internet per a la LAN, còpia al servidor de còpies, errada i recuperació…) | apartats 1 a 6 |
 | Per a cada sistema: requisits, llicència i origen/integritat de la ISO; firmware i arrencada; versió; actualització i via de recuperació; una incidència d'instal·lació o arrencada real (símptoma, hipòtesi, comprovació, solució i retorn); una connexió permesa i una de bloquejada amb el registre | Dins de cada apartat |
 | **Apte+:** implementar un sistema per a fer còpies de la configuració dels servidors crítics de l'entorn | apartat 2 (TrueNAS) |
 | **Preguntes de l'enunciat** i justificació de firmware, arrencada, particionat i sistema de fitxers | Dins de l'apartat de cada sistema: firmware i disc a la taula de cada equip · Proxmox 3.6 a 3.9 · Windows Server 4.2 i 4.4 |
@@ -184,6 +184,7 @@ Copias/backups/proxmox        300M   lz4
 Copias/backups/winserver        1G   lz4
 Copias/backups/win11          512M   lz4
 Copias/backups/ubuntu         512M   lz4
+Copias/backups/infra          300M   lz4
 Copias/backups/historic       200M   lz4      ← còpies manuals antigues conservades
 ```
 
@@ -205,6 +206,7 @@ Cada còpia la fa l'administrador quan acaba un canvi, entrant amb usuari i cont
 | Proxmox | Al pve1 (amb una n'hi ha prou, el clúster replica `/etc/pve`): `tar czf pve-cluster-config-DATA.tar.gz /etc/pve /etc/network/interfaces /etc/hosts ...` i `scp` a `backup_user@192.168.11.5` | `backups/proxmox/` |
 | Windows Server i Windows 11 | A mà, en un PowerShell com a administrador: `ipconfig /all`, `route print`, `Get-LocalUser`, `Get-HotFix`, `netsh advfirewall export`, `secedit /export` i la llista de programari; es comprimeix amb `Compress-Archive` i es copia a la carpeta compartida | `backups\winserver\` i `backups\win11\` |
 | Ubuntu | `sudo tar czf ubuntu-client11-DATA.tar.gz /etc/NetworkManager/system-connections /etc/netplan /etc/fstab ...` i `scp` a `backup_user@192.168.11.5` | `backups/ubuntu/` |
+| Servidor d'infraestructura | `sudo tar czf infra11-config-DATA.tar.gz /etc/network/interfaces /etc/hosts /etc/ssh/sshd_config ...` i `scp` a `backup_user@192.168.11.5` | `backups/infra/` |
 
 L'última ronda de còpies manuals es va comprovar amb el `sha256sum` del fitxer a l'equip i al TrueNAS, que coincideixen. Evidència: [`evidencies/t5-copies-manuals.txt`](evidencies/t5-copies-manuals.txt)
 
@@ -609,3 +611,71 @@ L'Ubuntu s'uneix al domini amb **realmd** i **SSSD**: `realmd` fa la unió i dei
 Evidència: [`evidencies/t5-ubuntu-domini.txt`](evidencies/t5-ubuntu-domini.txt)
 
 L'usuari local `joan11` continua funcionant. Els usuaris del domini entren amb el nom complet (`usuari@joan11.local`).
+
+## 6. Servidor d'infraestructura GNU/Linux: Debian 13 (`192.168.11.30`)
+
+> Encara no s'ha decidit per a què s'utilitzarà (servidor web o de monitoratge, a la segona avaluació). Per això només s'han fet les tasques de l'enunciat: usuari d'administració, xarxa, programari base per a administrar-lo i còpia al servidor de còpies. No s'hi ha instal·lat cap servei.
+
+Evidència: [`evidencies/t5-infra-estat.txt`](evidencies/t5-infra-estat.txt)
+
+### 6.1 Instal·lació
+
+| Ítem | Valor |
+|---|---|
+| Versió | **Debian GNU/Linux 13 (trixie)**, nucli 6.12.117, sense entorn gràfic |
+| ISO | `debian-13.1.0-amd64-netinst.iso` · SHA-256 `658b28e2…568b3` (la mateixa que el Debian de comunicacions, comprovada amb `SHA256SUMS` de Debian) |
+| Mètode | Instal·lació desatesa de VirtualBox (`VBoxManage unattended install`) amb selecció mínima de paquets: idioma, zona horària `Europe/Madrid`, nom d'equip i usuari d'administració |
+| VM | `Servidor Infraestructura Debian`, al grup **PROJECTE ISO**: 1 vCPU, 1 GB RAM, disc de 12 GB (SSD) |
+| Firmware, arrencada i disc | BIOS · arrencada: disc · MBR: arrel 11,3 GB + partició estesa amb *swap* 687 MB · **ext4**. **Per què:** opció per defecte de l'instal·lador de Debian. Un servidor sense dades pròpies no necessita res més, i amb 1 GB de RAM ZFS no tindria sentit |
+| Requisits oficials | Debian sense escriptori: 512 MB de RAM i 4 GB de disc com a mínim. Té 1 GB i 12 GB per a deixar marge al servei que s'hi pose |
+| Llicència | Lliure (DFSG), sense cost |
+| Actualització | `apt full-upgrade` després d'instal·lar: el nucli passa de 6.12.43 a 6.12.117 |
+
+### 6.2 Usuari d'administració
+
+| Usuari | Permisos |
+|---|---|
+| `administrador11` | Usuari creat en la instal·lació i afegit al grup **`sudo`** (`usermod -aG sudo administrador11`). És el que s'utilitza per a administrar el servidor |
+| `root` | Superusuari, només des de la consola |
+
+S'ha instal·lat `sudo`, que la instal·lació mínima no porta. L'administració remota es fa per **SSH** (`openssh-server`, actiu).
+
+### 6.3 Xarxa
+
+| Ítem | Valor |
+|---|---|
+| Adaptador VirtualBox | Xarxa interna **`redjoan11`**, com la resta d'equips de la LAN |
+| Interfície | `enp0s3`, **IP manual** `192.168.11.30/24`, porta d'enllaç `192.168.11.1` (OPNsense), a `/etc/network/interfaces` |
+| Comprovació | Respon el TrueNAS (`ping 192.168.11.5`) i té eixida a Internet (`www.gva.es` pel port 443) |
+
+**Problema trobat:** la instal·lació es fa amb un adaptador NAT de VirtualBox (per a descarregar els paquets) i després es passa a `redjoan11`. En canviar-lo, el client DHCP de la instal·lació (`dhcpcd`) seguia en marxa: posava una adreça `169.254.x.x` i reescrivia la configuració de xarxa, i el servidor no eixia a Internet. Solució: aturar `dhcpcd`, tornar a aplicar la configuració manual (`ifdown`/`ifup enp0s3`) i reiniciar per comprovar que la IP manual es manté i que `dhcpcd` ja no s'arrenca.
+
+**Problema trobat:** `apt` intentava connectar per IPv6, que la LAN no té. S'ha forçat IPv4 a `/etc/apt/apt.conf.d/99ipv4` (`Acquire::ForceIPv4 "true";`).
+
+### 6.4 Programari instal·lat
+
+| Paquet | Per a què |
+|---|---|
+| `openssh-server` | Administració remota per SSH |
+| `sudo` | Que `administrador11` puga administrar sense entrar com a `root` |
+
+Com que encara no se sap quina funció tindrà, **no s'hi ha instal·lat cap servei** més. Quan es decidisca (servidor web o de monitoratge), s'instal·larà i es configurarà el programari corresponent.
+
+### 6.5 Còpia de la configuració al TrueNAS
+
+Al TrueNAS s'ha creat el dataset `Copias/backups/infra` amb una quota de 300 MB, propietat de `backup_user` (apartat 2). La còpia es fa a mà, igual que la dels altres Linux:
+
+```text
+sudo tar czf infra11-config-DATA.tar.gz /etc/network/interfaces /etc/hosts /etc/hostname /etc/resolv.conf \
+     /etc/ssh/sshd_config /etc/apt/sources.list /etc/apt/apt.conf.d/99ipv4 /etc/fstab /etc/passwd /etc/group paquets.txt
+scp infra11-config-DATA.tar.gz backup_user@192.168.11.5:/mnt/Copias/backups/infra/
+```
+
+| Es copia | No es copia (i per què) |
+|---|---|
+| Xarxa, nom, usuaris i grups, configuració de SSH, repositoris i la **llista de paquets** (`dpkg --get-selections`) | El sistema sencer: es reinstal·la des de la ISO en uns 15 minuts i s'hi aplica aquesta configuració |
+
+**Resultat:** `infra11-config-20261117-1357.tar.gz` (5,9 KB), amb el **mateix SHA-256** al servidor i al TrueNAS (`f982863f…71dcd463c`).
+
+![Servidor d'infraestructura: usuari, xarxa i còpia al TrueNAS](evidencies/captures/t5-infra-01-estat.png)
+

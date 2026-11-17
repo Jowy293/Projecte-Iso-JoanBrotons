@@ -1,0 +1,56 @@
+# Servidor d'infraestructura GNU/Linux: infra11 (Debian 13) · 192.168.11.30
+
+$ head -1 /etc/os-release; uname -r
+PRETTY_NAME="Debian GNU/Linux 13 (trixie)"
+6.12.117+deb13-amd64
+
+$ hostnamectl hostname
+infra11
+
+$ id administrador11
+uid=1000(administrador11) gid=1000(administrador11) grupos=1000(administrador11),27(sudo),100(users)
+
+$ ip -br a; ip r
+lo               UNKNOWN        127.0.0.1/8 ::1/128
+enp0s3           UP             192.168.11.30/24 fe80::a00:27ff:fe07:d99/64
+default via 192.168.11.1 dev enp0s3 onlink
+192.168.11.0/24 dev enp0s3 proto kernel scope link src 192.168.11.30
+
+$ cat /etc/network/interfaces
+source /etc/network/interfaces.d/*
+auto lo
+iface lo inet loopback
+auto enp0s3
+iface enp0s3 inet static
+  address 192.168.11.30/24
+  gateway 192.168.11.1
+
+$ lsblk -o NAME,SIZE,FSTYPE,MOUNTPOINT ; fdisk -l /dev/sda
+sda      12G
+├─sda1 11,3G ext4   /
+├─sda2    1K
+└─sda5  687M swap   [SWAP]
+Tipo de etiqueta de disco: dos   (MBR)
+
+$ systemctl is-active ssh
+active
+
+$ ping -c2 192.168.11.5   (TrueNAS)
+2 packets transmitted, 2 received, 0% packet loss
+
+$ bash -c 'exec 3<>/dev/tcp/www.gva.es/443'   (eixida a Internet per l'OPNsense)
+TCP443 www.gva.es OK
+
+$ dpkg -l | grep ^ii | wc -l
+324
+
+$ systemd-analyze
+Startup finished in 1.991s (kernel) + 2.220s (userspace) = 4.211s
+
+## Còpia de la configuració al TrueNAS
+$ sha256sum /root/infra11-config-20261117-1357.tar.gz        (al servidor)
+f982863f75d15c8382554f41506a271923886a07b1aa0d9fdcf571a71dcd463c
+$ scp infra11-config-20261117-1357.tar.gz backup_user@192.168.11.5:/mnt/Copias/backups/infra/
+infra11-config-20261117-1357.tar.gz           100% 5869     4.7MB/s   00:00
+$ sha256sum /mnt/Copias/backups/infra/infra11-config-20261117-1357.tar.gz   (al TrueNAS)
+f982863f75d15c8382554f41506a271923886a07b1aa0d9fdcf571a71dcd463c

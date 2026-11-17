@@ -15,7 +15,7 @@
 És una reproducció a escala del sistema de l'empresa, seguint l'esquema de "muntatge individual" que va donar el professor:
 
 - **Tres servidors de comunicacions alternatius** (OPNsense, MikroTik i Debian amb nftables). Tenen la WAN a la xarxa de l'aula i la LAN a la xarxa interna.
-- Una **LAN interna** on hi ha el NAS de còpies (TrueNAS), un **clúster de tres nodes Proxmox**, el controlador de domini (Windows Server 2025) i dos clients (Windows 11 i Ubuntu, tots dos units al domini).
+- Una **LAN interna** on hi ha el NAS de còpies (TrueNAS), un **clúster de tres nodes Proxmox**, el controlador de domini (Windows Server 2025), un servidor d'infraestructura Debian i dos clients (Windows 11 i Ubuntu, tots dos units al domini).
 
 El portàtil no té recursos per a executar màquines dins dels Proxmox (disc USB i 32 GB de RAM compartits per 10 VM). Per això els tres nodes Proxmox formen el clúster però **no tenen cap màquina a dins**, i el Windows Server és una VM de VirtualBox independent.
 
@@ -37,7 +37,8 @@ Dades tretes de `VBoxManage showvminfo`:
 | WinServer2025-DC | Windows Server 2025 Standard (escriptori) | 2 | 3 GB | 50 GB (SSD, **sense discard**) | BIOS | interna `redjoan11` |
 | Windows 11 (Cliente) | Windows 11 Pro 23H2 | 2 | 4 GB | 80 GB | **EFI + Secure Boot + TPM 2.0** | interna `redjoan11` |
 | Ubuntu(Cliente) | Ubuntu 26.04.1 LTS | 1 | 2 GB | 25 GB + 7 × 512 MB (RAID, Tasca 6) | BIOS | interna `redjoan11` |
-| **Total** | | **15** | **22,5 GB** | ~320 GB reservats (VDI dinàmics) | | |
+| Servidor Infraestructura Debian | Debian 13 (servidor d'infraestructura `infra11`) | 1 | 1 GB | 12 GB | BIOS | interna `redjoan11` |
+| **Total** | | **16** | **23,5 GB** | ~320 GB reservats (VDI dinàmics) | | |
 
 **Per què aquests adaptadors:**
 - **Pont** només a la WAN dels servidors de comunicacions. Reben IP del DHCP de l'aula, igual que al rack del grup.
