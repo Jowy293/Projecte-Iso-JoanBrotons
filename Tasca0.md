@@ -23,7 +23,7 @@ El portàtil no té recursos per a executar màquines dins dels Proxmox (disc US
 
 ![Muntatge físic i a VirtualBox](diagrames/muntatge-virtualbox.svg)
 
-Dades tretes de `VBoxManage showvminfo` (17/11/2026):
+Dades tretes de `VBoxManage showvminfo`:
 
 | VM (nom a VirtualBox) | SO | vCPU | RAM | Disc(s) | Firmware | Adaptadors de xarxa |
 |---|---|---|---|---|---|---|

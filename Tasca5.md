@@ -65,7 +65,7 @@ Extracte de la configuració (sense claus ni hash): [`configs/opnsense-extracte.
 | Versió | RouterOS **7.24.5 (stable)**, x86_64 (`/system resource print`) |
 | Firmware, arrencada i disc | BIOS · arrencada: disc · Imatge de disc de RouterOS (2 GB) · Propi de RouterOS. **Per què:** RouterOS s'instal·la com una imatge tancada; no es pot triar |
 | Identitat | `MikroTik-11` |
-| Usuaris | `administrador11` (grup *full*). `admin` **desactivat**. ~~`backup`~~ (usuari de còpies amb clau SSH, **eliminat el 17/11/2026** en passar a còpies manuals; abans: grup `copies`: només `ssh,read,sensitive,test,ftp`, sense `write`, només des de `192.168.11.5`, amb clau SSH) |
+| Usuaris | `administrador11` (grup *full*). `admin` **desactivat**. ~~`backup`~~ (usuari de còpies amb clau SSH, **eliminat** en passar a còpies manuals; abans: grup `copies`: només `ssh,read,sensitive,test,ftp`, sense `write`, només des de `192.168.11.5`, amb clau SSH) |
 | WAN `ether1` | Client DHCP → `172.16.222.213/24` |
 | LAN `ether2` | `192.168.11.2/24` |
 | NAT | `srcnat out-interface-list=WAN action=masquerade` (**no existia: per això no hi havia Internet a través del MikroTik**) |
@@ -181,7 +181,7 @@ Copias/backups/proxmox        300M   lz4
 Copias/backups/winserver        1G   lz4
 Copias/backups/win11          512M   lz4
 Copias/backups/ubuntu         512M   lz4
-Copias/backups/historic       200M   lz4      ← còpies manuals antigues (27/10) conservades
+Copias/backups/historic       200M   lz4      ← còpies manuals antigues conservades
 ```
 
 - **Un dataset per equip amb quota** (RA3 g): si un equip genera còpies descontrolades, només omple la seua quota i no bloqueja les còpies de la resta. Les quotes s'han posat amb `zfs set quota=` perquè l'API de TrueNAS 27 exigeix un mínim d'1 GB.
@@ -203,7 +203,7 @@ Cada còpia la fa l'administrador quan acaba un canvi, entrant amb usuari i cont
 | Windows Server i Windows 11 | A mà, en un PowerShell com a administrador: `ipconfig /all`, `route print`, `Get-LocalUser`, `Get-HotFix`, `netsh advfirewall export`, `secedit /export` i la llista de programari; es comprimeix amb `Compress-Archive` i es copia a la carpeta compartida | `backups\winserver\` i `backups\win11\` |
 | Ubuntu | `sudo tar czf ubuntu-client11-DATA.tar.gz /etc/NetworkManager/system-connections /etc/netplan /etc/fstab ...` i `scp` a `backup_user@192.168.11.5` | `backups/ubuntu/` |
 
-L'última ronda de còpies manuals (17/11/2026, 09:25) es va comprovar amb el `sha256sum` del fitxer a l'equip i al TrueNAS, que coincideixen. Evidència: [`evidencies/t5-copies-manuals.txt`](evidencies/t5-copies-manuals.txt)
+L'última ronda de còpies manuals es va comprovar amb el `sha256sum` del fitxer a l'equip i al TrueNAS, que coincideixen. Evidència: [`evidencies/t5-copies-manuals.txt`](evidencies/t5-copies-manuals.txt)
 
 #### Com entrar a veure les còpies
 
@@ -216,7 +216,7 @@ L'última ronda de còpies manuals (17/11/2026, 09:25) es va comprovar amb el `s
 
 ![Carpeta compartida de còpies vista des del Windows 11](evidencies/captures/t5-copies-01-carpeta-compartida.png)
 
-**Abans (fins al 16/11/2026)** el TrueNAS anava a buscar les còpies dels servidors per SSH amb una clau (`backup_user@truenas11`), i l'Ubuntu enviava la seua amb una altra clau. El 17/11/2026 s'han eliminat totes les claus de còpia (del TrueNAS, l'OPNsense, el MikroTik, el Debian, el Proxmox i l'Ubuntu) i l'usuari `backup` del MikroTik, perquè les còpies les faça i les controle l'administrador.
+**Abans** el TrueNAS anava a buscar les còpies dels servidors per SSH amb una clau (`backup_user@truenas11`), i l'Ubuntu enviava la seua amb una altra clau. Després s'han eliminat totes les claus de còpia (del TrueNAS, l'OPNsense, el MikroTik, el Debian, el Proxmox i l'Ubuntu) i l'usuari `backup` del MikroTik, perquè les còpies les faça i les controle l'administrador.
 
 ### 2.3 Recuperació provada
 Les tres recuperacions de l'[apartat 1.7](#1-servidors-de-comunicacions-opnsense-mikrotik-i-debian--nftables) s'han fet **a partir d'aquestes còpies**: el MikroTik es va descarregar la seua per SFTP (`/tool fetch mode=sftp ... user=backup_user`), i al Debian i a l'OPNsense el TrueNAS els va retornar el fitxer per SSH.
@@ -409,7 +409,7 @@ L'enunciat diu que la implantació completa de dominis i polítiques (OU, GPO) c
 
 ### 4.3 Configuració: nom, usuari d'administració, xarxa i creació del domini
 
-| Ítem | Valor (comprovat el 16/11/2026) |
+| Ítem | Valor |
 |---|---|
 | Nom d'equip | `DC-JOAN11` (abans `WIN-7CG1O7V1DFS`, el nom aleatori de la instal·lació; canviat amb `Rename-Computer` i reinici) |
 | Xarxa | IP manual `192.168.11.10/24`, porta d'enllaç `192.168.11.1`, **DHCP: no** |
@@ -463,7 +463,7 @@ Còpia feta a mà en un PowerShell com a administrador: s'exporta la configuraci
 
 ### 5.1 Windows 11 (`192.168.11.20`)
 
-> La primera instal·lació va quedar inservible per la incidència de l'apartat 5.3 i s'ha **reinstal·lat el 16/11/2026**. Les dades d'aquesta taula són de la VM actual. Evidència: [`evidencies/t5-win11-estat.txt`](evidencies/t5-win11-estat.txt)
+> La primera instal·lació va quedar inservible per la incidència de l'apartat 5.3 i s'ha **reinstal·lat**. Les dades d'aquesta taula són de la VM actual. Evidència: [`evidencies/t5-win11-estat.txt`](evidencies/t5-win11-estat.txt)
 
 | Ítem | Valor |
 |---|---|
@@ -477,7 +477,7 @@ Còpia feta a mà en un PowerShell com a administrador: s'exporta la configuraci
 | Usuaris | `Administracion11` (administrador local) · `Cliente11` (usuari estàndard) · `Administrador` integrat **desactivat** |
 | Teclat | Espanyol (es-ES) |
 | Xarxa | IP manual `192.168.11.20/24`, gw `192.168.11.1` (OPNsense), **DHCP: no**. Respon el ping al tallafocs i al TrueNAS i té eixida a Internet (`Test-NetConnection www.gva.es -Port 443` → `True`) |
-| **Domini** | **Unit a `joan11.local`** (17/11/2026). Vegeu l'apartat 5.6 |
+| **Domini** | **Unit a `joan11.local`**. Vegeu l'apartat 5.6 |
 | Actualitzacions | Vegeu l'apartat 5.4 |
 
 ![TPM 2.0 i Secure Boot actius](evidencies/captures/t5-w11-07-tpm-secureboot.png)
@@ -512,10 +512,10 @@ Evidència: [`evidencies/t5-ubuntu-estat.txt`](evidencies/t5-ubuntu-estat.txt)
 | **Símptoma** | En reiniciar (12:24), Windows no arrenca: "Diagnosticando su PC" → "Intentando realizar reparaciones" → **"Reparación automática no pudo reparar tu PC"**. Si s'escull *Continuar*, torna a fallar ("Tu PC no se inició correctamente") |
 | Hipòtesi 1: disc o sistema de fitxers danyat | **Descartada.** `chkdsk C:` des de la consola de recuperació (WinRE): *"Se examinó el sistema de archivos sin encontrar problemas"*, 0 KB en sectors defectuosos |
 | Registre de la reparació | `C:\Windows\System32\Logfiles\Srt\SrtTrail.txt`: totes les proves (disc, registre, estat d'arrencada…) són correctes, però la **causa principal** és l'**aturada `c000021a`**, paràmetre `0xc000000d`: *"Un archivo de arranque imprescindible está dañado"*. La reparació de fitxers falla amb el codi `0x57` |
-| Hipòtesi 2: una actualització a mitges | `c000021a` vol dir que ha mort un procés crític (winlogon o csrss). Els binaris crítics tenen les dates originals (2022-2023), però existeix **`C:\Windows\WinSxS\pending.xml` amb data 16/11/2026 12:24**, l'hora exacta del reinici. És a dir, Windows Update havia deixat operacions de manteniment pendents i el sistema falla en aplicar-les durant l'arrencada. **Probable** |
+| Hipòtesi 2: una actualització a mitges | `c000021a` vol dir que ha mort un procés crític (winlogon o csrss). Els binaris crítics tenen les dates originals, però existeix **`C:\Windows\WinSxS\pending.xml` amb l'hora exacta del reinici**. És a dir, Windows Update havia deixat operacions de manteniment pendents i el sistema falla en aplicar-les durant l'arrencada. **Probable** |
 | Solució aplicada (1r intent) | `dism /Image:C:\ /Cleanup-Image /RevertPendingActions` → *"La operación se completó correctamente"*. El DISM programa la reversió per a l'arrencada següent |
 | Resultat | **Encara no arrenca.** L'arrencada següent torna a acabar en "Tu PC no se inició correctamente" |
-| Comprovació (2n intent, 16/11 a la tarda) | Des de la consola de WinRE: `pending.xml` **torna a existir**, amb data 12:32 (l'ha regenerat la mateixa reversió del DISM). Es reanomena a `pending.xml.bak` (no s'esborra, per poder tornar enrere) |
+| Comprovació (2n intent) | Des de la consola de WinRE: `pending.xml` **torna a existir**, amb data 12:32 (l'ha regenerat la mateixa reversió del DISM). Es reanomena a `pending.xml.bak` (no s'esborra, per poder tornar enrere) |
 | Resultat | **Continua sense arrancar** ("Tu PC no se inició correctamente"). Per tant, `pending.xml` no era l'única causa |
 | 3r intent | WinRE → *Desinstalar las actualizaciones* → *Desinstalar la última actualización de calidad* → **"Surgió un problema y no será posible desinstalar la última actualización"**. Sense punts de restauració ni instantània de la VM, no queden més vies de reparació raonables |
 | **Solució final** | **Reinstal·lació** des de la ISO (el client no té dades úniques i la configuració està documentada). El disc avariat es conserva com a `Win11-avariat-c000021a.vdi` per si calguera recuperar-ne algun fitxer. Aprofitant la reinstal·lació, s'afig a la VM **TPM 2.0 i Secure Boot**, que eren la mancança detectada a l'apartat 5.1 |
@@ -541,11 +541,11 @@ Després de la incidència de l'apartat 5.3, l'actualització es fa amb una via 
 | Via de recuperació | Instantània de la VM `w11-configurat-abans-actualitzar` (equip configurat i amb la còpia al TrueNAS ja feta). Si l'actualització falla, es torna a aquest estat en segons |
 | Eina | Ordres de PowerShell, com a administrador, sobre l'API de Windows Update (`Microsoft.Update.Session`), instal·la les actualitzacions de qualitat i de seguretat i **omet les de característiques** (canvi de versió), i ho registra tot amb l'hora |
 | 1a ronda (16:45-16:52) | 5 actualitzacions, totes amb codi 2 (correcte): plataforma de Windows Security KB5007651, eina d'eliminació de programari maliciós KB890830, definicions de Defender 1.463.329.0, KB4023057 i l'acumulativa 2023-12 KB5033375. No demana reinici |
-| Comprovació | Reinici i arrencada correcta (16:53), `pending.xml` no existeix, la xarxa i l'accés al NAS funcionen. Windows Update ofereix 2 actualitzacions més: plataforma de Defender KB4052623 i l'**acumulativa 2025-11 KB5068865** |
+| Comprovació | Reinici i arrencada correcta (16:53), `pending.xml` no existeix, la xarxa i l'accés al NAS funcionen. Windows Update ofereix 2 actualitzacions més: plataforma de Defender KB4052623 i l'**acumulativa KB5068865** |
 | Comprovació abans de reiniciar | Abans de reiniciar es comprova que no hi ha operacions pendents (`pending.xml`, clau `RebootRequired`) i que el servei de manteniment (`TrustedInstaller`/`TiWorker`) ha acabat. **Error meu en la 1a ronda:** vaig llançar el reinici en la mateixa ordre que la comprovació i `TiWorker` encara treballava. Com que era un reinici normal (no `-Force`), Windows va acabar el manteniment en apagar-se i va arrencar bé, però és justament el que va provocar la incidència de l'apartat 5.3 |
-| 2a ronda (16:59-17:30) | Nova instantània `w11-abans-acumulativa-2025-11`. Plataforma de Defender KB4052623 i **acumulativa 2025-11 KB5068865**, totes dues amb codi 2. Aquesta vegada **sí demana reinici** |
+| 2a ronda (16:59-17:30) | Nova instantània abans de l'acumulativa. Plataforma de Defender KB4052623 i **acumulativa KB5068865**, totes dues amb codi 2. Aquesta vegada **sí demana reinici** |
 | Comprovació final | Reinici normal (`shutdown /r`) a les 17:30 i arrencada correcta a les 17:33. **Build 22631.6199** (abans 22631.2861). En arrencar, `pending.xml` encara existeix (tasques de manteniment posteriors al reinici); es deixa acabar **sense tornar a reiniciar** i a les 17:41 ja no hi és. Xarxa, accés al TrueNAS i Guest Additions funcionen |
-| Resultat | L'equip queda amb l'última acumulativa publicada per a 23H2 (el suport de 23H2 Pro va acabar el novembre de 2025). El pas següent seria l'actualització de característiques a 24H2/25H2, que s'ha omés de manera conscient: és un canvi de versió i no forma part d'aquesta fase |
+| Resultat | L'equip queda amb l'última acumulativa publicada per a 23H2 (el suport de 23H2 Pro ja ha acabat). El pas següent seria l'actualització de característiques a 24H2/25H2, que s'ha omés de manera conscient: és un canvi de versió i no forma part d'aquesta fase |
 
 Evidència: [`evidencies/t5-win11-actualitzacio.txt`](evidencies/t5-win11-actualitzacio.txt)
 
@@ -570,7 +570,7 @@ Evidència Ubuntu: [`evidencies/t5-ubuntu-copia.txt`](evidencies/t5-ubuntu-copia
 | Unió | En un PowerShell com a administrador: `Add-Computer -DomainName joan11.local -Credential JOAN11\administrador11` → *"Unirse al dominio 'joan11.local'"* |
 | Reinici | Abans de reiniciar es comprova que Windows Update no té res pendent (`pending.xml` no existeix, `TiWorker` aturat) i es reinicia amb `shutdown /r` |
 | **Comprovació al client** | S'inicia sessió amb un **usuari del domini** (`JOAN11\administrador11`): `whoami` → `joan11\administrador11`, `Domain: joan11.local`, `PartOfDomain: True` |
-| **Comprovació al DC** | `Get-ADComputer W11-CLIENT11` → compte d'equip `CN=W11-CLIENT11,CN=Computers,DC=joan11,DC=local`, `OperatingSystem: Windows 11 Pro`, `Enabled: True`, creat el 17/11/2026 a les 8:31 |
+| **Comprovació al DC** | `Get-ADComputer W11-CLIENT11` → compte d'equip `CN=W11-CLIENT11,CN=Computers,DC=joan11,DC=local`, `OperatingSystem: Windows 11 Pro`, `Enabled: True` |
 
 Evidència: [`evidencies/t5-win11-domini.txt`](evidencies/t5-win11-domini.txt)
 

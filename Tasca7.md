@@ -28,7 +28,7 @@ Línia base de l'amfitrió (portàtil ASUS B3605CCA, Core Ultra 5 125H, 32 GB, S
 | Instal·lació del Windows Server | 7 (WS instal·lant) | 86-90 % | 11,5 GB | **~290 MB/s de lectura, 85 % d'ús** | — | [`t7-carrega-instalacio-winserver.txt`](evidencies/t7-carrega-instalacio-winserver.txt) |
 | **Totes les VM enceses** (WS i W11 arrencant) | **8** | 87,5 % (wa 4,4 %) | **6,3 GB** de 31,3 GB · swap 0 | 25 MB/s d'escriptura, **87 % d'ús** | 73 °C | [`t7-8vm-enceses.txt`](evidencies/t7-8vm-enceses.txt) |
 | WS congelat per TRIM (vegeu l'apartat 4) | 6 | ~92 % | 12,9 GB | **277 MB/s de lectura, 91 % d'ús** | — | [`t7-optimitzacio-discard.txt`](evidencies/t7-optimitzacio-discard.txt) |
-| Equip de casa: Windows 11 instal·lant l'acumulativa 2025-11 | 3 (W11, OPNsense, TrueNAS) | 92,7 % | 17,4 GB | 9 MB/s de lectura + 15 MB/s d'escriptura, **81 % d'ús** | 42 °C | [`t7-casa-win11-actualitzant.txt`](evidencies/t7-casa-win11-actualitzant.txt) |
+| Equip de casa: Windows 11 instal·lant l'actualització acumulativa | 3 (W11, OPNsense, TrueNAS) | 92,7 % | 17,4 GB | 9 MB/s de lectura + 15 MB/s d'escriptura, **81 % d'ús** | 42 °C | [`t7-casa-win11-actualitzant.txt`](evidencies/t7-casa-win11-actualitzant.txt) |
 
 ## 3. Informe: què se satura i quantes VM es poden fer servir
 
@@ -59,7 +59,7 @@ Evidència: [`evidencies/t7-optimitzacio-discard.txt`](evidencies/t7-optimitzaci
 
 ### 4.2 Optimització 2: arrencada i serveis dels servidors de comunicacions
 
-Mesurat el 16/11/2026 a l'**equip de casa** (el mateix disc USB arrencat al sobretaula, vegeu la [Tasca 2](Tasca2.md)), amb les mateixes VM enceses de fons abans i després (OPNsense, TrueNAS i Windows 11 en repòs) i el disc de l'amfitrió en repòs (2 % d'ús).
+Mesurat a l'**equip de casa** (el mateix disc USB arrencat al sobretaula, vegeu la [Tasca 2](Tasca2.md)), amb les mateixes VM enceses de fons abans i després (OPNsense, TrueNAS i Windows 11 en repòs) i el disc de l'amfitrió en repòs (2 % d'ús).
 
 | | Detall |
 |---|---|

@@ -3,7 +3,7 @@
 **ASIX ThinkLab — "Naix un sistema: instal·la, configura i vigila'l"** (v2.0)
 Mòduls **FDM** (RA1, RA4) i **ISO** (RA1, RA3, RA6) · Posició a l'aula **11** → LAN **`192.168.11.0/24`**
 
-Aquest repositori documenta l'**entorn de proves individual** muntat a VirtualBox al portàtil de classe, seguint l'esquema "Muntatge individual" donat pel professor. Tot el que hi ha aquí està comprovat a les màquines: cada afirmació remet a una evidència a [`evidencies/`](evidencies/), presa amb ordres reals (data 16/11/2026). On una dada no es pot comprovar, es marca **N/C** amb la proposta de comprovació.
+Aquest repositori documenta l'**entorn de proves individual** muntat a VirtualBox al portàtil de classe, seguint l'esquema "Muntatge individual" donat pel professor. Tot el que hi ha aquí està comprovat a les màquines: cada afirmació remet a una evidència a [`evidencies/`](evidencies/), presa amb ordres reals. On una dada no es pot comprovar, es marca **N/C** amb la proposta de comprovació.
 
 ## Mapa de l'entorn
 
@@ -33,7 +33,7 @@ Un fitxer per cada lliurament d'Aules:
 | 6 | Almenys 3 tipus de RAID · Apte+: RAID 1 entre discos de dos equips | [Tasca6.md](Tasca6.md) |
 | 7 | Anàlisi de recursos de la màquina física · Apte+: dues optimitzacions mesurades | [Tasca7.md](Tasca7.md) |
 
-La Tasca 8 (cas pràctic i qüestionari) es fa a classe el 25/11.
+La Tasca 8 (cas pràctic i qüestionari) es fa a classe.
 
 ## Estructura del repositori
 

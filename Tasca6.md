@@ -94,7 +94,7 @@ Els temps de reconstrucció són tan curts perquè els discos són de 512 MB i s
 | **Cau l'equip remot** (logout iSCSI = el TrueNAS deixa de ser accessible) | `State : clean, degraded`, 1 dispositiu actiu. `sha256sum -c` → **OK**. Es poden continuar escrivint dades (`nou.txt`) |
 | **Torna l'equip remot** (login + `--re-add`) | Resincronització en **7 s**. `State : clean`, 2 actius, `Intent Bitmap : Internal` |
 
-### 5.4 Comprovació final (captures, 16/11/2026 12:27)
+### 5.4 Comprovació final (captures)
 
 Després de reiniciar les VM, els arrays continuen actius. Això demostra que la configuració és persistent (`mdadm.conf`, `fstab` i node iSCSI automàtic):
 

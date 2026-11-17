@@ -51,11 +51,11 @@
 | Windows 11 | Ethernet | Interna `redjoan11` | Estàtica | 192.168.11.20/24 | 192.168.11.1 |
 | Ubuntu client | enp0s3 (connexió `lan-estatica`) | Interna `redjoan11` | Estàtica | 192.168.11.25/24 | 192.168.11.1 |
 
-\* IP donada pel DHCP de l'aula el 16/11/2026; pot canviar.
+\* IP donada pel DHCP de l'aula; pot canviar.
 
 ## 4. Verificació de la connectivitat (Apte+)
 
-Totes les proves s'han fet el **16/11/2026** amb les VM enceses, des de l'amfitrió, entrant per SSH a cada equip a través de la WAN del Debian.
+Totes les proves s'han fet amb les VM enceses, des de l'amfitrió, entrant per SSH a cada equip a través de la WAN del Debian.
 Eixida completa sense retocar: [`evidencies/t4-connectivitat.txt`](evidencies/t4-connectivitat.txt) · Windows 11: [`evidencies/t4-win11.txt`](evidencies/t4-win11.txt) · Windows Server: [`evidencies/t4-winserver.txt`](evidencies/t4-winserver.txt)
 
 ### 4.1 Configuració de cada interfície (comprovada)
@@ -98,7 +98,7 @@ Ping de 2 paquets des de cada equip a tota la LAN, en el moment en què les 8 VM
 
 Les proves des de l'Ubuntu, el Debian i el Windows 11 donen OK a tots els equips encesos en aquell moment. Les fallades que apareixen a l'evidència (`.2`, `.17`, `.10`) corresponen a VM que estaven aturades o reiniciant quan es van fer, no a errors de xarxa. Es veu perquè els mateixos destins responen a les proves fetes des de l'OPNsense i el MikroTik amb totes les VM enceses.
 
-**Nodes Proxmox nous (17/11/2026):** després d'instal·lar el pve2 i el pve3, des del Debian (`.3`) responen els tres nodes del clúster: `.17` (0,25 ms), `.18` (0,36 ms) i `.19` (0,27 ms). A més, els tres nodes es comuniquen entre ells per corosync, perquè el clúster té quòrum (Tasca 5, apartat 3.5).
+**Nodes Proxmox nous:** després d'instal·lar el pve2 i el pve3, des del Debian (`.3`) responen els tres nodes del clúster: `.17` (0,25 ms), `.18` (0,36 ms) i `.19` (0,27 ms). A més, els tres nodes es comuniquen entre ells per corosync, perquè el clúster té quòrum (Tasca 5, apartat 3.5).
 
 El MikroTik mostra el TTL de cada resposta: **64** als Linux/BSD i **128** als Windows (`.10`, `.20`). És el valor inicial de cada sistema, i confirma que les respostes venen directament de la LAN, sense passar per cap router.
 

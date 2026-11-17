@@ -12,11 +12,11 @@
 ## 1. Inventari
 
 ### 1.1 Equip de classe (dades reals)
-Obtingut el 16/11/2026 amb `lscpu`, `free`, `lsblk`, `lsusb -t`, `lspci`, `/sys/class/dmi` i `/sys/class/thermal`. Eixida completa: [`evidencies/inventari-host-classe.txt`](evidencies/inventari-host-classe.txt)
+Obtingut amb `lscpu`, `free`, `lsblk`, `lsusb -t`, `lspci`, `/sys/class/dmi` i `/sys/class/thermal`. Eixida completa: [`evidencies/inventari-host-classe.txt`](evidencies/inventari-host-classe.txt)
 
 | Component | Equip de classe |
 |---|---|
-| Model | ASUS ExpertBook **B3605CCA** (BIOS B3605CCA.303, 06/11/2025) |
+| Model | ASUS ExpertBook **B3605CCA** (BIOS B3605CCA.303) |
 | Format | Portàtil 16" amb bateria (fa de SAI en un tall de llum) |
 | SO amfitrió | Linux Mint 22.3, nucli 6.8.0-147 |
 | CPU | Intel **Core Ultra 5 125H** · 14 nuclis (4P + 8E + 2LPE) / 18 fils · 400 MHz-4,5 GHz · L3 18 MB · **VT-x** |
@@ -30,11 +30,11 @@ Obtingut el 16/11/2026 amb `lscpu`, `free`, `lsblk`, `lsusb -t`, `lspci`, `/sys/
 | Temperatura en repòs amb 5 VM | CPU 68 °C (`x86_pkg_temp`) |
 
 ### 1.2 Equip de casa (dades reals)
-Obtingut el 16/11/2026 arrencant l'equip de casa amb el mateix disc USB de classe (Linux Mint 22.3), amb `lscpu`, `free`, `lsblk`, `lsusb`, `lspci`, `/sys/class/dmi`, `/sys/class/nvme`, `/sys/class/tpm`, `mokutil` i `sensors`. Eixida completa: [`evidencies/t2-inventari-casa.txt`](evidencies/t2-inventari-casa.txt)
+Obtingut arrencant l'equip de casa amb el mateix disc USB de classe (Linux Mint 22.3), amb `lscpu`, `free`, `lsblk`, `lsusb`, `lspci`, `/sys/class/dmi`, `/sys/class/nvme`, `/sys/class/tpm`, `mokutil` i `sensors`. Eixida completa: [`evidencies/t2-inventari-casa.txt`](evidencies/t2-inventari-casa.txt)
 
 | Component | Equip de casa |
 |---|---|
-| Model | Sobretaula · placa **ASUS PRIME B650M-A II** (socket AM5, BIOS AMI 3287, 20/09/2025) |
+| Model | Sobretaula · placa **ASUS PRIME B650M-A II** (socket AM5, BIOS AMI 3287) |
 | Format | **Sobretaula** sense bateria (un tall de llum l'apaga si no té SAI) |
 | SO habitual | Windows 11 Pro (al disc NVMe intern) |
 | CPU | **AMD Ryzen 5 7600X** · 6 nuclis / 12 fils · 545 MHz-5,45 GHz · L2 6 MB · L3 32 MB · **AMD-V** |
@@ -99,7 +99,7 @@ Les eines s'han descarregat dels repositoris d'Ubuntu (`apt-get download`) i s'h
 
 | Prova | Eina i condicions | Resultat | Interpretació |
 |---|---|---|---|
-| **Memòria** | `memtester 4.6.0`, 2 GB bloquejats amb `mlock`, 1 passada completa, amb 6 VM enceses (16/11/2026 12:35) | **18 de 18 proves `ok`, 0 errors** (Stuck Address, Random Value, Compare XOR/SUB/MUL/DIV/OR/AND, Sequential Increment, Solid Bits, Block Sequential, Checkerboard, Bit Spread, Bit Flip, Walking Ones/Zeroes, 8/16-bit Writes). Durada: 6 min 17 s | La RAM no té errors. Com que hi havia ~22 GB ocupats per les VM, la prova cobreix una part de la memòria física diferent de la que ja usaven les VM. Evidència: [`evidencies/t2-memtester-classe.txt`](evidencies/t2-memtester-classe.txt) |
+| **Memòria** | `memtester 4.6.0`, 2 GB bloquejats amb `mlock`, 1 passada completa, amb 6 VM enceses | **18 de 18 proves `ok`, 0 errors** (Stuck Address, Random Value, Compare XOR/SUB/MUL/DIV/OR/AND, Sequential Increment, Solid Bits, Block Sequential, Checkerboard, Bit Spread, Bit Flip, Walking Ones/Zeroes, 8/16-bit Writes). Durada: 6 min 17 s | La RAM no té errors. Com que hi havia ~22 GB ocupats per les VM, la prova cobreix una part de la memòria física diferent de la que ja usaven les VM. Evidència: [`evidencies/t2-memtester-classe.txt`](evidencies/t2-memtester-classe.txt) |
 | **Xarxa (enllaç)** | `/sys/class/net/eno1`, `ip -s link` | **1000 Mbit/s full duplex**, 0 errors i 0 paquets descartats en 2,3 milions de paquets rebuts | La NIC i el cable funcionen bé |
 | **Xarxa (latència)** | `ping -c100 -i0.2` al router de l'aula `172.16.222.1` | **0 % de pèrdua**, mitjana 0,50 ms (mín. 0,44 / màx. 0,64 ms, desviació 0,03 ms) | Xarxa local estable, sense pèrdues ni variacions |
 | **Xarxa (Internet)** | `curl` descarregant fitxers grans de `deb.debian.org` i `archive.ubuntu.com` a `/dev/null` (sense escriure al disc) | **81-101 Mbit/s** | Un enllaç Gigabit podria donar ~940 Mbit/s: el límit és l'eixida a Internet del centre, compartida per tota l'aula, no el portàtil. Evidència: [`evidencies/t2-xarxa-classe.txt`](evidencies/t2-xarxa-classe.txt) |
@@ -108,7 +108,7 @@ Les eines s'han descarregat dels repositoris d'Ubuntu (`apt-get download`) i s'h
 | **Disc (sintètica)** | `fio 3.36` sobre el mateix disc USB, amb les VM aturades (fet a l'equip de casa, apartat 3.2) | 401 MB/s de lectura i 392 MB/s d'escriptura seqüencial | El disc no pot donar més: a classe, durant la instal·lació del Windows Server, ja n'usava el 72 % (290 MB/s) |
 
 ### 3.2 Equip de casa
-Totes les proves s'han fet el 16/11/2026, amb l'equip de casa arrencat des del disc USB de classe i **amb les VM aturades**. Les eines són les mateixes que a classe (descarregades amb `apt-get download` i executades des d'una carpeta d'usuari).
+Totes les proves s'han fet amb l'equip de casa arrencat des del disc USB de classe i **amb les VM aturades**. Les eines són les mateixes que a classe (descarregades amb `apt-get download` i executades des d'una carpeta d'usuari).
 
 | Prova | Eina i condicions | Resultat | Interpretació |
 |---|---|---|---|
