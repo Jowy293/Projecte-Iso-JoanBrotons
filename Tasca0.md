@@ -15,7 +15,7 @@
 És una reproducció a escala del sistema de l'empresa, seguint l'esquema de "muntatge individual" que va donar el professor:
 
 - **Tres servidors de comunicacions alternatius** (OPNsense, MikroTik i Debian amb nftables). Tenen la WAN a la xarxa de l'aula i la LAN a la xarxa interna.
-- Una **LAN interna** on hi ha el NAS de còpies (TrueNAS), un **clúster de tres nodes Proxmox**, el controlador de domini (Windows Server 2025) i dos clients (Windows 11, unit al domini, i Ubuntu).
+- Una **LAN interna** on hi ha el NAS de còpies (TrueNAS), un **clúster de tres nodes Proxmox**, el controlador de domini (Windows Server 2025) i dos clients (Windows 11 i Ubuntu, tots dos units al domini).
 
 El portàtil no té recursos per a executar màquines dins dels Proxmox (disc USB i 32 GB de RAM compartits per 10 VM). Per això els tres nodes Proxmox formen el clúster però **no tenen cap màquina a dins**, i el Windows Server és una VM de VirtualBox independent.
 

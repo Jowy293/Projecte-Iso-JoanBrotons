@@ -1,0 +1,44 @@
+# Unió de l'Ubuntu (ubuntu-client11) al domini joan11.local
+
+## Al client
+$ realm list
+joan11.local
+  type: kerberos
+  realm-name: JOAN11.LOCAL
+  domain-name: joan11.local
+  configured: kerberos-member
+  server-software: active-directory
+  client-software: sssd
+  required-package: sssd-tools
+  required-package: sssd
+  required-package: libnss-sss
+  required-package: libpam-sss
+  required-package: adcli
+  required-package: samba-common-bin
+  login-formats: %U@joan11.local
+  login-policy: allow-realm-logins
+
+$ id administrador11@joan11.local
+uid=1800201000(administrador11@joan11.local) gid=1800200513(usuarios del dominio@joan11.local) groups=1800200513(usuarios del dominio@joan11.local),1800200512(admins. del dominio@joan11.local),1800200572(grupo de replicación de contraseña rodc denegada@joan11.local)
+
+$ klist -k /etc/krb5.keytab
+Keytab name: FILE:/etc/krb5.keytab
+KVNO Principal
+---- --------------------------------------------------------------------------
+   2 UBUNTU-CLIENT11$@JOAN11.LOCAL
+   2 UBUNTU-CLIENT11$@JOAN11.LOCAL
+   2 host/UBUNTU-CLIENT11@JOAN11.LOCAL
+
+## Inici de sessió per SSH amb un usuari del domini
+$ ssh administrador11@joan11.local@192.168.11.25 'whoami; id -gn; pwd'
+administrador11@joan11.local
+usuarios del dominio@joan11.local
+/home/administrador11@joan11.local      (carpeta creada automàticament en el primer inici de sessió)
+
+## Al controlador de domini (DC-JOAN11): Get-ADComputer UBUNTU-CLIENT11
+DistinguishedName : CN=UBUNTU-CLIENT11,CN=Computers,DC=joan11,DC=local
+DNSHostName       : ubuntu-client11
+Enabled           : True
+Name              : UBUNTU-CLIENT11
+OperatingSystem   : pc-linux-gnu
+SamAccountName    : UBUNTU-CLIENT11$

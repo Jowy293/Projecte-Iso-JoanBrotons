@@ -16,7 +16,7 @@ Aquest repositori documenta l'**entorn de proves individual** muntat a VirtualBo
 | Windows Server | 192.168.11.10 | Windows Server 2025 Standard | Controlador de domini **`joan11.local`** (NetBIOS `JOAN11`), nom `DC-JOAN11` |
 | Proxmox VE (pve1, pve2, pve3) | **192.168.11.17**, .18, .19 | Proxmox VE 9.2.2 | Clúster de virtualització `clusterjoan11` de 3 nodes (sense màquines a dins) |
 | Windows 11 | 192.168.11.20 | Windows 11 Pro 23H2 (TPM 2.0 + Secure Boot) | Client (`W11-CLIENT11`), unit al domini `joan11.local` |
-| Ubuntu | 192.168.11.25 | Ubuntu 26.04.1 LTS | Client Linux (+ proves de RAID) |
+| Ubuntu | 192.168.11.25 | Ubuntu 26.04.1 LTS | Client Linux unit al domini `joan11.local` (+ proves de RAID) |
 
 Només les **WAN dels tres servidors de comunicacions** van per DHCP (adaptador pont a la xarxa de l'aula). **Tots els equips de la LAN tenen IP manual** i a la LAN no hi ha cap servidor DHCP.
 

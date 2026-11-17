@@ -1,0 +1,25 @@
+# Eixida a Internet per cadascun dels tres servidors de comunicacions
+# Es canvia la passarel·la per defecte del client o del servidor i es prova una connexió real a Internet.
+# (El ping cap a fora no respon ni des del mateix Debian: la xarxa de l'aula bloqueja l'ICMP cap a Internet,
+#  per això es prova amb TCP 443 i HTTP.)
+
+## Ubuntu (192.168.11.25): ip route replace default via <passarel·la>
+== default via 192.168.11.1 dev enp0s3   (OPNsense)
+TCP443 www.gva.es OK
+  HTTP/1.1 200 OK            (wget http://deb.debian.org/debian/)
+ 1:  192.168.11.1            (tracepath: primer salt)
+== default via 192.168.11.2 dev enp0s3   (MikroTik)
+TCP443 www.gva.es OK
+  HTTP/1.1 200 OK
+ 1:  192.168.11.2
+== default via 192.168.11.3 dev enp0s3   (Debian + nftables)
+TCP443 www.gva.es OK
+  HTTP/1.1 200 OK
+ 1:  192.168.11.3
+Al final es torna a la connexió lan-estatica: default via 192.168.11.1
+
+## Windows Server (192.168.11.10): Remove-NetRoute / New-NetRoute -NextHop <passarel·la> + Test-NetConnection www.gva.es -Port 443
+gw 192.168.11.1 -> nom resolt: 195.77.20.91  TCP 443: True
+gw 192.168.11.2 -> nom resolt: 195.77.20.91  TCP 443: True
+gw 192.168.11.3 -> nom resolt: 195.77.20.91  TCP 443: True
+final: 192.168.11.1

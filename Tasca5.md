@@ -26,6 +26,9 @@ Els tres servidors de comunicacions comparteixen la mateixa xarxa interna `redjo
 - **Només les WAN dels servidors de comunicacions van per DHCP.** Tota la resta d'equips té IP manual (vegeu [Tasca 4](Tasca4.md)).
 - **Cap servidor fa DHCP a la LAN.** Al principi el MikroTik repartia el rang `.5-.55`. Això provocava que el TrueNAS acabara a la `.55` i que el **propi OPNsense** agafara la `.50` a la seua LAN, amb la ruta per defecte cap al MikroTik. Amb tres passarel·les a la mateixa LAN, si hi ha més d'un DHCP, cada client acaba amb una passarel·la diferent a l'atzar.
 - Per a provar el MikroTik o el Debian, el client canvia la passarel·la (`ip route replace default via 192.168.11.2`). Així es fa a les proves de sota.
+- **Qualsevol dels tres dona Internet.** Si només està encés un servidor de comunicacions, n'hi ha prou amb posar la seua IP com a passarel·la al client i al servidor. Prova feta canviant la passarel·la de l'Ubuntu i del Windows Server a la `.1`, la `.2` i la `.3`: amb les tres hi ha connexió a Internet (TCP 443 a `www.gva.es` i HTTP a `deb.debian.org`), i el primer salt és sempre la passarel·la triada. El ping cap a fora no respon ni des del mateix Debian, perquè la xarxa de l'aula bloqueja l'ICMP cap a Internet. Evidència: [`evidencies/t5-passarelles-internet.txt`](evidencies/t5-passarelles-internet.txt)
+
+![Windows Server eixint a Internet per les tres passarel·les](evidencies/captures/t5-ws-05-passarelles-internet.png)
 
 ### 1.1 Comprovacions comunes abans d'instal·lar
 
@@ -401,11 +404,11 @@ Un **domini** (Active Directory a Windows Server) és una **base de dades centra
 | Configuració manual de cada PC | **GPO**: fons, unitats de xarxa mapades, bloqueig d'USB, actualitzacions, contrasenyes segures… aplicades automàticament per OU |
 | No hi ha registre central de qui entra on | Auditoria centralitzada d'inicis de sessió |
 
-**Què aporta a l'empresa de l'enunciat:** té cinc departaments amb usuaris que poden canviar d'equip. Amb el domini, un comercial pot iniciar sessió a qualsevol PC amb el seu compte, i informàtica gestiona tots els equips des d'un sol lloc. Al meu entorn s'ha creat el domini `joan11.local` i el **Windows 11 ja hi està unit** (apartat 5.6).
+**Què aporta a l'empresa de l'enunciat:** té cinc departaments amb usuaris que poden canviar d'equip. Amb el domini, un comercial pot iniciar sessió a qualsevol PC amb el seu compte, i informàtica gestiona tots els equips des d'un sol lloc. Al meu entorn s'ha creat el domini `joan11.local` i el **Windows 11 i l'Ubuntu ja hi estan units** (apartats 5.6 i 5.7).
 
 **Inconvenient:** el controlador de domini es converteix en un servei crític. A l'empresa caldrien dos controladors perquè, si un cau, els usuaris puguen continuar iniciant sessió.
 
-L'enunciat diu que la implantació completa de dominis i polítiques (OU, GPO) correspon a fases posteriors (RA4/RA5). **S'ha creat el domini i s'hi ha unit el Windows 11** (apartat 5.6), sense OU ni GPO.
+L'enunciat diu que la implantació completa de dominis i polítiques (OU, GPO) correspon a fases posteriors (RA4/RA5). **S'ha creat el domini i s'hi han unit els dos clients**, el Windows 11 (apartat 5.6) i l'Ubuntu (apartat 5.7). No s'han creat OU, grups, permisos ni directives: només hi ha les dues directives que Windows crea per defecte.
 
 ### 4.3 Configuració: nom, usuari d'administració, xarxa i creació del domini
 
@@ -415,7 +418,7 @@ L'enunciat diu que la implantació completa de dominis i polítiques (OU, GPO) c
 | Xarxa | IP manual `192.168.11.10/24`, porta d'enllaç `192.168.11.1`, **DHCP: no** |
 | Rols | **Serveis de domini d'Active Directory** (`Install-WindowsFeature` → `Success=True`) |
 | Domini | **`joan11.local`**, NetBIOS `JOAN11`, bosc i domini nivell Windows Server 2016 (`Install-ADDSForest`). Un sol DC, que fa també de catàleg global |
-| Usuari d'administració | `JOAN11\administrador11`, membre d'**Admins. del dominio** i d'**Administradores** (Builtin). En promocionar, l'usuari local passa a ser del domini però **no** entra sol a *Admins. del dominio*: s'hi ha afegit a mà (`Add-ADGroupMember`). El compte `Administrador` integrat continua desactivat |
+| Usuari d'administració | `JOAN11\administrador11`, membre d'**Admins. del dominio** i d'**Administradores** (Builtin). En promocionar, l'usuari local passa a ser del domini però **no** entra sol a *Admins. del dominio*: s'hi ha afegit a mà (`Add-ADGroupMember`). El compte `Administrador` integrat del domini el crea Windows en promocionar, però no s'utilitza |
 | Contrasenya del mode de restauració (DSRM) | Definida en la promoció i guardada fora del repositori |
 
 Evidència: [`evidencies/t5-winserver-domini-copia.txt`](evidencies/t5-winserver-domini-copia.txt) (sense retocar)
@@ -496,7 +499,8 @@ Evidència: [`evidencies/t5-ubuntu-estat.txt`](evidencies/t5-ubuntu-estat.txt)
 | Usuari d'administració | `joan11` (grup `sudo`) |
 | Xarxa | Connexió NetworkManager **`lan-estatica`**: manual `192.168.11.25/24`, gw `192.168.11.1`. La connexió de netplan per DHCP queda amb `autoconnect no` |
 | Actualitzacions | `apt` va informar de "0 actualitzacions" en iniciar sessió. `apt update` va fallar per l'hora (vegeu sota) |
-| Programari afegit | `openssh-server` (administració remota), `mdadm` (RAID), `sysstat` (mesures) |
+| Programari afegit | `openssh-server` (administració remota), `mdadm` (RAID), `sysstat` (mesures), i per al domini `realmd`, `sssd`, `adcli` i `krb5-user` |
+| **Domini** | **Unit a `joan11.local`**. Vegeu l'apartat 5.7 |
 
 **Problemes trobats i resolts:**
 1. **Sense xarxa en arrencar**: la connexió esperava DHCP i a la LAN ja no n'hi ha. `nmcli con mod` sobre la connexió generada per netplan no es mantenia, i per això s'ha creat la connexió pròpia `lan-estatica`.
@@ -575,3 +579,21 @@ Evidència Ubuntu: [`evidencies/t5-ubuntu-copia.txt`](evidencies/t5-ubuntu-copia
 Evidència: [`evidencies/t5-win11-domini.txt`](evidencies/t5-win11-domini.txt)
 
 Els usuaris locals (`Administracion11` i `Cliente11`) continuen funcionant. Ara també hi poden iniciar sessió els usuaris del domini, i l'equip ja podria rebre polítiques (GPO), que no es configuren en aquesta fase.
+
+### 5.7 Integració de l'Ubuntu al domini `joan11.local`
+
+L'Ubuntu s'uneix al domini amb **realmd** i **SSSD**: `realmd` fa la unió i deixa configurat `sssd`, que és el servei que després valida els usuaris contra el controlador de domini.
+
+| Pas | Detall |
+|---|---|
+| 1. Preparar la xarxa | A la connexió `lan-estatica` el client busca els noms al controlador de domini (`192.168.11.10`) amb el sufix `joan11.local` (`nmcli con mod lan-estatica ...`). Sense això no troba el domini. L'hora es posa igual que la del DC (Kerberos falla si la diferència passa de 5 minuts) |
+| 2. Instal·lar els paquets | `sudo apt install realmd sssd sssd-tools adcli krb5-user samba-common-bin oddjob oddjob-mkhomedir packagekit` |
+| 3. Descobrir el domini | `realm discover joan11.local` → `type: kerberos`, `server-software: active-directory`, `configured: no` |
+| 4. Unir-se | `sudo realm join -U administrador11 joan11.local` i la contrasenya de l'administrador del domini → *"Successfully enrolled machine in realm"*. Crea el compte d'equip al DC i la clau de l'equip a `/etc/krb5.keytab` |
+| 5. Carpeta personal automàtica | `sudo pam-auth-update --enable mkhomedir`: la primera vegada que entra un usuari del domini se li crea la carpeta `/home/usuari@joan11.local` |
+| **Comprovació al client** | `realm list` → `configured: kerberos-member`. `id administrador11@joan11.local` mostra l'usuari i els seus grups del domini. Inici de sessió per SSH amb `administrador11@joan11.local` → `whoami` = `administrador11@joan11.local` i carpeta personal creada |
+| **Comprovació al DC** | `Get-ADComputer UBUNTU-CLIENT11` → `CN=UBUNTU-CLIENT11,CN=Computers,DC=joan11,DC=local`, `Enabled: True` |
+
+Evidència: [`evidencies/t5-ubuntu-domini.txt`](evidencies/t5-ubuntu-domini.txt)
+
+L'usuari local `joan11` continua funcionant. Els usuaris del domini entren amb el nom complet (`usuari@joan11.local`).
