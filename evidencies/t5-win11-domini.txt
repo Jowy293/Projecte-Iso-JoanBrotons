@@ -1,0 +1,15 @@
+# Unió del Windows 11 al domini joan11.local · 2026-11-17 08:38
+## Al client, sessió iniciada amb un usuari del domini (JOAN11\administrador11)
+joan11\administrador11
+Name         : W11-CLIENT11
+Domain       : joan11.local
+PartOfDomain : True
+
+## Al controlador de domini (DC-JOAN11): Get-ADComputer W11-CLIENT11
+DistinguishedName : CN=W11-CLIENT11,CN=Computers,DC=joan11,DC=local
+DNSHostName       : W11-CLIENT11.joan11.local
+Enabled           : True
+Name              : W11-CLIENT11
+OperatingSystem   : Windows 11 Pro
+SamAccountName    : W11-CLIENT11$
+whenCreated       : 17/11/2026 8:31:23

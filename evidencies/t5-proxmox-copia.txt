@@ -28,3 +28,18 @@ etc/pve/firewall/
 etc/pve/sdn/
 etc/pve/vzdump.cron
 
+
+# 17/11/2026 · nova còpia després de crear el clúster (llançada a mà al TrueNAS)
+$ sudo -u backup_user /mnt/Copias/backups/scripts/copia-servidors.sh proxmox
+OK  pve1-config-20261117-1006.tar.gz  sha256=021db3f6ee8d0b87
+$ ls -l /mnt/Copias/backups/proxmox
+-rw-r--r-- 1 backup_user backup_user 13855 Nov 16 11:06 pve1-config-20261116-1106.tar.gz
+-rw-r--r-- 1 backup_user backup_user 21236 Nov 17 10:06 pve1-config-20261117-1006.tar.gz
+$ tar tzf pve1-config-20261117-1006.tar.gz | grep -E 'corosync|nodes/pve[123]/$|members|user.cfg'
+etc/pve/.members
+etc/pve/user.cfg
+etc/pve/nodes/pve3/
+etc/pve/nodes/pve2/
+etc/pve/nodes/pve1/
+etc/pve/corosync.conf
+(68 fitxers en total)

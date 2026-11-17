@@ -15,33 +15,15 @@
 És una reproducció a escala del sistema de l'empresa, seguint l'esquema de "muntatge individual" que va donar el professor:
 
 - **Tres servidors de comunicacions alternatius** (OPNsense, MikroTik i Debian amb nftables). Tenen la WAN a la xarxa de l'aula i la LAN a la xarxa interna.
-- Una **LAN interna** on hi ha el NAS de còpies (TrueNAS), el node de virtualització (Proxmox), el controlador de domini (Windows Server 2025) i dos clients (Windows 11 i Ubuntu).
+- Una **LAN interna** on hi ha el NAS de còpies (TrueNAS), un **clúster de tres nodes Proxmox**, el controlador de domini (Windows Server 2025) i dos clients (Windows 11, unit al domini, i Ubuntu).
 
-El portàtil no pot fer virtualització imbricada amb garanties (disc USB i 32 GB de RAM compartits per 8 VM). Per això, i per indicació del professor, el Proxmox només té configurada la xarxa i el Windows Server és una VM de VirtualBox independent en lloc d'anar dins del Proxmox.
+El portàtil no té recursos per a executar màquines dins dels Proxmox (disc USB i 32 GB de RAM compartits per 10 VM). Per això els tres nodes Proxmox formen el clúster però **no tenen cap màquina a dins**, i el Windows Server és una VM de VirtualBox independent.
 
 ## 2. Esquema de màquines virtuals i recursos assignats
 
-```mermaid
-flowchart LR
-    subgraph HOST["Portàtil ASUS B3605CCA · Linux Mint 22.3 · VirtualBox 7.0.20<br/>Core Ultra 5 125H (18 fils) · 32 GB RAM · SSD Kingston A400 per USB 3.0"]
-        direction TB
-        subgraph PONT["Adaptador pont sobre eno1 (xarxa de l'aula 172.16.222.0/24)"]
-            OPN["OPNsense<br/>1 vCPU · 3 GB · 25 GB"]
-            MK["MikroTik<br/>2 vCPU · 512 MB · 2 GB"]
-            DEB["Debian + nftables<br/>1 vCPU · 2 GB · 20 GB"]
-        end
-        subgraph INT["Xarxa interna «redjoan11» (192.168.11.0/24)"]
-            TN["TrueNAS<br/>1 vCPU · 2 GB · 18 GB + 5 GB"]
-            PVE["Proxmox VE<br/>1 vCPU · 2 GB · 30 GB · VT-x imbricat"]
-            WS["Windows Server 2025<br/>2 vCPU · 3 GB · 50 GB"]
-            W11["Windows 11<br/>2 vCPU · 4 GB · 80 GB · EFI · TPM 2.0"]
-            UB["Ubuntu 26.04<br/>1 vCPU · 2 GB · 25 GB + 7×512 MB"]
-        end
-    end
-    OPN & MK & DEB --- INT
-```
+![Muntatge físic i a VirtualBox](diagrames/muntatge-virtualbox.svg)
 
-Dades tretes de `VBoxManage showvminfo` el 16/11/2026:
+Dades tretes de `VBoxManage showvminfo` (17/11/2026):
 
 | VM (nom a VirtualBox) | SO | vCPU | RAM | Disc(s) | Firmware | Adaptadors de xarxa |
 |---|---|---|---|---|---|---|
@@ -49,11 +31,13 @@ Dades tretes de `VBoxManage showvminfo` el 16/11/2026:
 | MikroTik | RouterOS 7.24.5 x86 | 2 | 512 MB | 2 GB | BIOS | 1: pont `eno1` · 2: interna `redjoan11` |
 | Servidor de Comunicaciones Debian | Debian 13.1 | 1 | 2 GB | 20 GB | BIOS | 1: pont `eno1` · 2: interna `redjoan11` |
 | TrueNas(Datos) | TrueNAS 27.0.0-RC.1 | 1 | 2 GB | 18 GB (sistema) + **5 GB (còpies)** | BIOS | interna `redjoan11` |
-| Proxmox | Proxmox VE 9.2 | 1 | 2 GB | 30 GB | BIOS, **VT-x imbricat** | interna `redjoan11` |
+| Proxmox | Proxmox VE 9.2 (node `pve1`) | 1 | 2 GB | 30 GB | BIOS, **VT-x imbricat** | interna `redjoan11` |
+| Proxmox2 | Proxmox VE 9.2 (node `pve2`) | 2 | 2 GB | 32 GB | BIOS, **VT-x imbricat** | interna `redjoan11` |
+| Proxmox3 | Proxmox VE 9.2 (node `pve3`) | 2 | 2 GB | 32 GB | BIOS, **VT-x imbricat** | interna `redjoan11` |
 | WinServer2025-DC | Windows Server 2025 Standard (escriptori) | 2 | 3 GB | 50 GB (SSD, **sense discard**) | BIOS | interna `redjoan11` |
 | Windows 11 (Cliente) | Windows 11 Pro 23H2 | 2 | 4 GB | 80 GB | **EFI + Secure Boot + TPM 2.0** | interna `redjoan11` |
 | Ubuntu(Cliente) | Ubuntu 26.04.1 LTS | 1 | 2 GB | 25 GB + 7 × 512 MB (RAID, Tasca 6) | BIOS | interna `redjoan11` |
-| **Total** | | **11** | **18,5 GB** | ~255 GB reservats (VDI dinàmics) | | |
+| **Total** | | **15** | **22,5 GB** | ~320 GB reservats (VDI dinàmics) | | |
 
 **Per què aquests adaptadors:**
 - **Pont** només a la WAN dels servidors de comunicacions. Reben IP del DHCP de l'aula, igual que al rack del grup.
@@ -92,6 +76,7 @@ Dades reals (`lscpu`, `free`, `lsblk`, `lsusb -t`, `/sys`): [`evidencies/inventa
 | 8 | **El Windows Server es congelava** a la fase *specialize*, al primer inici de sessió i a l'escriptori (pantalla quieta i rellotge aturat), mentre el disc de l'amfitrió llegia a ~277 MB/s | El disc virtual tenia **discard/TRIM activat sobre un VDI dinàmic**. Quan Windows llança el TRIM, VirtualBox llig el fitxer `.vdi` sencer per compactar-lo | `VBoxManage storageattach … --discard off`. Després del canvi, la instal·lació dels rols ha anat sense cap bloqueig. Detall a la [Tasca 7](Tasca7.md) |
 | 9 | El Windows 11 no arrencava després d'un reinici (aturada `c000021a`) | Un reinici forçat mentre Windows Update tenia operacions pendents | No es va poder reparar des de WinRE i es va reinstal·lar, ara amb **TPM 2.0 i Secure Boot**. Abans d'actualitzar es fa una instantània ([Tasca 5, apartats 5.3 i 5.4](Tasca5.md)) |
 | 10 | En arrancar el disc de classe a l'equip de casa, les VM guardades no es reprenien (`VERR_SSM_LOAD_CPUID_MISMATCH`) | L'estat guardat conté les característiques de la CPU on es va guardar (Intel del portàtil) i el sobretaula és AMD | Es descarta l'estat guardat i la VM arrenca en fred. Per a canviar d'equip, les VM s'han d'**apagar** (no guardar en estat) |
+| 11 | En muntar el clúster Proxmox, el pve1 anava un dia endarrerit i el pve2 i el pve3 una hora avançats | El pve1 venia d'un estat guardat. Als nous, VirtualBox dona el rellotge de la placa en hora local i Linux el llegia com a UTC | `timedatectl set-local-rtc 1` i hora posada des de l'amfitrió als tres nodes abans de crear el clúster ([Tasca 5, apartat 3.4](Tasca5.md)) |
 
 ## 5. Repositori
 

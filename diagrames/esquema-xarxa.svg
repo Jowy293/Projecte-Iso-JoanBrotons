@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <rect width="1200" height="900" fill="#ffffff"/>
+  <defs>
+    <style>
+      .t{fill:#1f2937}.s{fill:#4b5563;font-size:13px}.h{font-weight:700;font-size:16px;fill:#111827}
+      .ln{stroke:#6b7280;stroke-width:2;fill:none}.lnb{stroke:#2563eb;stroke-width:3;fill:none}
+      .com{fill:#fff7ed;stroke:#ea580c;stroke-width:2}.srv{fill:#eff6ff;stroke:#2563eb;stroke-width:2}
+      .vir{fill:#f5f3ff;stroke:#7c3aed;stroke-width:2}.cli{fill:#ecfdf5;stroke:#059669;stroke-width:2}
+      .net{fill:#f3f4f6;stroke:#9ca3af;stroke-width:2}.lan{fill:#dbeafe;stroke:#2563eb;stroke-width:2}
+      .tag{font-size:12px;fill:#6b7280;font-style:italic}
+    </style>
+  </defs>
+  <text x="600" y="38" text-anchor="middle" font-size="24" font-weight="700" fill="#111827">Esquema de xarxa · entorn individual · posició 11</text>
+  <text x="600" y="62" text-anchor="middle" class="s">LAN 192.168.11.0/24 · tot dins de VirtualBox al portàtil de classe</text>
+
+  <!-- Internet i aula -->
+  <ellipse cx="600" cy="105" rx="90" ry="26" class="net"/>
+  <text x="600" y="110" text-anchor="middle" class="h">Internet</text>
+  <line x1="600" y1="131" x2="600" y2="150" class="ln"/>
+  <rect x="470" y="150" width="260" height="34" rx="6" class="net"/>
+  <text x="600" y="172" text-anchor="middle" class="t" font-size="14">Xarxa del centre (172.18.22.1)</text>
+  <line x1="600" y1="184" x2="600" y2="204" class="ln"/>
+  <rect x="150" y="204" width="900" height="44" rx="8" class="net"/>
+  <text x="600" y="224" text-anchor="middle" class="h">Xarxa de l'aula 172.16.222.0/24</text>
+  <text x="600" y="241" text-anchor="middle" class="s">router 172.16.222.1 · DHCP del professorat · xarxa compartida</text>
+
+  <!-- comunicacions -->
+  <g>
+    <line x1="250" y1="248" x2="250" y2="300" class="ln"/><line x1="600" y1="248" x2="600" y2="300" class="ln"/><line x1="950" y1="248" x2="950" y2="300" class="ln"/>
+    <text x="258" y="280" class="tag">adaptador pont eno1 · DHCP</text>
+    <text x="608" y="280" class="tag">adaptador pont eno1 · DHCP</text>
+    <text x="958" y="280" class="tag">adaptador pont eno1 · DHCP</text>
+    <rect x="100" y="300" width="300" height="118" rx="10" class="com"/>
+    <text x="250" y="326" text-anchor="middle" class="h">OPNsense 26.7</text>
+    <text x="250" y="346" text-anchor="middle" class="s">Tallafocs · porta d'enllaç per defecte</text>
+    <text x="250" y="372" text-anchor="middle" class="t" font-size="14">WAN em0: DHCP (172.16.222.x)*</text>
+    <text x="250" y="395" text-anchor="middle" class="t" font-size="14" font-weight="700">LAN em1: 192.168.11.1</text>
+    <rect x="450" y="300" width="300" height="118" rx="10" class="com"/>
+    <text x="600" y="326" text-anchor="middle" class="h">MikroTik RouterOS 7.24</text>
+    <text x="600" y="346" text-anchor="middle" class="s">Passarel·la alternativa (contingència)</text>
+    <text x="600" y="372" text-anchor="middle" class="t" font-size="14">WAN ether1: DHCP (172.16.222.x)*</text>
+    <text x="600" y="395" text-anchor="middle" class="t" font-size="14" font-weight="700">LAN ether2: 192.168.11.2</text>
+    <rect x="800" y="300" width="300" height="118" rx="10" class="com"/>
+    <text x="950" y="326" text-anchor="middle" class="h">Debian 13 + nftables</text>
+    <text x="950" y="346" text-anchor="middle" class="s">Passarel·la alternativa (contingència)</text>
+    <text x="950" y="372" text-anchor="middle" class="t" font-size="14">WAN enp0s3: DHCP (172.16.222.x)*</text>
+    <text x="950" y="395" text-anchor="middle" class="t" font-size="14" font-weight="700">LAN enp0s8: 192.168.11.3</text>
+  </g>
+
+  <!-- commutador LAN -->
+  <line x1="250" y1="418" x2="250" y2="470" class="lnb"/><line x1="600" y1="418" x2="600" y2="470" class="lnb"/><line x1="950" y1="418" x2="950" y2="470" class="lnb"/>
+  <rect x="40" y="470" width="1120" height="54" rx="10" class="lan"/>
+  <text x="600" y="493" text-anchor="middle" class="h">Commutador virtual · xarxa interna VirtualBox «redjoan11» · 192.168.11.0/24</text>
+  <text x="600" y="512" text-anchor="middle" class="s">màscara 255.255.255.0 · totes les IP manuals · sense servidor DHCP · porta d'enllaç 192.168.11.1</text>
+
+  <!-- equips LAN -->
+  <line x1="155" y1="524" x2="155" y2="580" class="lnb"/><line x1="355" y1="524" x2="355" y2="580" class="lnb"/>
+  <line x1="660" y1="524" x2="660" y2="580" class="lnb"/><line x1="945" y1="524" x2="945" y2="580" class="lnb"/><line x1="1100" y1="524" x2="1100" y2="580" class="lnb"/>
+
+  <rect x="60" y="580" width="190" height="120" rx="10" class="srv"/>
+  <text x="155" y="606" text-anchor="middle" class="h">TrueNAS 27</text>
+  <text x="155" y="626" text-anchor="middle" class="s">Servidor de còpies</text>
+  <text x="155" y="650" text-anchor="middle" class="t" font-size="15" font-weight="700">192.168.11.5</text>
+  <text x="155" y="672" text-anchor="middle" class="s">pool «Copias» (disc 2)</text>
+
+  <rect x="265" y="580" width="180" height="120" rx="10" class="srv"/>
+  <text x="355" y="606" text-anchor="middle" class="h">Windows Server</text>
+  <text x="355" y="624" text-anchor="middle" class="h">2025</text>
+  <text x="355" y="646" text-anchor="middle" class="t" font-size="15" font-weight="700">192.168.11.10</text>
+  <text x="355" y="668" text-anchor="middle" class="s">DC-JOAN11</text>
+  <text x="355" y="686" text-anchor="middle" class="s">domini joan11.local</text>
+
+  <rect x="460" y="565" width="400" height="150" rx="12" class="vir" stroke-dasharray="6 4"/>
+  <text x="660" y="586" text-anchor="middle" class="h" fill="#5b21b6">Clúster Proxmox VE 9.2 «clusterjoan11»</text>
+  <rect x="475" y="598" width="118" height="102" rx="8" fill="#ffffff" stroke="#7c3aed" stroke-width="2"/>
+  <text x="534" y="622" text-anchor="middle" class="h">pve1</text>
+  <text x="534" y="646" text-anchor="middle" class="t" font-size="14" font-weight="700">.17</text>
+  <text x="534" y="668" text-anchor="middle" class="s">node 1 · 1 vot</text>
+  <rect x="601" y="598" width="118" height="102" rx="8" fill="#ffffff" stroke="#7c3aed" stroke-width="2"/>
+  <text x="660" y="622" text-anchor="middle" class="h">pve2</text>
+  <text x="660" y="646" text-anchor="middle" class="t" font-size="14" font-weight="700">.18</text>
+  <text x="660" y="668" text-anchor="middle" class="s">node 2 · 1 vot</text>
+  <rect x="727" y="598" width="118" height="102" rx="8" fill="#ffffff" stroke="#7c3aed" stroke-width="2"/>
+  <text x="786" y="622" text-anchor="middle" class="h">pve3</text>
+  <text x="786" y="646" text-anchor="middle" class="t" font-size="14" font-weight="700">.19</text>
+  <text x="786" y="668" text-anchor="middle" class="s">node 3 · 1 vot</text>
+
+  <rect x="875" y="580" width="140" height="120" rx="10" class="cli"/>
+  <text x="945" y="606" text-anchor="middle" class="h">Windows 11 Pro</text>
+  <text x="945" y="630" text-anchor="middle" class="t" font-size="15" font-weight="700">192.168.11.20</text>
+  <text x="945" y="652" text-anchor="middle" class="s">W11-CLIENT11</text>
+  <text x="945" y="670" text-anchor="middle" class="s">membre de</text>
+  <text x="945" y="686" text-anchor="middle" class="s">joan11.local</text>
+
+  <rect x="1030" y="580" width="140" height="120" rx="10" class="cli"/>
+  <text x="1100" y="606" text-anchor="middle" class="h">Ubuntu 26.04</text>
+  <text x="1100" y="630" text-anchor="middle" class="t" font-size="15" font-weight="700">192.168.11.25</text>
+  <text x="1100" y="652" text-anchor="middle" class="s">ubuntu-client11</text>
+  <text x="1100" y="670" text-anchor="middle" class="s">+ proves de RAID</text>
+
+  <!-- relació de domini -->
+  <path d="M945 700 C 945 760, 355 760, 355 700" class="ln" stroke-dasharray="5 4"/>
+  <text x="650" y="755" text-anchor="middle" class="tag">el Windows 11 s'autentica contra el controlador de domini</text>
+
+  <!-- llegenda -->
+  <g font-size="13">
+    <rect x="60" y="800" width="18" height="14" class="com"/><text x="86" y="812" class="t">Comunicacions</text>
+    <rect x="210" y="800" width="18" height="14" class="srv"/><text x="236" y="812" class="t">Servidors</text>
+    <rect x="335" y="800" width="18" height="14" class="vir"/><text x="361" y="812" class="t">Virtualització</text>
+    <rect x="485" y="800" width="18" height="14" class="cli"/><text x="511" y="812" class="t">Clients</text>
+    <line x1="600" y1="807" x2="640" y2="807" class="lnb"/><text x="648" y="812" class="t">LAN interna</text>
+    <line x1="760" y1="807" x2="800" y2="807" class="ln"/><text x="808" y="812" class="t">Xarxa de l'aula</text>
+  </g>
+  <text x="60" y="845" class="s">* Les IP WAN les dona el DHCP de l'aula i poden canviar (16/11/2026: OPNsense .184, MikroTik .213, Debian .195).</text>
+  <text x="60" y="866" class="s">Reserva d'adreces: .1-.3 comunicacions · .5 NAS · .10 controlador de domini · .17-.19 Proxmox · .20-.29 clients.</text>
+</svg>

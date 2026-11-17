@@ -154,7 +154,7 @@ Durant cada prova, el client Ubuntu executava [`scripts/probe.sh`](scripts/probe
 | Versió | `TrueNAS-27.0.0-RC.1` (`midclt call system.version`). ISO `TrueNAS-27.0.0-RC.1.iso`, SHA-256 `515a0252…498e` |
 | VM | 1 vCPU, 2 GB RAM, disc de sistema 18 GB (`boot-pool`) + **disc addicional de 5 GB** (`sdb`) per a les còpies |
 | Hostname | `truenas11` · zona horària `Europe/Madrid` |
-| Xarxa | `enp0s3` **estàtica** `192.168.11.5/24`, gw `192.168.11.1`, DNS `192.168.11.1` i `192.168.11.3` |
+| Xarxa | `enp0s3` **estàtica** `192.168.11.5/24`, gw `192.168.11.1` |
 | Usuaris | `truenas_admin` (administrador, accés web i SSH) · `backup_user` (propietari de les còpies, home `/mnt/Copias/backups`) |
 | Serveis | SSH (amb contrasenya per als administradors, amb clau per a les còpies) · SMB (recurs `backups`) · **FTP desactivat** (anava en clar i no feia falta) |
 
@@ -203,11 +203,11 @@ L'script verifica que el fitxer no estiga buit i mostra la mida i el `sha256`. S
 ### 2.3 Recuperació provada
 Les tres recuperacions de l'[apartat 1.7](#1-servidors-de-comunicacions-opnsense-mikrotik-i-debian--nftables) s'han fet **a partir d'aquestes còpies**: el MikroTik es va descarregar la seua per SFTP (`/tool fetch mode=sftp ... user=backup_user`), i al Debian i a l'OPNsense el TrueNAS els va retornar el fitxer per SSH.
 
-## 3. Proxmox VE (192.168.11.17)
+## 3. Proxmox VE: clúster de 3 nodes (192.168.11.17, .18 i .19)
 
-> **Abast acordat amb el professorat:** a l'entorn individual, el Proxmox **només ha de tenir configurada la xarxa** (i l'administració). No s'hi creen màquines dins perquè el portàtil no té recursos per a virtualització imbricada amb un Windows Server a dins. Per això el Windows Server 2025 s'ha instal·lat com a VM de VirtualBox independent ([apartat 4](#4-windows-server-2025-controlador-de-domini-joan11local-1921681110)).
+> Dins dels Proxmox **no hi ha cap màquina virtual ni contenidor**: a l'entorn individual només es configuren els nodes, la xarxa, els usuaris d'administració i el clúster.
 
-Evidències: [`evidencies/t5-proxmox-estat.txt`](evidencies/t5-proxmox-estat.txt) · [`evidencies/t5-proxmox-copia.txt`](evidencies/t5-proxmox-copia.txt)
+Evidències: [`evidencies/t5-proxmox-estat.txt`](evidencies/t5-proxmox-estat.txt) · [`evidencies/t5-proxmox-cluster.txt`](evidencies/t5-proxmox-cluster.txt) · [`evidencies/t5-proxmox-copia.txt`](evidencies/t5-proxmox-copia.txt)
 
 ### 3.1 Sistema
 
@@ -215,8 +215,20 @@ Evidències: [`evidencies/t5-proxmox-estat.txt`](evidencies/t5-proxmox-estat.txt
 |---|---|
 | Versió | `pve-manager/9.2.2` (nucli 7.0.2-6-pve), base Debian 13 trixie |
 | ISO | `proxmox-ve_9.2-1.iso` · SHA-256 `4e88fe41…f0395` **coincideix** amb `enterprise.proxmox.com/iso/SHA256SUMS` |
-| VM VirtualBox | 1 vCPU amb **VT-x imbricat activat** (*nested*), 2 GB RAM, 30 GB |
-| Hostname | `pve1.joan11.local` |
+| Instal·lació | Instal·lador en mode text (*Terminal UI*): disc `ext4`, país Espanya, zona `Europe/Madrid`, teclat espanyol |
+
+| Node | VM VirtualBox | Hostname | IP (`vmbr0`) | Recursos |
+|---|---|---|---|---|
+| 1 | `Proxmox` | `pve1.joan11.local` | `192.168.11.17/24` | 1 vCPU, 2 GB, 30 GB · VT-x imbricat |
+| 2 | `Proxmox2` | `pve2.joan11.local` | `192.168.11.18/24` | 2 vCPU, 2 GB, 32 GB · VT-x imbricat |
+| 3 | `Proxmox3` | `pve3.joan11.local` | `192.168.11.19/24` | 2 vCPU, 2 GB, 32 GB · VT-x imbricat |
+
+Tots tres a la xarxa interna `redjoan11`, amb porta d'enllaç `192.168.11.1` (OPNsense) i els tres noms a `/etc/hosts` de cada node.
+
+| | |
+|---|---|
+| ![Resum de la instal·lació del pve2](evidencies/captures/t5-pve2-01-resum-installacio.png) | ![Resum de la instal·lació del pve3](evidencies/captures/t5-pve3-01-resum-installacio.png) |
+| Resum abans d'instal·lar el node 2 | Resum abans d'instal·lar el node 3 |
 
 ### 3.2 Usuaris d'administració
 
@@ -225,7 +237,9 @@ Evidències: [`evidencies/t5-proxmox-estat.txt`](evidencies/t5-proxmox-estat.txt
 | `root@pam` | PAM | Superusuari (necessari per al clúster i la consola) |
 | `administrador11@pam` | PAM | Rol `Administrator` sobre `/` (ACL). Usuari Linux creat amb `useradd` i afegit a Proxmox amb `pveum user add` |
 
-Accés web: `https://192.168.11.17:8006`.
+Els usuaris de Proxmox es guarden a `/etc/pve/user.cfg`, que el clúster replica als tres nodes. Com que el realm és **PAM**, l'usuari Linux `administrador11` s'ha creat també al pve2 i al pve3 (`useradd`). L'instal·lador obliga a posar una contrasenya de root de 8 caràcters com a mínim; després s'ha canviat amb `chpasswd` perquè siga la mateixa als tres nodes.
+
+Accés web: `https://192.168.11.17:8006` (o `.18`, `.19`: des de qualsevol node es gestiona tot el clúster).
 
 ### 3.3 Xarxa
 
@@ -239,35 +253,51 @@ iface vmbr0 inet static
         bridge-fd 0
 ```
 
-- `vmbr0` és el pont Linux on es connectarien les VM i contenidors: tindrien IP a la mateixa LAN 192.168.11.0/24.
+- `vmbr0` és el pont Linux on es connectarien les VM i contenidors. El pve2 i el pve3 tenen la mateixa configuració amb la seua IP (`.18` i `.19`).
 - Canvis aplicats amb `ifreload -a`, sense reiniciar.
 
 ### 3.4 Repositoris i actualització
 
-- S'han desactivat `pve-enterprise` i `ceph` (sense subscripció donen error 401) i s'ha afegit `pve-no-subscription`. Els fitxers originals estan a `/root/repos-desactivats/`.
-- `apt update` funciona, i hi ha **130 paquets actualitzables**. **No s'ha fet `dist-upgrade`** per mantindre l'abast acordat (només xarxa). Queda pendent de decidir amb el professorat.
+- Als tres nodes s'han desactivat `pve-enterprise` i `ceph` (sense subscripció donen error 401) i s'ha afegit `pve-no-subscription`. Els fitxers originals estan a `/root/repos-desactivats/`.
+- `apt update` funciona, i hi ha **130 paquets actualitzables**. **No s'ha fet `dist-upgrade`**: els tres nodes tenen la mateixa versió (9.2.2), que és el que importa en un clúster.
 - Problema trobat: `apt update` fallava amb "signatura no vàlida fins a …" perquè el rellotge anava endarrerit (NTP bloquejat a l'aula i VM represa des d'estat guardat). S'ha resolt amb [`scripts/httptime.sh`](scripts/httptime.sh).
+- **Problema trobat en muntar el clúster:** el pve1 anava un dia endarrerit (represa des d'estat guardat) i el pve2 i el pve3 anaven **una hora avançats**: VirtualBox dona el rellotge de la placa en hora local i Linux el llegia com si fora UTC. En un clúster les hores dels nodes han de coincidir (corosync i els certificats en depenen). Solució als tres nodes: `timedatectl set-local-rtc 1` (el rellotge de la placa va en hora local), hora posada des de l'amfitrió i `hwclock --systohc`.
 
 ### 3.5 Còpia de la configuració
 
-`copia-servidors.sh proxmox` → `proxmox/pve1-config-20261116-1106.tar.gz` (13,8 KB):
+`copia-servidors.sh proxmox`, llançat a mà al TrueNAS. Després de crear el clúster s'ha tornat a fer: `proxmox/pve1-config-20261117-1006.tar.gz` (**21,2 KB**, abans 13,8 KB), que ja conté `corosync.conf`, `.members` i les carpetes dels tres nodes (`nodes/pve1`, `pve2`, `pve3`):
 
 | Es copia | Per què |
 |---|---|
-| `/etc/pve/` (storage.cfg, user.cfg, `qemu-server/`, `lxc/`, firewall, certificats i claus de `priv/`) | És tota la configuració del node i del clúster (sistema de fitxers `pmxcfs`). Amb això es reconstrueix el node després de reinstal·lar |
+| `/etc/pve/` (`corosync.conf`, storage.cfg, user.cfg, `nodes/`, firewall, certificats i claus de `priv/`) | És tota la configuració del clúster (sistema de fitxers `pmxcfs`). Com que el clúster la replica als tres nodes, n'hi ha prou amb copiar-la d'un |
 | `/etc/network/interfaces`, `hosts`, `hostname`, `resolv.conf` | Xarxa i identitat del node |
 | `/etc/apt/sources.list.d/` | Repositoris |
 
 **No es copia:** el sistema operatiu (es reinstal·la des de la ISO en ~10 min) ni els discos de les VM. Les VM es copiarien amb `vzdump` cap a un emmagatzematge separat (el TrueNAS per NFS o un Proxmox Backup Server), no amb un `tar`.
 **Compte:** la còpia conté claus privades (`priv/`): només la pot llegir `backup_user` (permisos 750 al dataset).
 
-### 3.6 Clúster, contenidors i migració: disseny (no executat)
+### 3.6 Clúster `clusterjoan11`
 
-La rúbrica permet "registrar el disseny o la simulació autoritzada si no hi ha nodes suficients". Amb un sol node a l'entorn individual:
+| Pas | Ordre | Resultat |
+|---|---|---|
+| 1. Crear el clúster al pve1 | `pvecm create clusterjoan11 --link0 192.168.11.17` | Genera la clau de corosync (`/etc/corosync/authkey`) i `/etc/pve/corosync.conf` |
+| 2. Afegir el pve2 | Al pve2: `pvecm add 192.168.11.17 --link0 192.168.11.18` (demana la contrasenya de root del pve1 i confirmar la seua empremta X509) | `successfully added node 'pve2' to cluster`. El node rep un certificat nou signat per l'autoritat del clúster |
+| 3. Afegir el pve3 | Al pve3: `pvecm add 192.168.11.17 --link0 192.168.11.19` | `successfully added node 'pve3' to cluster` |
+| 4. Comprovació | `pvecm status` i `pvecm nodes` **a cadascun dels tres nodes** | `Nodes: 3`, `Expected votes: 3`, `Quorum: 2`, `Quorate: Yes`. Els tres nodes en línia |
 
-- **Clúster:** caldrien ≥3 nodes (o 2 + QDevice) perquè hi haja **quòrum**. Amb 2 nodes, si un cau, l'altre perd el quòrum i bloqueja `/etc/pve`. Ordres: `pvecm create clusterjoan11` al primer node i `pvecm add 192.168.11.17` als altres. La xarxa del clúster (corosync) hauria d'anar separada de la LAN dels usuaris.
+| | |
+|---|---|
+| ![Clúster vist des del pve2](evidencies/captures/t5-pve-01-cluster-pve2.png) | ![Clúster vist des del pve3](evidencies/captures/t5-pve-02-cluster-pve3.png) |
+| `pvecm status` al pve2 | `pvecm status` al pve3 |
+
+**Per què 3 nodes:** cada node té un vot i el clúster necessita la majoria (**quòrum = 2**) per a funcionar. Amb 3 nodes, si en cau un, els altres dos continuen tenint quòrum. Amb només 2, la caiguda d'un deixaria l'altre sense quòrum i bloquejaria `/etc/pve`.
+
+**Limitació de l'entorn:** la xarxa del clúster (corosync, `link0`) va per la mateixa LAN que els usuaris. En una instal·lació real aniria per una xarxa separada perquè el trànsit dels usuaris no afecte la comunicació entre nodes.
+
+### 3.7 Gestió conjunta, migració, contenidors i virtualització (teoria)
+
 - **Gestió conjunta / migració / HA:** amb clúster, tots els nodes es gestionen des d'una web (gestió conjunta). La **migració** mou una VM d'un node a un altre: en calent si el disc està en emmagatzematge compartit, en fred copiant el disc si no. L'**alta disponibilitat (HA)** reinicia automàticament la VM en un altre node si el seu cau, i necessita quòrum i emmagatzematge compartit (NFS/iSCSI al TrueNAS o Ceph).
-- **Contenidor vs màquina virtual:** el contenidor LXC comparteix el nucli del host: arrenca en segons i ocupa centenars de MB, però només pot executar Linux i aïlla menys. La VM (KVM) té nucli propi: pot executar Windows o BSD i aïlla més, però costa més RAM i disc. A l'empresa: **LXC** per a serveis Linux lleugers (DNS, monitoratge, web interna), i **VM** per al Windows Server, el tallafocs virtual o qualsevol cosa que necessite un nucli diferent.
+- **Contenidor vs màquina virtual:** el contenidor LXC comparteix el nucli del host: arrenca en segons i ocupa centenars de MB, però només pot executar Linux i aïlla menys. La VM (KVM) té nucli propi: pot executar Windows o BSD i aïlla més, però costa més RAM i disc. A l'empresa: **LXC** per a serveis Linux lleugers (monitoratge, web interna), i **VM** per al Windows Server, el tallafocs virtual o qualsevol cosa que necessite un nucli diferent.
 - **Avantatges de virtualitzar servidors:** consolidació (menys maquinari i consum), instantànies abans d'un canvi, còpia i restauració de la VM sencera, migració. **Inconvenients:** un host que cau s'emporta totes les seues VM (cal clúster/HA), sobrecost de RAM i E/S, i una complexitat i llicències (Windows per nucli) que cal planificar.
 
 ## 4. Windows Server 2025: controlador de domini joan11.local (192.168.11.10)
@@ -315,7 +345,7 @@ Què aporta a l'empresa de l'enunciat (direcció, administració, comercial, pro
 
 **Inconvenients acceptats:** el DC es converteix en un punt crític. Si cau, no es pot iniciar sessió en equips nous. A producció en caldrien dos, i aquí només n'hi ha un. També costa llicències (CAL) i administració.
 
-L'enunciat diu que la implantació completa de dominis i polítiques (OU, GPO, unió de clients) correspon a fases posteriors (RA4/RA5). El professor va indicar que el domini es podia crear si volíem: **s'ha creat i es deixa preparat**, sense OU ni GPO.
+L'enunciat diu que la implantació completa de dominis i polítiques (OU, GPO) correspon a fases posteriors (RA4/RA5). **S'ha creat el domini i s'hi ha unit el Windows 11** (apartat 5.6), sense OU ni GPO.
 
 ### 4.3 Configuració: nom, usuari d'administració, xarxa i creació del domini
 
@@ -323,7 +353,7 @@ L'enunciat diu que la implantació completa de dominis i polítiques (OU, GPO, u
 |---|---|
 | Nom d'equip | `DC-JOAN11` (abans `WIN-7CG1O7V1DFS`, el nom aleatori de la instal·lació; canviat amb `Rename-Computer` i reinici) |
 | Xarxa | IP manual `192.168.11.10/24`, porta d'enllaç `192.168.11.1`, **DHCP: no** |
-| Rols | **Serveis de domini d'Active Directory** (`Install-WindowsFeature AD-Domain-Services,DNS -IncludeManagementTools` → `Success=True`) |
+| Rols | **Serveis de domini d'Active Directory** (`Install-WindowsFeature` → `Success=True`) |
 | Domini | **`joan11.local`**, NetBIOS `JOAN11`, bosc i domini nivell Windows Server 2016 (`Install-ADDSForest`). Un sol DC, que fa també de catàleg global |
 | Usuari d'administració | `JOAN11\administrador11`, membre d'**Admins. del dominio** i d'**Administradores** (Builtin). En promocionar, l'usuari local passa a ser del domini però **no** entra sol a *Admins. del dominio*: s'hi ha afegit a mà (`Add-ADGroupMember`). El compte `Administrador` integrat continua desactivat |
 | Contrasenya del mode de restauració (DSRM) | Definida en la promoció i guardada fora del repositori |
@@ -331,7 +361,7 @@ L'enunciat diu que la implantació completa de dominis i polítiques (OU, GPO, u
 Evidència: [`evidencies/t5-winserver-domini-copia.txt`](evidencies/t5-winserver-domini-copia.txt) (sense retocar)
 
 ```text
-DNSRoot           : joan11.local          NetBIOSName : JOAN11
+Domini            : joan11.local          NetBIOSName : JOAN11
 DomainMode        : Windows2016Domain     PDCEmulator : DC-JOAN11.joan11.local
 HostName          : DC-JOAN11.joan11.local   IPv4Address : 192.168.11.10   IsGlobalCatalog : True
 Serveis: ADWS, KDC, Netlogon, NTDS → Running
@@ -339,7 +369,7 @@ Serveis: ADWS, KDC, Netlogon, NTDS → Running
 
 | | |
 |---|---|
-| ![Rols instal·lats](evidencies/captures/t5-ws-01-rols-instal-lats.png) | ![Administrador del servidor amb els rols del domini](evidencies/captures/t5-ws-02-dc-rols-adds-dns.png) |
+| ![Rols instal·lats](evidencies/captures/t5-ws-01-rols-instal-lats.png) | ![Administrador del servidor amb els rols del domini](evidencies/captures/t5-ws-02-dc-rols.png) |
 | Instal·lació dels rols i canvi de nom | El servidor ja com a DC, amb els rols en estat correcte |
 
 ![administrador11 a Admins. del dominio](evidencies/captures/t5-ws-04-admins-domini.png)
@@ -381,8 +411,8 @@ Script: [`scripts/copia-windows.ps1`](scripts/copia-windows.ps1), executat com a
 | Nom d'equip | `W11-CLIENT11` |
 | Usuaris | `Administracion11` (administrador local) · `Cliente11` (usuari estàndard) · `Administrador` integrat **desactivat** |
 | Teclat | Espanyol (es-ES) |
-| Xarxa | IP manual `192.168.11.20/24`, gw `192.168.11.1` (OPNsense), DNS `192.168.11.10` (DC) i `192.168.11.1`, **DHCP: no**. Respon el ping al tallafocs i al TrueNAS i té eixida a Internet (`Test-NetConnection www.gva.es -Port 443` → `True`) |
-| Domini | No s'uneix al domini en aquesta fase (opcional a la rúbrica; correspon a RA4/RA5). |
+| Xarxa | IP manual `192.168.11.20/24`, gw `192.168.11.1` (OPNsense), **DHCP: no**. Respon el ping al tallafocs i al TrueNAS i té eixida a Internet (`Test-NetConnection www.gva.es -Port 443` → `True`) |
+| **Domini** | **Unit a `joan11.local`** (17/11/2026). Vegeu l'apartat 5.6 |
 | Actualitzacions | Vegeu l'apartat 5.4 |
 
 ![TPM 2.0 i Secure Boot actius](evidencies/captures/t5-w11-07-tpm-secureboot.png)
@@ -398,7 +428,7 @@ Evidència: [`evidencies/t5-ubuntu-estat.txt`](evidencies/t5-ubuntu-estat.txt)
 | VM | 1 vCPU, 2 GB, 25 GB + 7 discos de 512 MB per al RAID (Tasca 6) |
 | Nom d'equip | `ubuntu-client11` (abans `joan11-VirtualBox`) |
 | Usuari d'administració | `joan11` (grup `sudo`) |
-| Xarxa | Connexió NetworkManager **`lan-estatica`**: manual `192.168.11.25/24`, gw `192.168.11.1`, DNS `192.168.11.1, 192.168.11.3`. La connexió de netplan per DHCP queda amb `autoconnect no` |
+| Xarxa | Connexió NetworkManager **`lan-estatica`**: manual `192.168.11.25/24`, gw `192.168.11.1`. La connexió de netplan per DHCP queda amb `autoconnect no` |
 | Actualitzacions | `apt` va informar de "0 actualitzacions" en iniciar sessió. `apt update` va fallar per l'hora (vegeu sota) |
 | Programari afegit | `openssh-server` (administració remota), `mdadm` (RAID), `sysstat` (mesures) |
 
@@ -465,3 +495,17 @@ Evidència Windows 11 (després de la reinstal·lació): [`evidencies/t5-win11-c
 ![Còpia del Windows 11 al TrueNAS](evidencies/captures/t5-w11-08-copia-truenas.png)
 
 Evidència Ubuntu: [`evidencies/t5-ubuntu-copia.txt`](evidencies/t5-ubuntu-copia.txt): `ubuntu-client11-20261116-1107.tar.gz` (6,8 KB) + `paquets-20261116-1107.txt` (43 KB).
+
+### 5.6 Integració del Windows 11 al domini `joan11.local`
+
+| Pas | Detall |
+|---|---|
+| Comprovacions prèvies | El client arriba al DC (`192.168.11.10`) i al port LDAP 389, troba el domini `joan11.local` i té la mateixa hora que el DC (Kerberos falla si la diferència passa de 5 minuts) |
+| Unió | En un PowerShell com a administrador: `Add-Computer -DomainName joan11.local -Credential JOAN11\administrador11` → *"Unirse al dominio 'joan11.local'"* |
+| Reinici | Abans de reiniciar es comprova que Windows Update no té res pendent (`pending.xml` no existeix, `TiWorker` aturat) i es reinicia amb `shutdown /r` |
+| **Comprovació al client** | S'inicia sessió amb un **usuari del domini** (`JOAN11\administrador11`): `whoami` → `joan11\administrador11`, `Domain: joan11.local`, `PartOfDomain: True` |
+| **Comprovació al DC** | `Get-ADComputer W11-CLIENT11` → compte d'equip `CN=W11-CLIENT11,CN=Computers,DC=joan11,DC=local`, `OperatingSystem: Windows 11 Pro`, `Enabled: True`, creat el 17/11/2026 a les 8:31 |
+
+Evidència: [`evidencies/t5-win11-domini.txt`](evidencies/t5-win11-domini.txt)
+
+Els usuaris locals (`Administracion11` i `Cliente11`) continuen funcionant. Ara també hi poden iniciar sessió els usuaris del domini, i l'equip ja podria rebre polítiques (GPO), que no es configuren en aquesta fase.

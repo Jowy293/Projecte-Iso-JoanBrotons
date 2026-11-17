@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <rect width="1200" height="760" fill="#ffffff"/>
+  <defs>
+    <style>
+      .t{fill:#1f2937;font-size:14px}.s{fill:#4b5563;font-size:13px}.h{font-weight:700;font-size:16px;fill:#111827}
+      .ln{stroke:#6b7280;stroke-width:2;fill:none}.lnb{stroke:#2563eb;stroke-width:3;fill:none}.lno{stroke:#ea580c;stroke-width:3;fill:none}
+      .com{fill:#fff7ed;stroke:#ea580c;stroke-width:2}.srv{fill:#eff6ff;stroke:#2563eb;stroke-width:2}
+      .vir{fill:#f5f3ff;stroke:#7c3aed;stroke-width:2}.cli{fill:#ecfdf5;stroke:#059669;stroke-width:2}
+      .net{fill:#f3f4f6;stroke:#9ca3af;stroke-width:2}
+    </style>
+  </defs>
+  <text x="600" y="38" text-anchor="middle" font-size="24" font-weight="700" fill="#111827">Muntatge físic i a VirtualBox</text>
+  <text x="600" y="62" text-anchor="middle" class="s">Com estan connectades les 10 màquines virtuals al portàtil de classe</text>
+
+  <!-- xarxa aula -->
+  <rect x="40" y="90" width="230" height="70" rx="10" class="net"/>
+  <text x="155" y="118" text-anchor="middle" class="h">Commutador de l'aula</text>
+  <text x="155" y="140" text-anchor="middle" class="s">172.16.222.0/24 · cable RJ45</text>
+  <line x1="155" y1="160" x2="155" y2="215" class="ln"/>
+
+  <!-- amfitrió -->
+  <rect x="30" y="200" width="1140" height="520" rx="14" fill="#fafafa" stroke="#374151" stroke-width="2"/>
+  <text x="300" y="228" class="h">Amfitrió: portàtil ASUS ExpertBook B3605CCA</text>
+  <text x="300" y="248" class="s">Intel Core Ultra 5 125H (18 fils, VT-x) · 32 GB RAM · Linux Mint 22.3 · VirtualBox 7.0.20</text>
+
+  <rect x="60" y="215" width="190" height="56" rx="8" fill="#ffffff" stroke="#374151" stroke-width="2"/>
+  <text x="155" y="238" text-anchor="middle" class="h">NIC eno1</text>
+  <text x="155" y="258" text-anchor="middle" class="s">Intel 1 Gbit/s</text>
+
+  <rect x="60" y="290" width="190" height="80" rx="8" fill="#ffffff" stroke="#374151" stroke-width="2"/>
+  <text x="155" y="314" text-anchor="middle" class="h">Disc USB 3.0</text>
+  <text x="155" y="334" text-anchor="middle" class="s">Kingston A400 480 GB</text>
+  <text x="155" y="352" text-anchor="middle" class="s">sistema + tots els .vdi</text>
+
+  <!-- adaptadors -->
+  <path d="M250 243 L275 243 L275 298 L300 298" class="lno"/>
+  <rect x="300" y="268" width="510" height="60" rx="8" class="com"/>
+  <text x="555" y="292" text-anchor="middle" class="h">Adaptador pont sobre eno1 (WAN)</text>
+  <text x="555" y="312" text-anchor="middle" class="s">cada servidor de comunicacions rep una IP del DHCP de l'aula</text>
+
+  <rect x="850" y="268" width="290" height="60" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text x="995" y="292" text-anchor="middle" class="h">Xarxa interna «redjoan11»</text>
+  <text x="995" y="312" text-anchor="middle" class="s">192.168.11.0/24 · només dins de VirtualBox</text>
+
+  <!-- VM comunicacions (2 adaptadors) -->
+  <g>
+    <line x1="380" y1="328" x2="380" y2="380" class="lno"/><line x1="555" y1="328" x2="555" y2="380" class="lno"/><line x1="730" y1="328" x2="730" y2="380" class="lno"/>
+    <rect x="300" y="380" width="160" height="96" rx="8" class="com"/>
+    <text x="380" y="403" text-anchor="middle" class="h">OPNsense</text>
+    <text x="380" y="423" text-anchor="middle" class="s">1 vCPU · 3 GB · 25 GB</text>
+    <text x="380" y="443" text-anchor="middle" class="s">adapt.1 pont · adapt.2 int.</text>
+    <text x="380" y="463" text-anchor="middle" class="t" font-weight="700">.1</text>
+    <rect x="475" y="380" width="160" height="96" rx="8" class="com"/>
+    <text x="555" y="403" text-anchor="middle" class="h">MikroTik</text>
+    <text x="555" y="423" text-anchor="middle" class="s">2 vCPU · 512 MB · 2 GB</text>
+    <text x="555" y="443" text-anchor="middle" class="s">adapt.1 pont · adapt.2 int.</text>
+    <text x="555" y="463" text-anchor="middle" class="t" font-weight="700">.2</text>
+    <rect x="650" y="380" width="160" height="96" rx="8" class="com"/>
+    <text x="730" y="403" text-anchor="middle" class="h">Debian nftables</text>
+    <text x="730" y="423" text-anchor="middle" class="s">1 vCPU · 2 GB · 20 GB</text>
+    <text x="730" y="443" text-anchor="middle" class="s">adapt.1 pont · adapt.2 int.</text>
+    <text x="730" y="463" text-anchor="middle" class="t" font-weight="700">.3</text>
+    <line x1="380" y1="476" x2="380" y2="520" class="lnb"/><line x1="555" y1="476" x2="555" y2="520" class="lnb"/><line x1="730" y1="476" x2="730" y2="520" class="lnb"/>
+  </g>
+
+  <!-- VM LAN (1 adaptador) -->
+  <line x1="995" y1="328" x2="995" y2="520" class="lnb"/>
+  <line x1="120" y1="520" x2="995" y2="520" class="lnb"/>
+  <text x="1005" y="515" class="s" fill="#2563eb">LAN</text>
+  <g>
+    <line x1="120" y1="520" x2="120" y2="545" class="lnb"/><line x1="260" y1="520" x2="260" y2="545" class="lnb"/>
+    <line x1="400" y1="520" x2="400" y2="545" class="lnb"/><line x1="540" y1="520" x2="540" y2="545" class="lnb"/><line x1="680" y1="520" x2="680" y2="545" class="lnb"/>
+    <line x1="820" y1="520" x2="820" y2="545" class="lnb"/><line x1="960" y1="520" x2="960" y2="545" class="lnb"/>
+
+    <rect x="55" y="545" width="130" height="110" rx="8" class="srv"/>
+    <text x="120" y="568" text-anchor="middle" class="h">TrueNAS</text>
+    <text x="120" y="588" text-anchor="middle" class="s">1 vCPU · 2 GB</text>
+    <text x="120" y="606" text-anchor="middle" class="s">18 GB + 5 GB</text>
+    <text x="120" y="640" text-anchor="middle" class="t" font-weight="700">.5</text>
+
+    <rect x="195" y="545" width="130" height="110" rx="8" class="srv"/>
+    <text x="260" y="568" text-anchor="middle" class="h">Win Server</text>
+    <text x="260" y="588" text-anchor="middle" class="s">2 vCPU · 3 GB</text>
+    <text x="260" y="606" text-anchor="middle" class="s">50 GB</text>
+    <text x="260" y="640" text-anchor="middle" class="t" font-weight="700">.10</text>
+
+    <rect x="335" y="545" width="130" height="110" rx="8" class="vir"/>
+    <text x="400" y="568" text-anchor="middle" class="h" font-size="14">Proxmox · pve1</text>
+    <text x="400" y="588" text-anchor="middle" class="s">1 vCPU · 2 GB</text>
+    <text x="400" y="606" text-anchor="middle" class="s">30 GB · VT-x imbr.</text>
+    <text x="400" y="640" text-anchor="middle" class="t" font-weight="700">.17</text>
+
+    <rect x="475" y="545" width="130" height="110" rx="8" class="vir"/>
+    <text x="540" y="568" text-anchor="middle" class="h" font-size="14">Proxmox2 · pve2</text>
+    <text x="540" y="588" text-anchor="middle" class="s">2 vCPU · 2 GB</text>
+    <text x="540" y="606" text-anchor="middle" class="s">32 GB · VT-x imbr.</text>
+    <text x="540" y="640" text-anchor="middle" class="t" font-weight="700">.18</text>
+
+    <rect x="615" y="545" width="130" height="110" rx="8" class="vir"/>
+    <text x="680" y="568" text-anchor="middle" class="h" font-size="14">Proxmox3 · pve3</text>
+    <text x="680" y="588" text-anchor="middle" class="s">2 vCPU · 2 GB</text>
+    <text x="680" y="606" text-anchor="middle" class="s">32 GB · VT-x imbr.</text>
+    <text x="680" y="640" text-anchor="middle" class="t" font-weight="700">.19</text>
+
+    <rect x="755" y="545" width="130" height="110" rx="8" class="cli"/>
+    <text x="820" y="568" text-anchor="middle" class="h">Windows 11</text>
+    <text x="820" y="588" text-anchor="middle" class="s">2 vCPU · 4 GB</text>
+    <text x="820" y="606" text-anchor="middle" class="s">80 GB · UEFI+TPM</text>
+    <text x="820" y="640" text-anchor="middle" class="t" font-weight="700">.20</text>
+
+    <rect x="895" y="545" width="130" height="110" rx="8" class="cli"/>
+    <text x="960" y="568" text-anchor="middle" class="h">Ubuntu</text>
+    <text x="960" y="588" text-anchor="middle" class="s">1 vCPU · 2 GB</text>
+    <text x="960" y="606" text-anchor="middle" class="s">25 GB + 7 × 0,5 GB</text>
+    <text x="960" y="640" text-anchor="middle" class="t" font-weight="700">.25</text>
+  </g>
+
+  <text x="55" y="690" class="s">Total assignat: 15 vCPU · 22,5 GB de RAM per a les 10 VM. No totes s'encenen alhora (vegeu la Tasca 7).</text>
+  <text x="55" y="708" class="s">Els tres servidors de comunicacions són els únics amb dos adaptadors: el pont cap a l'aula (WAN) i la xarxa interna (LAN).</text>
+</svg>
