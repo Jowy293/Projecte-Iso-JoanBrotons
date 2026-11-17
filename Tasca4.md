@@ -98,7 +98,7 @@ Ping de 2 paquets des de cada equip a tota la LAN, en el moment en què les 8 VM
 
 Les proves des de l'Ubuntu, el Debian i el Windows 11 donen OK a tots els equips encesos en aquell moment. Les fallades que apareixen a l'evidència (`.2`, `.17`, `.10`) corresponen a VM que estaven aturades o reiniciant quan es van fer, no a errors de xarxa. Es veu perquè els mateixos destins responen a les proves fetes des de l'OPNsense i el MikroTik amb totes les VM enceses.
 
-**Nodes Proxmox nous (17/11/2026):** després d'instal·lar el pve2 i el pve3, des del Debian (`.3`) responen els tres nodes del clúster: `.17` (0,25 ms), `.18` (0,36 ms) i `.19` (0,27 ms). A més, els tres nodes es comuniquen entre ells per corosync, perquè el clúster té quòrum (Tasca 5, apartat 3.6).
+**Nodes Proxmox nous (17/11/2026):** després d'instal·lar el pve2 i el pve3, des del Debian (`.3`) responen els tres nodes del clúster: `.17` (0,25 ms), `.18` (0,36 ms) i `.19` (0,27 ms). A més, els tres nodes es comuniquen entre ells per corosync, perquè el clúster té quòrum (Tasca 5, apartat 3.5).
 
 El MikroTik mostra el TTL de cada resposta: **64** als Linux/BSD i **128** als Windows (`.10`, `.20`). És el valor inicial de cada sistema, i confirma que les respostes venen directament de la LAN, sense passar per cap router.
 
