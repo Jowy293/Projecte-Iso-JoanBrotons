@@ -305,6 +305,8 @@ iface vmbr0 inet static
 
 ### 3.6 Avantatges i inconvenients de la virtualització de servidors
 
+> **Pregunta de l'enunciat:** *Indica les avantatges i inconvenients de la virtualització de servidors.*
+
 | Avantatges | Inconvenients |
 |---|---|
 | **Consolidació:** diversos servidors en un mateix maquinari, amb menys consum, espai i cost | **Punt únic de fallada:** si el host cau, cauen totes les seues VM. Cal clúster i alta disponibilitat per a evitar-ho |
@@ -314,6 +316,8 @@ iface vmbr0 inet static
 | Crear un servidor nou és qüestió de minuts, sense comprar maquinari | Alguns dispositius (llicències lligades a maquinari, dongles USB) són difícils de virtualitzar |
 
 ### 3.7 Diferència entre contenidors i màquines virtuals. Quan utilitzar uns o altres?
+
+> **Pregunta de l'enunciat:** *Investigar la diferència entre contenidors i màquines virtuals. Quan hem d'utilitzar uns o altres? Justifica la resposta.*
 
 | | Contenidor (LXC a Proxmox) | Màquina virtual (KVM a Proxmox) |
 |---|---|---|
@@ -329,6 +333,8 @@ iface vmbr0 inet static
 
 ### 3.8 Migració d'un contenidor i d'una màquina virtual entre nodes. Temps, espai i millores
 
+> **Pregunta de l'enunciat:** *Realitza una migració de un contenidor i d'una màquina virtual d'un node a altre. Indica el temps que ha tardat, l'espai en disc que ocupa el contenidor i la màquina virtual. Es pot millorar?*
+
 Amb el clúster, els tres nodes es gestionen des de la web de qualsevol d'ells (**gestió conjunta**). La **migració** mou una VM o un contenidor d'un node a un altre: en calent si el disc està en un emmagatzematge compartit, i copiant el disc si no ho està. L'**alta disponibilitat (HA)** torna a engegar automàticament una VM en un altre node quan el seu cau, i necessita quòrum i emmagatzematge compartit (NFS o iSCSI al TrueNAS, o Ceph).
 
 > **No executat:** per decisió de l'entorn individual, dins dels nodes Proxmox no hi ha cap màquina ni contenidor (els nodes només tenen 2 GB de RAM cadascun). Es respon a partir del clúster muntat (apartat 3.5).
@@ -343,6 +349,8 @@ Amb el clúster, els tres nodes es gestionen des de la web de qualsevol d'ells (
 - **Discos *thin*** (com el `local-lvm` que ja tenen els nodes): només es copia l'espai ocupat, no la mida total del disc.
 
 ### 3.9 Còpia del clúster al TrueNAS: què té sentit guardar i què no
+
+> **Pregunta de l'enunciat:** *Guardar còpia dels principals fitxers, configuracions i/o imatge del clúster al servidor corresponent. Què té sentit guardar i què no?*
 
 Còpia manual (apartat 2). Després de crear el clúster s'ha tornat a fer: `proxmox/pve-cluster-config-20261117-0925.tar.gz` (**21,3 KB**, abans 13,8 KB), que ja conté `corosync.conf`, `.members` i les carpetes dels tres nodes (`nodes/pve1`, `pve2`, `pve3`):
 
@@ -393,6 +401,8 @@ Còpia manual (apartat 2). Després de crear el clúster s'ha tornat a fer: `pro
 
 ### 4.2 Què és un domini? Avantatges de centralitzar la gestió i què aporta a la nostra empresa
 
+> **Pregunta de l'enunciat:** *Què és un domini? Quina és la utilitat (avantatges) de centralitzar la gestió del nostre sistema a nivell administratiu mitjançant un domini? Explica què aporta a la nostra empresa.*
+
 Un **domini** (Active Directory a Windows Server) és una **base de dades centralitzada** amb tots els usuaris, grups, equips i polítiques de l'organització, guardada al **controlador de domini**. Els equips units al domini li deleguen l'autenticació: cada persona té **un sol compte** que li serveix a tots els equips i recursos de l'empresa.
 
 **Avantatges de centralitzar la gestió amb un domini:**
@@ -438,6 +448,8 @@ Serveis: ADWS, KDC, Netlogon, NTDS → Running
 ![administrador11 a Admins. del dominio](evidencies/captures/t5-ws-04-admins-domini.png)
 
 ### 4.4 Còpia de la configuració al TrueNAS. Què és interessant copiar i què no
+
+> **Pregunta de l'enunciat:** *Realitza les còpies de les configuracions i/o sistemes que consideres al servidor corresponent. Què és interessant copiar i què no?*
 
 Còpia feta a mà en un PowerShell com a administrador: s'exporta la configuració, es comprimeix i es deixa per **SMB** a `\\192.168.11.5\backups\winserver` amb l'usuari `backup_user`. Al final es compara el SHA-256 del fitxer local amb el del NAS.
 
