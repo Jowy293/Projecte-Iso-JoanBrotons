@@ -69,7 +69,7 @@ Dades reals (`lscpu`, `free`, `lsblk`, `lsusb -t`, `/sys`): [`evidencies/inventa
 | 1 | Diversos equips amb una IP que no era la seua (TrueNAS a la `.55`, LAN de l'OPNsense a la `.50`) | El MikroTik feia de servidor DHCP a la LAN amb el rang `.5-.55` | DHCP desactivat a tots els routers. IP manual a tota la LAN |
 | 2 | No hi havia Internet a través del MikroTik | Faltava la regla NAT `masquerade` | Regla afegida i tallafocs complet ([Tasca 5](Tasca5.md)) |
 | 3 | No hi havia Internet a través del Debian | `nftables.service` desactivat | `systemctl enable --now nftables` |
-| 4 | `apt` falla amb "signatura no vàlida encara" | Rellotge endarrerit: l'NTP està bloquejat i les VM es reprenen des d'estat guardat | Sincronització de l'hora per HTTP ([`scripts/httptime.sh`](scripts/httptime.sh)) |
+| 4 | `apt` falla amb "signatura no vàlida encara" | Rellotge endarrerit: l'NTP està bloquejat i les VM es reprenen des d'estat guardat | Sincronització de l'hora per HTTP (s'agafa de la capçalera `Date` d'una resposta web) |
 | 5 | L'Ubuntu arrencava l'instal·lador | La ISO seguia muntada i el DVD anava primer en l'ordre d'arrencada | ISO extreta i ordre d'arrencada amb el disc primer |
 | 6 | Contrasenyes desconegudes (OPNsense, Proxmox, Windows Server antic) | No estaven documentades | Restabliment pels mecanismes oficials (opció 3 de la consola de l'OPNsense, `chpasswd` des de la consola de Proxmox) i reinstal·lació del Windows Server, que no tenia res configurat |
 | 7 | La instal·lació del Windows Server amb EFI es quedava al 18 % i la VM no s'aturava | El procés de la VM estava bloquejat en una E/S de l'amfitrió | Reinstal·lació amb BIOS aplicant la imatge amb DISM ([Tasca 5, apartat 4.1](Tasca5.md#41-installació)) |
@@ -81,5 +81,5 @@ Dades reals (`lscpu`, `free`, `lsblk`, `lsusb -t`, `/sys`): [`evidencies/inventa
 ## 5. Repositori
 
 - Remot: <https://github.com/Jowy293/Projecte-Iso-JoanBrotons>
-- Un fitxer Markdown per tasca (`Tasca0.md` … `Tasca7.md`), amb les evidències a [`evidencies/`](evidencies/), les configuracions exportades a [`configs/`](configs/) i els scripts a [`scripts/`](scripts/).
+- Un fitxer Markdown per tasca (`Tasca0.md` … `Tasca7.md`), amb les evidències a [`evidencies/`](evidencies/) i les configuracions exportades a [`configs/`](configs/).
 - **Les contrasenyes no es guarden al repositori.**

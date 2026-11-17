@@ -1,4 +1,4 @@
-# Actualització del Windows 11 (W11-CLIENT11) · 16/11/2026 · scripts/actualitza-windows.ps1
+# Actualització del Windows 11 (W11-CLIENT11) · 16/11/2026
 # Via de recuperació: instantànies 'w11-configurat-abans-actualitzar' (abans de la 1a ronda) i 'w11-abans-acumulativa-2025-11' (abans de la 2a)
 
 16:45:34 Inici. Build: 10.0.22631.0

@@ -9,7 +9,7 @@
 
 ---
 
-> Evidència completa i sense retocar: [`evidencies/t6-raid.txt`](evidencies/t6-raid.txt) · Script utilitzat: [`scripts/raid.sh`](scripts/raid.sh)
+> Evidència completa i sense retocar: [`evidencies/t6-raid.txt`](evidencies/t6-raid.txt)
 
 ## 1. Muntatge
 
@@ -69,7 +69,7 @@ Els temps de reconstrucció són tan curts perquè els discos són de 512 MB i s
 
 ## 5. Ampliació (Apte+): RAID 1 en espill entre discos de **dos equips diferents**
 
-> Evidències: [`evidencies/t6-espill-remot.txt`](evidencies/t6-espill-remot.txt) · [`evidencies/t6-espill-remot-truenas.txt`](evidencies/t6-espill-remot-truenas.txt) · Scripts: [`scripts/tn_iscsi.sh`](scripts/tn_iscsi.sh), [`scripts/espill-remot.sh`](scripts/espill-remot.sh)
+> Evidències: [`evidencies/t6-espill-remot.txt`](evidencies/t6-espill-remot.txt) · [`evidencies/t6-espill-remot-truenas.txt`](evidencies/t6-espill-remot-truenas.txt)
 
 ### 5.1 Opcions estudiades
 | Opció | Com funciona | Per què sí / per què no |

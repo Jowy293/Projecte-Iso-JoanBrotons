@@ -56,7 +56,7 @@
 ## 4. Verificació de la connectivitat (Apte+)
 
 Totes les proves s'han fet el **16/11/2026** amb les VM enceses, des de l'amfitrió, entrant per SSH a cada equip a través de la WAN del Debian.
-Script: [`scripts/t4-connectivitat.sh`](scripts/t4-connectivitat.sh) · Eixida completa sense retocar: [`evidencies/t4-connectivitat.txt`](evidencies/t4-connectivitat.txt) · Windows 11: [`evidencies/t4-win11.txt`](evidencies/t4-win11.txt) · Windows Server: [`evidencies/t4-winserver.txt`](evidencies/t4-winserver.txt)
+Eixida completa sense retocar: [`evidencies/t4-connectivitat.txt`](evidencies/t4-connectivitat.txt) · Windows 11: [`evidencies/t4-win11.txt`](evidencies/t4-win11.txt) · Windows Server: [`evidencies/t4-winserver.txt`](evidencies/t4-winserver.txt)
 
 ### 4.1 Configuració de cada interfície (comprovada)
 

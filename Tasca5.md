@@ -6,7 +6,8 @@
 |---|---|
 | **Obligatori:** configurar al meu entorn de proves els mateixos sistemes que el grup: servidors de comunicacions (MikroTik, OPNsense, Debian amb nftables), TrueNAS, Proxmox, Windows Server 2025 i clients Windows 11 i GNU/Linux, cadascun amb les tasques de l'enunciat (usuari d'administració, xarxa, Internet per a la LAN, còpia al servidor de còpies, errada i recuperació…) | apartats 1 a 5 |
 | Per a cada sistema: requisits, llicència i origen/integritat de la ISO; firmware i arrencada; versió; actualització i via de recuperació; una incidència d'instal·lació o arrencada real (símptoma, hipòtesi, comprovació, solució i retorn); una connexió permesa i una de bloquejada amb el registre | Dins de cada apartat |
-| **Apte+:** implementar un sistema per a fer còpies de la configuració dels servidors crítics de l'entorn | apartats 2 (TrueNAS) i 6 |
+| **Apte+:** implementar un sistema per a fer còpies de la configuració dels servidors crítics de l'entorn | apartat 2 (TrueNAS) |
+| **Preguntes de l'enunciat** (virtualització, contenidors i VM, migració, què copiar del clúster, què és un domini, què copiar del Windows Server) i justificació de firmware, arrencada, particionat i sistema de fitxers | **apartat 6** |
 
 ---
 
@@ -90,11 +91,11 @@ Configuració exportada (sense dades sensibles): [`configs/mikrotik-export.rsc`]
 **Problemes trobats i resolts:**
 1. `nftables.service` estava **inactive (dead)**: el fitxer tenia el NAT però no s'aplicava mai → la LAN no eixia per la `.3`. Solució: `systemctl enable --now nftables`.
 2. La WAN tenia **dues IP** (`.194` i `.195`) perquè la gestionaven alhora `ifupdown` i NetworkManager. Solució: `/etc/NetworkManager/conf.d/10-ifupdown-gestiona.conf` amb `unmanaged-devices` per a `enp0s3` i `enp0s8`.
-3. NTP (UDP/123) està bloquejat a la xarxa de l'aula i el rellotge quedava endarrerit (les VM es reprenen des d'estat guardat). Això feia fallar `apt` ("signatura no vàlida encara"). Solució: script [`scripts/httptime.sh`](scripts/httptime.sh) amb un *timer* de systemd que agafa l'hora de la capçalera `Date` d'HTTP.
+3. NTP (UDP/123) està bloquejat a la xarxa de l'aula i el rellotge quedava endarrerit (les VM es reprenen des d'estat guardat). Això feia fallar `apt` ("signatura no vàlida encara"). Solució: un *timer* de systemd que agafa l'hora de la capçalera `Date` d'una resposta web i la posa amb `date -s`.
 
 ### 1.5 Connexió permesa i connexió bloquejada (amb registre)
 
-Client: Ubuntu `192.168.11.25`. S'ha canviat la passarel·la a `.1`, `.2` i `.3` successivament ([`scripts/fwtest.sh`](scripts/fwtest.sh)).
+Client: Ubuntu `192.168.11.25`. S'ha canviat la passarel·la a `.1`, `.2` i `.3` successivament.
 Evidència: [`evidencies/t5-proves-firewall-client.txt`](evidencies/t5-proves-firewall-client.txt) i [`evidencies/t5-logs-firewalls.txt`](evidencies/t5-logs-firewalls.txt)
 
 | Passarel·la | tracepath | Permesa: HTTP a deb.debian.org:80 | Bloquejada: TCP 1.1.1.1:23 |
@@ -120,7 +121,7 @@ Nota: el `ping 8.8.8.8` **no funciona des de cap equip de l'aula** (ni des de l'
 
 ### 1.6 Còpia de la configuració al servidor de còpies
 
-Les còpies les fa **l'administrador a mà**, sense scripts ni tasques programades: entra a cada equip amb el seu usuari, n'exporta la configuració i la deixa a la carpeta compartida del TrueNAS. Els passos estan a l'[apartat 2](#2-truenas-servidor-de-còpies-192168115).
+Les còpies les fa **l'administrador a mà**, sense tasques programades: entra a cada equip amb el seu usuari, n'exporta la configuració i la deixa a la carpeta compartida del TrueNAS. Els passos estan a l'[apartat 2](#2-truenas-servidor-de-còpies-192168115).
 
 | Equip | Què es copia | Fitxer al TrueNAS | Mida |
 |---|---|---|---|
@@ -132,7 +133,7 @@ Les còpies les fa **l'administrador a mà**, sense scripts ni tasques programad
 
 ### 1.7 Errada controlada i recuperació
 
-Durant cada prova, el client Ubuntu executava [`scripts/probe.sh`](scripts/probe.sh): fa un `wget` cada segon per la passarel·la provada i registra els canvis d'estat.
+Durant cada prova, el client Ubuntu feia un `wget` cada segon per la passarel·la provada i registra els canvis d'estat.
 
 | Equip | Errada provocada | Recuperació | Caiguda observada pel client | Evidència |
 |---|---|---|---|---|
@@ -185,7 +186,7 @@ Copias/backups/historic       200M   lz4      ← còpies manuals antigues (27/1
 
 #### Com es fa cada còpia (manual)
 
-Les còpies **no estan automatitzades**: no hi ha cap script de còpia, ni claus SSH per a fer-les, ni tasques programades. Al TrueNAS s'ha comprovat que no hi ha cap tasca de cron, d'instantànies periòdiques, de replicació, de rsync ni de còpia al núvol (`cronjob.query`, `pool.snapshottask.query`, `replication.query`, `rsynctask.query` i `cloudsync.query` tornen buits).
+Les còpies **no estan automatitzades**: no hi ha claus SSH per a fer-les ni tasques programades. Al TrueNAS s'ha comprovat que no hi ha cap tasca de cron, d'instantànies periòdiques, de replicació, de rsync ni de còpia al núvol (`cronjob.query`, `pool.snapshottask.query`, `replication.query`, `rsynctask.query` i `cloudsync.query` tornen buits).
 
 Cada còpia la fa l'administrador quan acaba un canvi, entrant amb usuari i contrasenya:
 
@@ -195,7 +196,7 @@ Cada còpia la fa l'administrador quan acaba un canvi, entrant amb usuari i cont
 | MikroTik | Per SSH o Winbox com a `administrador11`: `/export show-sensitive file=mikrotik11` i baixar el fitxer des de *Files* (o copiar el text de l'eixida) | `backups\mikrotik\` |
 | Debian | `sudo tar czf deb-comms11-etc-DATA.tar.gz /etc/nftables.conf /etc/network/interfaces /etc/sysctl.d /etc/ssh/sshd_config /etc/hosts ...` i `scp` a `backup_user@192.168.11.5` (demana contrasenya) | `backups/debian-comms/` |
 | Proxmox | Al pve1 (amb una n'hi ha prou, el clúster replica `/etc/pve`): `tar czf pve-cluster-config-DATA.tar.gz /etc/pve /etc/network/interfaces /etc/hosts ...` i `scp` a `backup_user@192.168.11.5` | `backups/proxmox/` |
-| Windows Server i Windows 11 | [`scripts/copia-windows.ps1`](scripts/copia-windows.ps1) executat a mà com a administrador: exporta la configuració i la deixa per SMB | `backups\winserver\` i `backups\win11\` |
+| Windows Server i Windows 11 | A mà, en un PowerShell com a administrador: `ipconfig /all`, `route print`, `Get-LocalUser`, `Get-HotFix`, `netsh advfirewall export`, `secedit /export` i la llista de programari; es comprimeix amb `Compress-Archive` i es copia a la carpeta compartida | `backups\winserver\` i `backups\win11\` |
 | Ubuntu | `sudo tar czf ubuntu-client11-DATA.tar.gz /etc/NetworkManager/system-connections /etc/netplan /etc/fstab ...` i `scp` a `backup_user@192.168.11.5` | `backups/ubuntu/` |
 
 L'última ronda de còpies manuals (17/11/2026, 09:25) es va comprovar amb el `sha256sum` del fitxer a l'equip i al TrueNAS, que coincideixen. Evidència: [`evidencies/t5-copies-manuals.txt`](evidencies/t5-copies-manuals.txt)
@@ -211,7 +212,7 @@ L'última ronda de còpies manuals (17/11/2026, 09:25) es va comprovar amb el `s
 
 ![Carpeta compartida de còpies vista des del Windows 11](evidencies/captures/t5-copies-01-carpeta-compartida.png)
 
-**Abans (fins al 16/11/2026)** les còpies dels servidors les anava a buscar un script al TrueNAS per SSH amb una clau (`backup_user@truenas11`), i l'Ubuntu enviava la seua amb una altra clau. El 17/11/2026 s'han eliminat l'script, totes les claus de còpia (del TrueNAS, l'OPNsense, el MikroTik, el Debian, el Proxmox i l'Ubuntu) i l'usuari `backup` del MikroTik, perquè les còpies les faça i les controle l'administrador.
+**Abans (fins al 16/11/2026)** el TrueNAS anava a buscar les còpies dels servidors per SSH amb una clau (`backup_user@truenas11`), i l'Ubuntu enviava la seua amb una altra clau. El 17/11/2026 s'han eliminat totes les claus de còpia (del TrueNAS, l'OPNsense, el MikroTik, el Debian, el Proxmox i l'Ubuntu) i l'usuari `backup` del MikroTik, perquè les còpies les faça i les controle l'administrador.
 
 ### 2.3 Recuperació provada
 Les tres recuperacions de l'[apartat 1.7](#1-servidors-de-comunicacions-opnsense-mikrotik-i-debian--nftables) s'han fet **a partir d'aquestes còpies**: el MikroTik es va descarregar la seua per SFTP (`/tool fetch mode=sftp ... user=backup_user`), i al Debian i a l'OPNsense el TrueNAS els va retornar el fitxer per SSH.
@@ -273,7 +274,7 @@ iface vmbr0 inet static
 
 - Als tres nodes s'han desactivat `pve-enterprise` i `ceph` (sense subscripció donen error 401) i s'ha afegit `pve-no-subscription`. Els fitxers originals estan a `/root/repos-desactivats/`.
 - `apt update` funciona, i hi ha **130 paquets actualitzables**. **No s'ha fet `dist-upgrade`**: els tres nodes tenen la mateixa versió (9.2.2), que és el que importa en un clúster.
-- Problema trobat: `apt update` fallava amb "signatura no vàlida fins a …" perquè el rellotge anava endarrerit (NTP bloquejat a l'aula i VM represa des d'estat guardat). S'ha resolt amb [`scripts/httptime.sh`](scripts/httptime.sh).
+- Problema trobat: `apt update` fallava amb "signatura no vàlida fins a …" perquè el rellotge anava endarrerit (NTP bloquejat a l'aula i VM represa des d'estat guardat). S'ha resolt posant l'hora a partir de la capçalera `Date` d'una resposta web (`date -s`).
 - **Problema trobat en muntar el clúster:** el pve1 anava un dia endarrerit (represa des d'estat guardat) i el pve2 i el pve3 anaven **una hora avançats**: VirtualBox dona el rellotge de la placa en hora local i Linux el llegia com si fora UTC. En un clúster les hores dels nodes han de coincidir (corosync i els certificats en depenen). Solució als tres nodes: `timedatectl set-local-rtc 1` (el rellotge de la placa va en hora local), hora posada des de l'amfitrió i `hwclock --systohc`.
 
 ### 3.5 Còpia de la configuració
@@ -307,11 +308,11 @@ Còpia manual (apartat 2). Després de crear el clúster s'ha tornat a fer: `pro
 
 **Limitació de l'entorn:** la xarxa del clúster (corosync, `link0`) va per la mateixa LAN que els usuaris. En una instal·lació real aniria per una xarxa separada perquè el trànsit dels usuaris no afecte la comunicació entre nodes.
 
-### 3.7 Gestió conjunta, migració, contenidors i virtualització (teoria)
+### 3.7 Gestió conjunta, migració i alta disponibilitat
 
-- **Gestió conjunta / migració / HA:** amb clúster, tots els nodes es gestionen des d'una web (gestió conjunta). La **migració** mou una VM d'un node a un altre: en calent si el disc està en emmagatzematge compartit, en fred copiant el disc si no. L'**alta disponibilitat (HA)** reinicia automàticament la VM en un altre node si el seu cau, i necessita quòrum i emmagatzematge compartit (NFS/iSCSI al TrueNAS o Ceph).
-- **Contenidor vs màquina virtual:** el contenidor LXC comparteix el nucli del host: arrenca en segons i ocupa centenars de MB, però només pot executar Linux i aïlla menys. La VM (KVM) té nucli propi: pot executar Windows o BSD i aïlla més, però costa més RAM i disc. A l'empresa: **LXC** per a serveis Linux lleugers (monitoratge, web interna), i **VM** per al Windows Server, el tallafocs virtual o qualsevol cosa que necessite un nucli diferent.
-- **Avantatges de virtualitzar servidors:** consolidació (menys maquinari i consum), instantànies abans d'un canvi, còpia i restauració de la VM sencera, migració. **Inconvenients:** un host que cau s'emporta totes les seues VM (cal clúster/HA), sobrecost de RAM i E/S, i una complexitat i llicències (Windows per nucli) que cal planificar.
+Amb el clúster, els tres nodes es gestionen des de la web de qualsevol d'ells (**gestió conjunta**). La **migració** mou una VM o un contenidor d'un node a un altre: en calent si el disc està en un emmagatzematge compartit, i copiant el disc si no ho està. L'**alta disponibilitat (HA)** torna a engegar automàticament una VM en un altre node quan el seu cau, i necessita quòrum i emmagatzematge compartit (NFS o iSCSI al TrueNAS, o Ceph).
+
+Les preguntes de l'enunciat sobre virtualització, contenidors, migració i còpia del clúster estan respostes a l'**apartat 6** (6.2 a 6.5).
 
 ## 4. Windows Server 2025: controlador de domini joan11.local (192.168.11.10)
 
@@ -389,7 +390,7 @@ Serveis: ADWS, KDC, Netlogon, NTDS → Running
 
 ### 4.4 Còpia de la configuració al TrueNAS
 
-Script: [`scripts/copia-windows.ps1`](scripts/copia-windows.ps1), executat com a administrador. Exporta la configuració, la comprimeix i la deixa per **SMB** a `\\192.168.11.5\backups\winserver` amb l'usuari `backup_user`. Al final compara el SHA-256 del fitxer local amb el del NAS.
+Còpia feta a mà en un PowerShell com a administrador: s'exporta la configuració, es comprimeix i es deixa per **SMB** a `\\192.168.11.5\backups\winserver` amb l'usuari `backup_user`. Al final es compara el SHA-256 del fitxer local amb el del NAS.
 
 | Es copia | Per què |
 |---|---|
@@ -405,7 +406,7 @@ Script: [`scripts/copia-windows.ps1`](scripts/copia-windows.ps1), executat com a
 
 ![Còpia del Windows Server al TrueNAS](evidencies/captures/t5-ws-03-copia-truenas.png)
 
-> L'error en roig de la captura (`Get-LocalGroupMember: No se encontró el grupo S-1-5-32-544`) és perquè un controlador de domini no té grups locals. L'script ja està corregit perquè, en un DC, llegisca el grup *Administradores* del domini.
+> L'error en roig de la captura (`Get-LocalGroupMember: No se encontró el grupo S-1-5-32-544`) és perquè un controlador de domini no té grups locals. En un DC, el grup que s'ha de llegir és *Administradores* del domini (`Get-ADGroupMember`).
 
 ## 5. Clients: Windows 11 i Ubuntu
 
@@ -486,7 +487,7 @@ Després de la incidència de l'apartat 5.3, l'actualització es fa amb una via 
 | Pas | Detall |
 |---|---|
 | Via de recuperació | Instantània de la VM `w11-configurat-abans-actualitzar` (equip configurat i amb la còpia al TrueNAS ja feta). Si l'actualització falla, es torna a aquest estat en segons |
-| Eina | [`scripts/actualitza-windows.ps1`](scripts/actualitza-windows.ps1): utilitza l'API de Windows Update (`Microsoft.Update.Session`), instal·la les actualitzacions de qualitat i de seguretat i **omet les de característiques** (canvi de versió), i ho registra tot amb l'hora |
+| Eina | Ordres de PowerShell, com a administrador, sobre l'API de Windows Update (`Microsoft.Update.Session`), instal·la les actualitzacions de qualitat i de seguretat i **omet les de característiques** (canvi de versió), i ho registra tot amb l'hora |
 | 1a ronda (16:45-16:52) | 5 actualitzacions, totes amb codi 2 (correcte): plataforma de Windows Security KB5007651, eina d'eliminació de programari maliciós KB890830, definicions de Defender 1.463.329.0, KB4023057 i l'acumulativa 2023-12 KB5033375. No demana reinici |
 | Comprovació | Reinici i arrencada correcta (16:53), `pending.xml` no existeix, la xarxa i l'accés al NAS funcionen. Windows Update ofereix 2 actualitzacions més: plataforma de Defender KB4052623 i l'**acumulativa 2025-11 KB5068865** |
 | Comprovació abans de reiniciar | Abans de reiniciar es comprova que no hi ha operacions pendents (`pending.xml`, clau `RebootRequired`) i que el servei de manteniment (`TrustedInstaller`/`TiWorker`) ha acabat. **Error meu en la 1a ronda:** vaig llançar el reinici en la mateixa ordre que la comprovació i `TiWorker` encara treballava. Com que era un reinici normal (no `-Force`), Windows va acabar el manteniment en apagar-se i va arrencar bé, però és justament el que va provocar la incidència de l'apartat 5.3 |
@@ -501,7 +502,7 @@ Evidència: [`evidencies/t5-win11-actualitzacio.txt`](evidencies/t5-win11-actual
 | Client | Mètode | Es copia | No es copia (i per què) |
 |---|---|---|---|
 | Ubuntu | A mà: `tar` + `scp` a `backup_user@192.168.11.5` amb contrasenya → `ubuntu/` (apartat 2) | Connexions de xarxa (NM i netplan), `hosts`, `fstab`, `mdadm.conf`, `sshd_config`, repositoris, perfil i documents de l'usuari, **llista de paquets** (`dpkg --get-selections`) per a reinstal·lar-los d'una vegada | El sistema sencer: es reinstal·la des de la ISO en ~15 min i se li apliquen la configuració i la llista de paquets |
-| Windows 11 | **Push** per SMB a `\\192.168.11.5\backups\win11` amb [`scripts/copia-windows.ps1`](scripts/copia-windows.ps1) (el mateix que el servidor, apartat 4.4) | Configuració de xarxa i rutes, usuaris locals i administradors, actualitzacions, programari instal·lat, tallafocs (`.wfw`, reimportable amb `netsh advfirewall import`) i polítiques de seguretat locals | La imatge completa del disc (~19 GB usats) no cap al pool de 5 GB. Com s'ha vist a l'apartat 5.3, reinstal·lar i aplicar aquesta configuració és el camí de recuperació |
+| Windows 11 | **Push** per SMB a `\\192.168.11.5\backups\win11` a mà, amb les mateixes ordres que el servidor (apartat 4.4) | Configuració de xarxa i rutes, usuaris locals i administradors, actualitzacions, programari instal·lat, tallafocs (`.wfw`, reimportable amb `netsh advfirewall import`) i polítiques de seguretat locals | La imatge completa del disc (~19 GB usats) no cap al pool de 5 GB. Com s'ha vist a l'apartat 5.3, reinstal·lar i aplicar aquesta configuració és el camí de recuperació |
 
 Evidència Windows 11 (després de la reinstal·lació): [`evidencies/t5-win11-copia.txt`](evidencies/t5-win11-copia.txt): `W11-CLIENT11-config-20261116-1640.zip` (35,5 KB) amb el **mateix SHA-256 a l'equip i al NAS**.
 
@@ -522,3 +523,106 @@ Evidència Ubuntu: [`evidencies/t5-ubuntu-copia.txt`](evidencies/t5-ubuntu-copia
 Evidència: [`evidencies/t5-win11-domini.txt`](evidencies/t5-win11-domini.txt)
 
 Els usuaris locals (`Administracion11` i `Cliente11`) continuen funcionant. Ara també hi poden iniciar sessió els usuaris del domini, i l'equip ja podria rebre polítiques (GPO), que no es configuren en aquesta fase.
+
+## 6. Respostes a les preguntes de l'enunciat
+
+### 6.1 Firmware, ordre d'arrencada, particionat i sistema de fitxers (punt 2 de la tasca)
+
+| Equip | Firmware | Ordre d'arrencada | Particionat | Sistema de fitxers | Per què |
+|---|---|---|---|---|---|
+| OPNsense | BIOS | Disc (després de la instal·lació, sense ISO al lector) | GPT: `efi` 260 MB, `freebsd-boot` 512 KB, arrel 25 GB | **UFS** amb *soft-updates* | És el que proposa l'instal·lador. Un tallafocs només guarda configuració i registres: no necessita les funcions de ZFS (instantànies, RAID) i UFS gasta menys RAM |
+| MikroTik | BIOS | Disc | Imatge de disc de RouterOS (2 GB) | Propi de RouterOS | RouterOS s'instal·la com una imatge tancada; no es pot triar |
+| Debian + nftables | BIOS | **Disc primer**, sense menú F12 (Tasca 7) | MBR: arrel 18,9 GB + partició estesa amb *swap* 1,1 GB | **ext4** | Sistema de fitxers estàndard de Debian, estable i amb diari. Per a un servidor de comunicacions no cal res més |
+| TrueNAS | BIOS | Disc | Disc 1 (18 GB): `boot-pool` · Disc 2 (5 GB): pool `Copias` | **ZFS** | TrueNAS només funciona amb ZFS. Té sumes de verificació (detecta dades corruptes), compressió LZ4 i quotes per dataset. Les còpies van en un **disc separat** del sistema, com demana l'enunciat |
+| Proxmox (3 nodes) | BIOS | Disc | GPT: BIOS boot, EFI 512 MB i LVM (`root` 13,8 GB ext4, `swap` 1,9 GB i `data` *thin-pool* 11,8 GB) | **ext4** + **LVM-thin** | Opció per defecte de l'instal·lador. El *thin-pool* permet discos de VM que només ocupen el que s'escriu i instantànies. ZFS necessitaria molta més RAM, i els nodes només en tenen 2 GB |
+| Windows Server 2025 | **BIOS (legacy)** | Disc | **MBR**, una partició `C:` de 50 GB | **NTFS** | La instal·lació amb UEFI es quedava bloquejada al 18 % (incidència de l'apartat 4.1) i es va instal·lar amb BIOS. Windows Server **recomana** TPM i UEFI però no els exigeix |
+| Windows 11 | **UEFI + Secure Boot + TPM 2.0** | Disc | **GPT**: recuperació 0,3 GB, EFI 0,1 GB, MSR 0,1 GB, `C:` 79,5 GB | **NTFS** | Windows 11 **exigeix** UEFI, Secure Boot i TPM 2.0. A la VM s'han afegit el TPM virtual i les claus de Secure Boot (apartat 5.1). NTFS és l'únic sistema de fitxers on s'instal·la Windows |
+| Ubuntu | BIOS | **Disc primer** (abans arrencava l'instal·lador perquè la ISO anava primer) | GPT: BIOS boot 1 MB + arrel 25 GB | **ext4** | Opció per defecte d'Ubuntu. Els 7 discos de 512 MB són per als RAID de la Tasca 6 |
+
+### 6.2 Avantatges i inconvenients de la virtualització de servidors
+
+| Avantatges | Inconvenients |
+|---|---|
+| **Consolidació:** diversos servidors en un mateix maquinari, amb menys consum, espai i cost | **Punt únic de fallada:** si el host cau, cauen totes les seues VM. Cal clúster i alta disponibilitat per a evitar-ho |
+| **Instantànies** abans d'un canvi: si una actualització va malament, es torna enrere en segons (ho he fet amb el Windows 11, apartat 5.4) | **Rendiment compartit:** les VM competeixen per la RAM i el disc. Al meu entorn el disc és el coll de botella (Tasca 7) |
+| **Còpia i restauració de la VM sencera** i trasllat a un altre host | **Complexitat:** cal saber administrar l'hipervisor, la xarxa virtual i l'emmagatzematge |
+| **Migració** entre nodes d'un clúster per a fer manteniment sense aturar el servei | **Llicències:** Windows Server es llicencia per nuclis del host físic, no per VM |
+| Crear un servidor nou és qüestió de minuts, sense comprar maquinari | Alguns dispositius (llicències lligades a maquinari, dongles USB) són difícils de virtualitzar |
+
+### 6.3 Diferència entre contenidors i màquines virtuals. Quan utilitzar uns o altres?
+
+| | Contenidor (LXC a Proxmox) | Màquina virtual (KVM a Proxmox) |
+|---|---|---|
+| Nucli del sistema | **Comparteix el nucli del host** | **Té el seu propi nucli** sobre maquinari virtual |
+| Sistemes que pot executar | Només Linux | Qualsevol: Windows, BSD, Linux… |
+| Recursos | Molt pocs: centenars de MB de disc i RAM | Més: cal RAM i disc per a tot un sistema operatiu |
+| Arrencada | Segons | Desenes de segons o minuts |
+| Aïllament i seguretat | Menor: un error greu del nucli afecta tots els contenidors | Major: cada VM està aïllada per l'hipervisor |
+
+**Quan utilitzar-los a la nostra empresa:**
+- **Contenidors** per a serveis Linux senzills i lleugers: un servidor web intern, el monitoratge o una base de dades petita. Aprofiten millor la RAM, que és justament el recurs limitat.
+- **Màquines virtuals** quan cal un altre sistema operatiu o més aïllament: el **Windows Server** (controlador de domini), un **tallafocs virtual** (OPNsense és FreeBSD) o qualsevol servei exposat a Internet.
+
+### 6.4 Migració d'un contenidor i d'una màquina virtual entre nodes. Temps, espai i millores
+
+> **No executat:** per decisió de l'entorn individual, dins dels nodes Proxmox no hi ha cap màquina ni contenidor (els nodes només tenen 2 GB de RAM cadascun). Es respon a partir del clúster muntat (apartat 3.6).
+
+**Com es faria:** des de la web del clúster (*clic dret → Migrar*) o amb `pct migrate <id> pve2` (contenidor) i `qm migrate <id> pve2` (VM), cronometrant l'ordre i mirant l'espai amb `pvesm list local-lvm`.
+
+**De què depèn el temps:** els nodes no tenen emmagatzematge compartit, així que la migració ha de **copiar el disc sencer** per la xarxa. Un contenidor Debian ocupa uns centenars de MB i una VM Linux mínima uns quants GB, de manera que **el contenidor migraria molt més ràpid**. A més, un contenidor no es pot migrar en calent: s'atura, es copia i es torna a engegar (`--restart`). Una VM sí que es pot migrar encesa, perquè també se'n copia la memòria.
+
+**Es pot millorar?** Sí:
+- **Emmagatzematge compartit** (NFS o iSCSI al TrueNAS, o Ceph): el disc no es mou, només la memòria. La migració passa de minuts a segons.
+- **Xarxa dedicada i més ràpida** per a la migració (10 Gbit/s, separada de la dels usuaris).
+- **Discos *thin*** (com el `local-lvm` que ja tenen els nodes): només es copia l'espai ocupat, no la mida total del disc.
+
+### 6.5 Còpia del clúster: què té sentit guardar i què no
+
+| Té sentit guardar | Per què |
+|---|---|
+| `/etc/pve/` (`corosync.conf`, `user.cfg`, `storage.cfg`, configuració dels nodes, tallafocs i certificats) | És tota la configuració del clúster. El clúster la replica als tres nodes, així que n'hi ha prou amb copiar-la d'un |
+| `/etc/network/interfaces`, `/etc/hosts`, `/etc/hostname` i repositoris | Identitat i xarxa de cada node, per a reinstal·lar-lo igual |
+| Les **VM i contenidors** (quan n'hi haja), amb `vzdump` cap a un emmagatzematge separat | És on estan les dades i els serveis de l'empresa |
+
+| No té sentit guardar | Per què |
+|---|---|
+| El sistema operatiu dels nodes | Es reinstal·la des de la ISO en uns 10 minuts i s'hi aplica la configuració |
+| Els discos de les VM copiats amb un `tar` | Una VM encesa canvia mentre es copia i la còpia quedaria inconsistent. Per a això està `vzdump` |
+| Còpies al mateix disc dels nodes | Si falla el node, es perd la còpia. Han d'anar a un altre equip (el TrueNAS) |
+
+Còpia feta: `proxmox/pve-cluster-config-20261117-0925.tar.gz` (21 KB, apartat 3.5).
+
+### 6.6 Què és un domini i què aporta a la nostra empresa
+
+Un **domini** (Active Directory a Windows Server) és una **base de dades centralitzada** amb tots els usuaris, grups, equips i polítiques de l'organització, guardada al **controlador de domini**. Els equips units al domini li deleguen l'autenticació: cada persona té **un sol compte** que li serveix a tots els equips i recursos de l'empresa.
+
+**Avantatges de centralitzar la gestió amb un domini:**
+- **Un compte per persona:** es crea una vegada i val a tots els PC. Si algú deixa l'empresa, es desactiva el compte i perd l'accés a tot alhora.
+- **Permisos per grups:** es donen permisos a grups (direcció, comercial, producció…) i no persona a persona ni equip a equip.
+- **Polítiques (GPO):** contrasenyes segures, unitats de xarxa, bloqueig d'USB o actualitzacions s'apliquen automàticament a tots els equips.
+- **Control i auditoria:** es pot saber qui ha iniciat sessió on i quan.
+- **Menys feina d'administració:** canviar una configuració es fa una vegada al servidor, no a cada PC.
+
+**Què aporta a l'empresa de l'enunciat:** té cinc departaments amb usuaris que poden canviar d'equip. Amb el domini, un comercial pot iniciar sessió a qualsevol PC amb el seu compte, i informàtica gestiona tots els equips des d'un sol lloc. Al meu entorn s'ha creat el domini `joan11.local` i el **Windows 11 ja hi està unit** (apartat 5.6).
+
+**Inconvenient:** el controlador de domini es converteix en un servei crític. A l'empresa caldrien dos controladors perquè, si un cau, els usuaris puguen continuar iniciant sessió.
+
+### 6.7 Còpia del Windows Server: què és interessant copiar i què no
+
+| Interessant copiar | Per què |
+|---|---|
+| Configuració de xarxa i rutes | Per a refer l'equip amb la mateixa IP i porta d'enllaç |
+| Rols i característiques instal·lats | Es tornen a instal·lar amb una ordre |
+| Usuaris i grup d'administradors | Saber qui administra l'equip |
+| Actualitzacions i programari instal·lat | Deixar l'equip al mateix nivell després de reinstal·lar |
+| Regles del tallafocs (`netsh advfirewall export`) i polítiques de seguretat (`secedit`) | És la configuració de seguretat, la més laboriosa de refer a mà |
+| **Estat del sistema** (base de dades d'Active Directory) amb `wbadmin start systemstatebackup` | Si cau el DC, és el que permet recuperar els usuaris i equips del domini. Ocupa diversos GB, per això es proposa quan hi haja un disc de còpies més gran |
+
+| No interessant copiar | Per què |
+|---|---|
+| La imatge sencera del disc (~15 GB ocupats) | No cap al pool de còpies de 5 GB i reinstal·lar + aplicar la configuració és més ràpid |
+| Fitxers temporals, memòria virtual (`pagefile.sys`) o hibernació | No tenen informació útil i ocupen molt |
+| La carpeta `C:\Windows` | Es recupera reinstal·lant des de la ISO |
+
+Còpia feta: `winserver/DC-JOAN11-config-20261116-1239.zip` (29 KB, apartat 4.4).
+

@@ -11,9 +11,9 @@
 
 ## 1. Com s'ha mesurat
 
-| Què | Eina | Script / evidència |
+| Què | Eina | Evidència |
 |---|---|---|
-| CPU (us, sy, id, wa), RAM, swap | `vmstat`, `free` | [`scripts/mesura-host.sh`](scripts/mesura-host.sh) |
+| CPU (us, sy, id, wa), RAM, swap | `vmstat`, `free` | [`t7-8vm-enceses.txt`](evidencies/t7-8vm-enceses.txt) |
 | Disc de l'amfitrió (MB/s i % d'utilització) | `/proc/diskstats` (camps de sectors llegits/escrits i temps d'E/S de `sda`) | ídem |
 | Xarxa | `/proc/net/dev` (`eno1`) | ídem |
 | Temperatura | `/sys/class/thermal` (`x86_pkg_temp`) | ídem |
@@ -66,7 +66,7 @@ Mesurat el 16/11/2026 a l'**equip de casa** (el mateix disc USB arrencat al sobr
 | **Problema detectat** | Totes les VM BIOS tenien l'ordre d'arrencada *disquet → DVD → disc*, el menú F12 de VirtualBox i controladors d'àudio i USB que un servidor no necessita. A més, el **Debian que fa de tallafocs tenia instal·lat l'escriptori GNOME**: arrancava en mode gràfic (`graphical.target`), amb `gdm`, impressió (`cups`), `avahi` i `ModemManager`, i el GRUB esperava 5 s. `systemd-analyze`: **1 min 6 s** fins a acabar l'arrencada, dels quals 30,9 s eren `plymouth-quit-wait` (l'espera de l'escriptori), i **639 MB de RAM** usats |
 | **Canvis a VirtualBox** (Debian i MikroTik) | `VBoxManage modifyvm ... --boot1 disk --boot2 none --bios-boot-menu disabled --audio-enabled off --usb-ohci off --usb-ehci off --usb-xhci off` |
 | **Canvis dins del Debian** | `systemctl set-default multi-user.target` (sense escriptori) · `systemctl disable --now cups cups.socket cups.path cups-browsed avahi-daemon avahi-daemon.socket ModemManager` · `GRUB_TIMEOUT=1` + `update-grub` |
-| **Com es mesura** | [`scripts/temps-arrencada.sh`](scripts/temps-arrencada.sh): engega la VM en fred i compta els segons fins que la seua WAN (en pont amb la xarxa de casa) respon al ping; després l'apaga per ACPI. 3 repeticions per VM. A més, `systemd-analyze` i `free -m` dins del Debian |
+| **Com es mesura** | S'engega la VM en fred (`VBoxManage startvm`) i es compten els segons fins que la seua WAN (en pont amb la xarxa de casa) respon al `ping`; després s'apaga per ACPI. 3 repeticions per VM. A més, `systemd-analyze` i `free -m` dins del Debian |
 
 **Resultats:**
 
@@ -92,7 +92,7 @@ Evidències: [`t7-arrencada-abans.txt`](evidencies/t7-arrencada-abans.txt) · [`
 
 ### 4.3 Observació sobre la RAM (per què no s'ha optimitzat retallant-la)
 
-La proposta inicial era reduir la RAM assignada. Abans d'aplicar-la s'ha mesurat quanta RAM ocupa realment cada VM a l'amfitrió ([`scripts/ram-vm.sh`](scripts/ram-vm.sh), RSS del procés `VBoxHeadless`) després d'arrancar en fred:
+La proposta inicial era reduir la RAM assignada. Abans d'aplicar-la s'ha mesurat quanta RAM ocupa realment cada VM a l'amfitrió (RSS del procés `VBoxHeadless` de cada VM, amb `ps`) després d'arrancar en fred:
 
 | VM | Assignada | Ocupada realment a l'amfitrió |
 |---|---|---|

@@ -43,7 +43,6 @@ diagrames/              Esquemes de xarxa (SVG)
 evidencies/             Eixides reals d'ordres (logs, proves, mesures)
 evidencies/captures/    Captures de pantalla de les VM
 configs/                Configuracions exportades (sense contrasenyes ni claus privades)
-scripts/                Scripts utilitzats per a proves i còpies
 ```
 
 ## Usuaris d'administració
