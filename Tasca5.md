@@ -62,7 +62,7 @@ Extracte de la configuració (sense claus ni hash): [`configs/opnsense-extracte.
 |---|---|
 | Versió | RouterOS **7.24.5 (stable)**, x86_64 (`/system resource print`) |
 | Identitat | `MikroTik-11` |
-| Usuaris | `administrador11` (grup *full*). `admin` **desactivat**. `backup` (grup `copies`: només `ssh,read,sensitive,test,ftp`, sense `write`, només des de `192.168.11.5`, amb clau SSH) |
+| Usuaris | `administrador11` (grup *full*). `admin` **desactivat**. ~~`backup`~~ (usuari de còpies amb clau SSH, **eliminat el 17/11/2026** en passar a còpies manuals; abans: grup `copies`: només `ssh,read,sensitive,test,ftp`, sense `write`, només des de `192.168.11.5`, amb clau SSH) |
 | WAN `ether1` | Client DHCP → `172.16.222.213/24` |
 | LAN `ether2` | `192.168.11.2/24` |
 | NAT | `srcnat out-interface-list=WAN action=masquerade` (**no existia: per això no hi havia Internet a través del MikroTik**) |
@@ -120,13 +120,13 @@ Nota: el `ping 8.8.8.8` **no funciona des de cap equip de l'aula** (ni des de l'
 
 ### 1.6 Còpia de la configuració al servidor de còpies
 
-La còpia es fa **manualment** quan la configuració està acabada: `copia-servidors.sh`, executat al TrueNAS, va a buscar la configuració per SSH amb clau. Detall a l'[apartat 2](#2-truenas-servidor-de-còpies-192168115).
+Les còpies les fa **l'administrador a mà**, sense scripts ni tasques programades: entra a cada equip amb el seu usuari, n'exporta la configuració i la deixa a la carpeta compartida del TrueNAS. Els passos estan a l'[apartat 2](#2-truenas-servidor-de-còpies-192168115).
 
 | Equip | Què es copia | Fitxer al TrueNAS | Mida |
 |---|---|---|---|
-| OPNsense | `/conf/config.xml` (tota la configuració en un fitxer) | `opnsense/config-opnsense11-20261116-1046.xml` | 38 KB |
-| MikroTik | `/export show-sensitive` (text, reimportable) | `mikrotik/mikrotik11-20261116-1052.rsc` | 2,4 KB |
-| Debian | `tar` de `/etc/nftables.conf`, `interfaces`, `sysctl.d`, `sshd_config`, `hosts`, NM i el *timer* d'hora | `debian-comms/deb-comms11-etc-…tar.gz` | 3,7 KB |
+| OPNsense | `/conf/config.xml` (tota la configuració en un fitxer) | `opnsense/config-opnsense11-20261117-0925.xml` | 37 KB |
+| MikroTik | `/export show-sensitive` (text, reimportable) | `mikrotik/mikrotik11-20261117-0925.rsc` | 2,2 KB |
+| Debian | `tar` de `/etc/nftables.conf`, `interfaces`, `sysctl.d`, `sshd_config`, `hosts`, NM i el *timer* d'hora | `debian-comms/deb-comms11-etc-20261117-0925.tar.gz` | 3,7 KB |
 
 **Què NO es copia i per què:** la imatge sencera del disc (OPNsense 25 GB, Debian 20 GB) no cap al pool de 5 GB i no cal: reinstal·lar des de la ISO verificada + restaurar la configuració és més ràpid i ocupa uns quants KB.
 
@@ -141,7 +141,7 @@ Durant cada prova, el client Ubuntu executava [`scripts/probe.sh`](scripts/probe
 | MikroTik | **Reset de fàbrica** `/system reset-configuration no-defaults=yes` | Consola: IP temporal → `/tool fetch mode=sftp` de la còpia del TrueNAS → `/ip address remove [find]; /import restore.rsc` → tornar a crear els usuaris | **1 min 51 s** (10:49:45 → 10:51:36, inclou el reinici) | [`t5-fallada-mikrotik.txt`](evidencies/t5-fallada-mikrotik.txt) |
 
 **Lliçons apreses (reals, eixides de les proves):**
-- `/export` del MikroTik **no inclou els usuaris ni les claus SSH**: després d'importar cal recrear `administrador11` i `backup`. Millora: guardar també un `/system backup` binari (inclou usuaris) a més de l'export de text.
+- `/export` del MikroTik **no inclou els usuaris ni les claus SSH**: després d'importar cal recrear `administrador11`. Millora: guardar també un `/system backup` binari (inclou usuaris) a més de l'export de text.
 - Després del reset, el MikroTik genera una **clau de host SSH nova** i la primera còpia posterior va fallar ("REMOTE HOST IDENTIFICATION HAS CHANGED"). És el comportament segur; es resol amb `ssh-keygen -R 192.168.11.2` un cop comprovat que el canvi és legítim.
 - Al Debian i a l'OPNsense, la recuperació en si dura menys de 2 s; la major part de la caiguda és el temps a detectar el problema.
 
@@ -156,7 +156,7 @@ Durant cada prova, el client Ubuntu executava [`scripts/probe.sh`](scripts/probe
 | Hostname | `truenas11` · zona horària `Europe/Madrid` |
 | Xarxa | `enp0s3` **estàtica** `192.168.11.5/24`, gw `192.168.11.1` |
 | Usuaris | `truenas_admin` (administrador, accés web i SSH) · `backup_user` (propietari de les còpies, home `/mnt/Copias/backups`) |
-| Serveis | SSH (amb contrasenya per als administradors, amb clau per a les còpies) · SMB (recurs `backups`) · **FTP desactivat** (anava en clar i no feia falta) |
+| Serveis | SSH amb contrasenya · SMB (recurs `backups`) · **FTP desactivat** (anava en clar i no feia falta) |
 
 > **Requisit oficial:** TrueNAS recomana ≥8 GB de RAM per a ZFS. Aquí té 2 GB perquè el pool és de 5 GB i és un laboratori: funciona, però no és una configuració de producció.
 
@@ -183,22 +183,35 @@ Copias/backups/historic       200M   lz4      ← còpies manuals antigues (27/1
 - **Compressió LZ4**: els fitxers de configuració són text i es comprimeixen molt.
 - El dataset antic `copias_de_seguiridad` (nom amb errata, compartit per SMB i FTP) s'ha eliminat després de copiar-ne el contingut a `historic/`.
 
-#### Com arriba cada còpia (el TrueNAS ha de ser accessible per a deixar-hi les còpies)
+#### Com es fa cada còpia (manual)
 
-| Tipus d'equip | Mètode | Per què |
+Les còpies **no estan automatitzades**: no hi ha cap script de còpia, ni claus SSH per a fer-les, ni tasques programades. Al TrueNAS s'ha comprovat que no hi ha cap tasca de cron, d'instantànies periòdiques, de replicació, de rsync ni de còpia al núvol (`cronjob.query`, `pool.snapshottask.query`, `replication.query`, `rsynctask.query` i `cloudsync.query` tornen buits).
+
+Cada còpia la fa l'administrador quan acaba un canvi, entrant amb usuari i contrasenya:
+
+| Equip | Com es treu la configuració | On es deixa |
 |---|---|---|
-| Servidors Linux/BSD/RouterOS (OPNsense, MikroTik, Debian, Proxmox) | **Pull per SSH** des del TrueNAS amb la clau `backup_user@truenas11` ([`scripts/copia-servidors.sh`](scripts/copia-servidors.sh)) | Els servidors no guarden cap credencial per a escriure al NAS. Si un servidor queda compromés, no pot esborrar les còpies. Les claus estan limitades amb `from="192.168.11.5"` |
-| Client Ubuntu | **Push per SFTP/SCP** a `backup_user@192.168.11.5` | L'usuari deixa la seua còpia quan vol |
-| Windows (Server i 11) | **Push per SMB** al recurs `\\192.168.11.5\backups` (usuari `backup_user`) | Protocol natiu de Windows (`robocopy`, Explorador, `wbadmin`) |
+| OPNsense | Web `https://192.168.11.1` → *Sistema → Configuració → Còpies de seguretat → Descarregar configuració* (o per SSH: `scp root@192.168.11.1:/conf/config.xml .`) | `backups\opnsense\` |
+| MikroTik | Per SSH o Winbox com a `administrador11`: `/export show-sensitive file=mikrotik11` i baixar el fitxer des de *Files* (o copiar el text de l'eixida) | `backups\mikrotik\` |
+| Debian | `sudo tar czf deb-comms11-etc-DATA.tar.gz /etc/nftables.conf /etc/network/interfaces /etc/sysctl.d /etc/ssh/sshd_config /etc/hosts ...` i `scp` a `backup_user@192.168.11.5` (demana contrasenya) | `backups/debian-comms/` |
+| Proxmox | Al pve1 (amb una n'hi ha prou, el clúster replica `/etc/pve`): `tar czf pve-cluster-config-DATA.tar.gz /etc/pve /etc/network/interfaces /etc/hosts ...` i `scp` a `backup_user@192.168.11.5` | `backups/proxmox/` |
+| Windows Server i Windows 11 | [`scripts/copia-windows.ps1`](scripts/copia-windows.ps1) executat a mà com a administrador: exporta la configuració i la deixa per SMB | `backups\winserver\` i `backups\win11\` |
+| Ubuntu | `sudo tar czf ubuntu-client11-DATA.tar.gz /etc/NetworkManager/system-connections /etc/netplan /etc/fstab ...` i `scp` a `backup_user@192.168.11.5` | `backups/ubuntu/` |
 
-Per indicació del professorat, **les còpies no s'automatitzen** (no hi ha cron ni snapshots periòdics). Es fan a mà quan cada equip està acabat:
+L'última ronda de còpies manuals (17/11/2026, 09:25) es va comprovar amb el `sha256sum` del fitxer a l'equip i al TrueNAS, que coincideixen. Evidència: [`evidencies/t5-copies-manuals.txt`](evidencies/t5-copies-manuals.txt)
 
-```bash
-# Al TrueNAS, com a backup_user
-sudo -u backup_user /mnt/Copias/backups/scripts/copia-servidors.sh tots     # o opnsense | mikrotik | debian | proxmox
-```
+#### Com entrar a veure les còpies
 
-L'script verifica que el fitxer no estiga buit i mostra la mida i el `sha256`. Si una còpia ix buida, l'esborra i diu `ERROR`. Va passar de veritat després del reset del MikroTik: havia canviat la clau de host.
+| Des d'on | Com |
+|---|---|
+| **Windows 11** (o qualsevol Windows de la LAN) | Explorador → `\\192.168.11.5\backups` → usuari `backup_user`. Es veu una carpeta per equip amb els fitxers i la data de cada còpia |
+| Ubuntu | *Fitxers* → *Altres ubicacions* → `smb://192.168.11.5/backups` (usuari `backup_user`) |
+| Consola | `ssh backup_user@192.168.11.5` i `ls -l /mnt/Copias/backups/*` |
+| Web del TrueNAS | `https://192.168.11.5` → *Datasets* → `Copias/backups`: mostra l'espai usat i la quota de cada carpeta |
+
+![Carpeta compartida de còpies vista des del Windows 11](evidencies/captures/t5-copies-01-carpeta-compartida.png)
+
+**Abans (fins al 16/11/2026)** les còpies dels servidors les anava a buscar un script al TrueNAS per SSH amb una clau (`backup_user@truenas11`), i l'Ubuntu enviava la seua amb una altra clau. El 17/11/2026 s'han eliminat l'script, totes les claus de còpia (del TrueNAS, l'OPNsense, el MikroTik, el Debian, el Proxmox i l'Ubuntu) i l'usuari `backup` del MikroTik, perquè les còpies les faça i les controle l'administrador.
 
 ### 2.3 Recuperació provada
 Les tres recuperacions de l'[apartat 1.7](#1-servidors-de-comunicacions-opnsense-mikrotik-i-debian--nftables) s'han fet **a partir d'aquestes còpies**: el MikroTik es va descarregar la seua per SFTP (`/tool fetch mode=sftp ... user=backup_user`), i al Debian i a l'OPNsense el TrueNAS els va retornar el fitxer per SSH.
@@ -265,7 +278,7 @@ iface vmbr0 inet static
 
 ### 3.5 Còpia de la configuració
 
-`copia-servidors.sh proxmox`, llançat a mà al TrueNAS. Després de crear el clúster s'ha tornat a fer: `proxmox/pve1-config-20261117-1006.tar.gz` (**21,2 KB**, abans 13,8 KB), que ja conté `corosync.conf`, `.members` i les carpetes dels tres nodes (`nodes/pve1`, `pve2`, `pve3`):
+Còpia manual (apartat 2). Després de crear el clúster s'ha tornat a fer: `proxmox/pve-cluster-config-20261117-0925.tar.gz` (**21,3 KB**, abans 13,8 KB), que ja conté `corosync.conf`, `.members` i les carpetes dels tres nodes (`nodes/pve1`, `pve2`, `pve3`):
 
 | Es copia | Per què |
 |---|---|
@@ -274,7 +287,7 @@ iface vmbr0 inet static
 | `/etc/apt/sources.list.d/` | Repositoris |
 
 **No es copia:** el sistema operatiu (es reinstal·la des de la ISO en ~10 min) ni els discos de les VM. Les VM es copiarien amb `vzdump` cap a un emmagatzematge separat (el TrueNAS per NFS o un Proxmox Backup Server), no amb un `tar`.
-**Compte:** la còpia conté claus privades (`priv/`): només la pot llegir `backup_user` (permisos 750 al dataset).
+**Compte:** la còpia conté claus privades del clúster (`priv/`): només la pot llegir `backup_user` (permisos 750 al dataset).
 
 ### 3.6 Clúster `clusterjoan11`
 
@@ -487,7 +500,7 @@ Evidència: [`evidencies/t5-win11-actualitzacio.txt`](evidencies/t5-win11-actual
 
 | Client | Mètode | Es copia | No es copia (i per què) |
 |---|---|---|---|
-| Ubuntu | **Push** per SCP amb clau, `copia-client-linux.sh` → `ubuntu/` | Connexions de xarxa (NM i netplan), `hosts`, `fstab`, `mdadm.conf`, `sshd_config`, repositoris, perfil i documents de l'usuari, **llista de paquets** (`dpkg --get-selections`) per a reinstal·lar-los d'una vegada | El sistema sencer: es reinstal·la des de la ISO en ~15 min i se li apliquen la configuració i la llista de paquets |
+| Ubuntu | A mà: `tar` + `scp` a `backup_user@192.168.11.5` amb contrasenya → `ubuntu/` (apartat 2) | Connexions de xarxa (NM i netplan), `hosts`, `fstab`, `mdadm.conf`, `sshd_config`, repositoris, perfil i documents de l'usuari, **llista de paquets** (`dpkg --get-selections`) per a reinstal·lar-los d'una vegada | El sistema sencer: es reinstal·la des de la ISO en ~15 min i se li apliquen la configuració i la llista de paquets |
 | Windows 11 | **Push** per SMB a `\\192.168.11.5\backups\win11` amb [`scripts/copia-windows.ps1`](scripts/copia-windows.ps1) (el mateix que el servidor, apartat 4.4) | Configuració de xarxa i rutes, usuaris locals i administradors, actualitzacions, programari instal·lat, tallafocs (`.wfw`, reimportable amb `netsh advfirewall import`) i polítiques de seguretat locals | La imatge completa del disc (~19 GB usats) no cap al pool de 5 GB. Com s'ha vist a l'apartat 5.3, reinstal·lar i aplicar aquesta configuració és el camí de recuperació |
 
 Evidència Windows 11 (després de la reinstal·lació): [`evidencies/t5-win11-copia.txt`](evidencies/t5-win11-copia.txt): `W11-CLIENT11-config-20261116-1640.zip` (35,5 KB) amb el **mateix SHA-256 a l'equip i al NAS**.

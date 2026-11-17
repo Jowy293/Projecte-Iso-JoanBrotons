@@ -51,7 +51,7 @@ scripts/                Scripts utilitzats per a proves i còpies
 | Equip | Usuari administrador |
 |---|---|
 | OPNsense | `root` |
-| MikroTik | `administrador11` (`admin` desactivat) · `backup` només lectura per a còpies |
+| MikroTik | `administrador11` (`admin` desactivat) |
 | Debian | `administrador11` (sudo) · `root` |
 | TrueNAS | `truenas_admin` · `backup_user` (propietari de les còpies) |
 | Proxmox (3 nodes) | `root@pam` · `administrador11@pam` (rol Administrator) |

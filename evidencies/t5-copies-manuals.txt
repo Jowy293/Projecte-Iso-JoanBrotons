@@ -1,0 +1,29 @@
+# Còpies manuals · 17/11/2026 09:25
+# Cada fitxer s'ha tret entrant a l'equip amb usuari i contrasenya i s'ha deixat al TrueNAS entrant com a backup_user amb contrasenya.
+
+## 1. Sense automatització al TrueNAS (midclt, 17/11/2026)
+cronjob.query: []
+pool.snapshottask.query: []
+replication.query: []
+rsynctask.query: []
+cloudsync.query: []
+no crontab for truenas_admin
+
+## 2. Claus i scripts de còpia eliminats
+TrueNAS : /mnt/Copias/backups/scripts/ (copia-servidors.sh) esborrat · clau privada id_ed25519 i known_hosts de backup_user esborrats · sshpubkey de backup_user buidada
+OPNsense: clau backup_user@truenas11 treta de root (config.xml i /root/.ssh/authorized_keys)
+MikroTik: usuari "backup", la seua clau SSH i el grup "copies" eliminats (/user print -> només admin [desactivat] i administrador11)
+Debian  : clau backup_user@truenas11 treta de /root/.ssh/authorized_keys
+Proxmox : clau backup_user@truenas11 treta de /etc/pve/priv/authorized_keys (compartit pels 3 nodes)
+Ubuntu  : clau de root per a enviar còpies i /usr/local/sbin/copia-client-linux.sh esborrats
+
+## 3. Fitxers deixats al TrueNAS i comprovació (sha256 a l'origen = sha256 al NAS)
+6d35a99b24e0800d4573ba1679cc6e73bfa4ae654be2c84a4b2308ac2a9e4d35  opnsense/config-opnsense11-20261117-0925.xml       (37.859 bytes)
+6c22b36dc5eff2127b0ec414a25e886c24a4625f785937aa62bad2881c13bdf8  mikrotik/mikrotik11-20261117-0925.rsc             (2.188 bytes)
+a11199053162a85161cfce4e661ac4c68d3d95b2495efc52a7f33b17b0aa0640  debian-comms/deb-comms11-etc-20261117-0925.tar.gz (3.703 bytes, 16 fitxers)
+7f14915ecaab6b844ba4e3ac704c845202fa72683f2e1c6e20c254976342ce3f  proxmox/pve-cluster-config-20261117-0925.tar.gz  (21.267 bytes, 67 fitxers)
+05e16c551be18479666e18de3e5435b86b4efb2ed6f431cf02705184d8bdbf6e  ubuntu/ubuntu-client11-20261117-0925.tar.gz       (6.830 bytes, 16 fitxers)
+(Windows Server i Windows 11: còpies del 16/11/2026 amb scripts/copia-windows.ps1, vegeu t5-winserver-domini-copia.txt i t5-win11-copia.txt)
+
+## 4. Accés a la carpeta compartida des del Windows 11
+Explorador -> \\192.168.11.5\backups -> usuari backup_user -> carpetes: backup_user, debian-comms, historic, mikrotik, opnsense, proxmox, ubuntu, win11, winserver
