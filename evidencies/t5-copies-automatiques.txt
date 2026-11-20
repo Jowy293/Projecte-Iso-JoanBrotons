@@ -1,0 +1,61 @@
+# Còpies automatitzades amb TrueNAS: tasques Rsync (PULL per SSH) + instantànies periòdiques ZFS
+
+## Tasques Rsync creades (midclt call rsynctask.query)
+1 Còpia automàtica de /etc · Debian comunicacions (deb-comms11) | /mnt/Copias/backups/debian-comms/auto | 02:00 | últim: SUCCESS
+2 Còpia automàtica de /etc · Clúster Proxmox (pve1)            | /mnt/Copias/backups/proxmox/auto      | 02:00 | últim: SUCCESS
+3 Còpia automàtica de /etc · Servidor d'infraestructura (infra11)| /mnt/Copias/backups/infra/auto        | 02:00 | últim: SUCCESS
+   Mode SSH · direcció PULL · usuari local backup_user · arguments extra: --exclude=shadow* --exclude=gshadow* --exclude=ssh/ssh_host_*_key
+
+## Instantànies periòdiques (midclt call pool.snapshottask.query)
+dataset Copias/backups (recursiu) · cada dia a les 02:30 · es conserven 14 dies · nom auto-%Y-%m-%d_%H-%M
+
+## Clau als servidors (/root/.ssh/authorized_keys; al Proxmox /etc/pve/priv/authorized_keys)
+from="192.168.11.5",restrict,command="/usr/bin/rrsync -ro /etc" ssh-rsa AAAA... copies-automatiques@truenas11
+
+## Historial d'execucions (core.get_jobs, method rsynctask.run)
+575 tasca 1 SUCCESS 08:30:58 1.0 s
+582 tasca 2 SUCCESS 08:31:00 1.0 s
+587 tasca 3 FAILED  08:31:02 0.0 s  rsync command returned 12 - STREAMIO   (infra11 sense python3: rrsync no podia arrancar)
+592 tasca 3 FAILED  08:31:12 0.0 s  rsync command returned 12 - STREAMIO
+598 tasca 3 SUCCESS 08:31:44 1.0 s  (després d'instal·lar python3)
+613 tasca 3 SUCCESS 08:33:01 1.0 s  << execució AUTOMÀTICA: la tasca es va programar per a les 08:33 i ningú la va llançar
+626 tasca 3 SUCCESS 08:34:26 0.0 s  (còpia després del canvi de prova a /etc/motd)
+632 tasca 3 FAILED  08:34:47 73.0 s rsync command returned 255   (servidor infra11 en pausa: simula que està caigut)
+642 tasca 3 SUCCESS 08:36:07 1.0 s  (servidor tornat a engegar)
+
+## Contingut copiat
+debian-comms: 992 fitxers, 5.9M
+proxmox: 730 fitxers, 2.2M   (inclou /etc/pve: corosync.conf, nodes/, user.cfg, storage.cfg...)
+infra: 538 fitxers, 1.7M
+$ ls /mnt/Copias/backups/debian-comms/auto/shadow
+ls: cannot access '.../shadow': No such file or directory      (exclòs a propòsit)
+
+## Prova de seguretat de la clau (des del TrueNAS, amb la clau de les còpies, contra infra11)
+1) obrir una shell al servidor:
+/usr/bin/rrsync error: SSH_ORIGINAL_COMMAND does not run rsync
+2) escriure un fitxer al servidor amb rsync:
+/usr/bin/rrsync error: sending to read-only server is not allowed
+3) llegir /root (fora de /etc):
+/usr/bin/rrsync error: do not use .. in arg (anchor the path at the root of your restricted dir)
+4) llegir /etc/hostname (permés):
+infra11
+
+## Prova de versions i recuperació
+$ zfs list -t snapshot -r Copias/backups/infra
+Copias/backups/infra@auto-2026-11-20_08-34
+# es canvia /etc/motd a infra11 (s'hi afegeix una línia) i es torna a executar la tasca 3
+$ diff .../infra/.zfs/snapshot/auto-2026-11-20_08-34/auto/motd .../infra/auto/motd
+7a8
+> CANVI DE PROVA: aquesta línia no hauria d estar
+# recuperació a infra11 des de la instantània
+$ scp backup_user@192.168.11.5:/mnt/Copias/backups/infra/.zfs/snapshot/auto-2026-11-20_08-34/auto/motd /tmp/ && sudo cp /tmp/motd /etc/motd
+$ grep -c 'CANVI DE PROVA' /etc/motd
+0
+motd igual a l original
+temps de recuperacio: 0.7 s
+
+## Prova de fallada (servidor caigut)
+$ midclt call alert.list
+CRITICAL RsyncFailed - Rsync "PULL" task for "/mnt/Copias/backups/infra/auto" failed.
+INFO RsyncSuccess - Rsync "PULL" task for "/mnt/Copias/backups/debian-comms/auto" succeeded.
+INFO RsyncSuccess - Rsync "PULL" task for "/mnt/Copias/backups/proxmox/auto" succeeded.

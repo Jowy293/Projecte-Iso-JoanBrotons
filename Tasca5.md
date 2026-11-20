@@ -6,7 +6,7 @@
 |---|---|
 | **Obligatori:** configurar al meu entorn de proves els mateixos sistemes que el grup: servidors de comunicacions (MikroTik, OPNsense, Debian amb nftables), TrueNAS, Proxmox, Windows Server 2025, servidor d'infraestructura GNU/Linux i clients Windows 11 i GNU/Linux, cadascun amb les tasques de l'enunciat (usuari d'administració, xarxa, Internet per a la LAN, còpia al servidor de còpies, errada i recuperació…) | apartats 1 a 6 |
 | Per a cada sistema: requisits, llicència i origen/integritat de la ISO; firmware i arrencada; versió; actualització i via de recuperació; una incidència d'instal·lació o arrencada real (símptoma, hipòtesi, comprovació, solució i retorn); una connexió permesa i una de bloquejada amb el registre | Dins de cada apartat |
-| **Apte+:** implementar un sistema per a fer còpies de la configuració dels servidors crítics de l'entorn | apartat 2 (TrueNAS) |
+| **Apte+:** implementar un sistema per a fer còpies de la configuració dels servidors crítics de l'entorn | apartat 2 (TrueNAS): còpies manuals i còpies automàtiques (2.4) |
 | **Preguntes de l'enunciat** i justificació de firmware, arrencada, particionat i sistema de fitxers | Dins de l'apartat de cada sistema: firmware i disc a la taula de cada equip · Proxmox 3.6 a 3.9 · Windows Server 4.2 i 4.4 |
 
 ---
@@ -194,9 +194,7 @@ Copias/backups/historic       200M   lz4      ← còpies manuals antigues conse
 
 #### Com es fa cada còpia (manual)
 
-Les còpies **no estan automatitzades**: no hi ha claus SSH per a fer-les ni tasques programades. Al TrueNAS s'ha comprovat que no hi ha cap tasca de cron, d'instantànies periòdiques, de replicació, de rsync ni de còpia al núvol (`cronjob.query`, `pool.snapshottask.query`, `replication.query`, `rsynctask.query` i `cloudsync.query` tornen buits).
-
-Cada còpia la fa l'administrador quan acaba un canvi, entrant amb usuari i contrasenya:
+Hi ha dues maneres de fer les còpies: **a mà** (aquesta taula), que val per a tots els equips, i **automàticament** per als servidors Linux (apartat 2.4). Les còpies manuals les fa l'administrador quan acaba un canvi, entrant amb usuari i contrasenya:
 
 | Equip | Com es treu la configuració | On es deixa |
 |---|---|---|
@@ -221,10 +219,74 @@ L'última ronda de còpies manuals es va comprovar amb el `sha256sum` del fitxer
 
 ![Carpeta compartida de còpies vista des del Windows 11](evidencies/captures/t5-copies-01-carpeta-compartida.png)
 
-**Abans** el TrueNAS anava a buscar les còpies dels servidors per SSH amb una clau (`backup_user@truenas11`), i l'Ubuntu enviava la seua amb una altra clau. Després s'han eliminat totes les claus de còpia (del TrueNAS, l'OPNsense, el MikroTik, el Debian, el Proxmox i l'Ubuntu) i l'usuari `backup` del MikroTik, perquè les còpies les faça i les controle l'administrador.
+Al principi hi havia un sistema de còpies fet amb fitxers d'ordres propis i claus SSH sense restricció. Es va retirar i s'ha substituït per les eines del mateix TrueNAS (apartat 2.4).
 
 ### 2.3 Recuperació provada
 Les tres recuperacions de l'[apartat 1.7](#1-servidors-de-comunicacions-opnsense-mikrotik-i-debian--nftables) s'han fet **a partir d'aquestes còpies**: el MikroTik es va descarregar la seua per SFTP (`/tool fetch mode=sftp ... user=backup_user`), i al Debian i a l'OPNsense el TrueNAS els va retornar el fitxer per SSH.
+
+### 2.4 Còpies automatitzades: eina triada, per què i prova
+
+L'objectiu és que la configuració dels servidors crítics es copie sola cada nit al TrueNAS, que se'n guarden diverses versions i que, si una còpia falla, l'administrador se n'assabente.
+
+#### Opcions estudiades
+
+| Opció | Com funciona | A favor | En contra |
+|---|---|---|---|
+| Fitxers d'ordres propis + `cron` + `scp` | Cada servidor (o el NAS) executa unes ordres programades que copien els fitxers | Molt flexible | S'ha de mantenir el codi a mà, no guarda versions, no avisa si falla i les claus solen tindre accés complet. És el que hi havia al principi i es va retirar |
+| **Tasques Rsync del TrueNAS + instantànies periòdiques ZFS** ✅ | El NAS va a buscar (*PULL*) els fitxers de cada servidor per SSH a l'hora programada. Després, una instantània ZFS guarda la versió del dia | Ja està al NAS que tenim, es gestiona des de la web, mostra l'estat de cada tasca i avisa si falla. Les instantànies donen versions i no es poden modificar. Als servidors només cal `rsync`, que ja tenen | Només serveix per a equips amb SSH i `rsync` (Linux). Copia fitxers, no la imatge sencera del sistema |
+| BorgBackup / restic | Programes de còpia amb deduplicació i xifratge que s'instal·len a cada servidor | Còpies xifrades i molt compactes, amb versions | S'ha d'instal·lar i programar a cada equip i no té interfície web. Al TrueNAS, restic només s'utilitza per a les còpies al núvol |
+| Bacula / Bareos | Sistema empresarial amb director, servidor d'emmagatzematge i un agent a cada equip (també Windows) | Ho cobreix tot, amb catàleg i polítiques | Molt complex de muntar i pesat per a un NAS amb 2 GB de RAM |
+| UrBackup | Servidor de còpies amb agents per a Windows i Linux; fa còpies de fitxers i d'imatges | Interfície web, també per a Windows | Necessita un servidor més (o una aplicació al TrueNAS) i un agent a cada equip, i més RAM de la que hi ha |
+| Proxmox Backup Server | Còpies de les VM i contenidors de Proxmox | Ideal per a les VM del clúster | Només serveix per a VM i contenidors, i dins dels Proxmox no n'hi ha cap |
+
+#### Per què s'han triat les tasques del TrueNAS
+
+1. **No cal instal·lar res de nou:** el TrueNAS ja és el servidor de còpies i porta les tasques Rsync i les instantànies. Els servidors Debian i Proxmox ja tenen `rsync`.
+2. **Es gestiona i es comprova des de la web:** a *Data Protection* es veu cada tasca, quan s'executarà i si l'última execució ha acabat bé o no. Si falla, el TrueNAS genera una alerta.
+3. **Els servidors no poden tocar les còpies:** com que és el NAS qui va a buscar els fitxers (*PULL*), els servidors no tenen cap clau ni contrasenya del NAS. Si atacaren un servidor, no podrien esborrar les còpies.
+4. **Versions:** cada nit es fa una instantània ZFS de totes les còpies i es conserva 14 dies. Les instantànies són de només lectura, de manera que, si es copia un fitxer trencat, la versió bona continua a la instantània del dia abans.
+5. **La clau només serveix per a copiar:** als servidors la clau està limitada amb `rrsync -ro /etc`, que només deixa llegir `/etc` amb rsync, i només des de la IP del NAS.
+
+#### Com s'ha configurat
+
+| Pas | On | Detall |
+|---|---|---|
+| 1. Parell de claus | TrueNAS → *Credentials* → *Backup Credentials* → *SSH Keypairs* | Clau `copies-automatiques`, generada pel mateix TrueNAS |
+| 2. Autoritzar la clau | Cada servidor, `/root/.ssh/authorized_keys` (al Proxmox, `/etc/pve/priv/authorized_keys`, que és el mateix per als tres nodes) | `from="192.168.11.5",restrict,command="/usr/bin/rrsync -ro /etc" ssh-rsa …`. `rrsync` ve amb el paquet `rsync` |
+| 3. Connexions SSH | TrueNAS → *SSH Connections* | `ssh-debian-comms` (192.168.11.3), `ssh-proxmox` (192.168.11.17) i `ssh-infra` (192.168.11.30), amb la clau del pas 1 i la clau de host de cada servidor |
+| 4. Tasques Rsync | TrueNAS → *Data Protection* → *Rsync Tasks* | Una per servidor: mode SSH, direcció **PULL**, origen `/` (és a dir, el `/etc` del servidor, per `rrsync`), destí `/mnt/Copias/backups/<equip>/auto`, usuari `backup_user`, **cada dia a les 02:00**. Opcions *archive*, *compress* i *delete* (la carpeta queda igual que el servidor; les versions antigues les guarden les instantànies). S'exclouen `shadow`, `gshadow` i les claus privades de host SSH |
+| 5. Instantànies | TrueNAS → *Data Protection* → *Periodic Snapshot Tasks* | `Copias/backups` (recursiu), **cada dia a les 02:30**, es conserven **14 dies**, nom `auto-AAAA-MM-DD_HH-MM` |
+
+Equips que cobreix: el **Debian de comunicacions**, el **clúster Proxmox** (des del pve1 es copia `/etc/pve`, que és la configuració de tot el clúster) i el **servidor d'infraestructura**. L'OPNsense, el MikroTik i els Windows continuen amb la còpia manual de l'apartat anterior perquè no tenen `rsync`.
+
+#### Proves fetes
+
+| Prova | Què s'ha fet | Resultat |
+|---|---|---|
+| Primera còpia | Executar les tres tasques des de la web | Correctes en ~1 s cadascuna: Debian 992 fitxers (5,9 MB), Proxmox 730 (2,2 MB, amb `corosync.conf` i `nodes/`), infraestructura 538 (1,7 MB). `shadow` no s'ha copiat |
+| **Execució automàtica** | Programar la tasca de l'infra11 per a dos minuts després i no tocar res | La tasca s'executa sola a les **08:33:01** i acaba bé. Després es torna a deixar a les 02:00 |
+| Seguretat de la clau | Des del TrueNAS, amb la clau de les còpies, intentar obrir una shell, escriure un fitxer al servidor i llegir `/root` | Les tres coses es rebutgen (`does not run rsync`, `read-only server`, `do not use ..`). Llegir `/etc/hostname` sí que funciona |
+| **Versions i recuperació** | Fer una instantània, afegir una línia a `/etc/motd` de l'infra11, tornar a copiar i recuperar el fitxer bo des de la instantània (`.zfs/snapshot/auto-…/auto/motd`) | `diff` mostra la línia nova a la còpia actual i no a la instantània. Fitxer recuperat al servidor en **0,7 s** i idèntic a l'original |
+| **Servidor caigut** | Posar en pausa la VM de l'infra11 i executar la seua tasca | La tasca falla (`rsync command returned 255`) i el TrueNAS mostra l'alerta **CRITICAL** *Rsync "PULL" task … failed*. En tornar a engegar el servidor, la còpia següent acaba bé |
+
+**Problema trobat:** la primera execució contra l'infra11 fallava (`rsync command returned 12`). El servidor accepta la clau, però `rrsync` és un programa en Python i la instal·lació mínima de Debian no porta Python. Solució: instal·lar `python3` a l'infra11.
+
+**Problema trobat:** en crear les tasques, el TrueNAS comprova que la carpeta remota existeix executant una orden que no és rsync, i `rrsync` la rebutja. S'ha desactivat aquesta comprovació a la tasca (*Validate Remote Path*). La restricció de la clau funciona com ha de funcionar.
+
+Evidència: [`evidencies/t5-copies-automatiques.txt`](evidencies/t5-copies-automatiques.txt)
+
+| | |
+|---|---|
+| ![Data Protection: tasques d'instantànies i Rsync](evidencies/captures/t5-auto-01-data-protection.png) | ![Les tres tasques Rsync](evidencies/captures/t5-auto-02-tasques-rsync.png) |
+| *Data Protection*: instantànies diàries i les tres tasques Rsync completades | Tasques Rsync en mode PULL, a les 02:00, amb l'usuari `backup_user` |
+| ![Clau i connexions SSH](evidencies/captures/t5-auto-03-credencials-ssh.png) | ![Instantànies de les còpies](evidencies/captures/t5-auto-04-instantanies.png) |
+| Clau `copies-automatiques` i les tres connexions SSH | Instantània de cada carpeta de còpies |
+
+#### Limitacions i millores
+
+- **Les instantànies estan al mateix disc que les còpies.** Si es trenca el disc de 5 GB, es perd tot. La millora és replicar el pool a un altre equip (*Replication Tasks* del TrueNAS cap a un segon NAS) per a complir la regla 3-2-1 (3 còpies, 2 suports, 1 fora).
+- **Només Linux.** Per a l'OPNsense es podria activar la seua còpia automàtica de la configuració, i per al Windows Server, *Windows Server Backup* programat cap a la carpeta compartida.
+- **Només es copia `/etc`**, no la imatge del sistema. Per a aquests servidors és suficient perquè es reinstal·len en minuts, però per a servidors amb dades caldria afegir-ne les carpetes.
 
 ## 3. Proxmox VE: clúster de 3 nodes (192.168.11.17, .18 i .19)
 

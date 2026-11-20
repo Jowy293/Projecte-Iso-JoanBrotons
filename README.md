@@ -12,7 +12,7 @@ Aquest repositori documenta l'**entorn de proves individual** muntat a VirtualBo
 | OPNsense | **192.168.11.1** | OPNsense 26.7 | Passarel·la per defecte, tallafocs |
 | MikroTik | 192.168.11.2 | RouterOS 7.24.5 | Passarel·la alternativa (contingència) |
 | Debian + nftables | 192.168.11.3 | Debian 13.1 | Passarel·la alternativa |
-| TrueNAS | **192.168.11.5** | TrueNAS 27.0.0-RC.1 | Servidor de còpies (pool `Copias`, disc de 5 GB) |
+| TrueNAS | **192.168.11.5** | TrueNAS 27.0.0-RC.1 | Servidor de còpies (pool `Copias`, disc de 5 GB): còpies manuals i còpies automàtiques cada nit dels servidors Linux |
 | Windows Server | 192.168.11.10 | Windows Server 2025 Standard | Controlador de domini **`joan11.local`** (NetBIOS `JOAN11`), nom `DC-JOAN11` |
 | Proxmox VE (pve1, pve2, pve3) | **192.168.11.17**, .18, .19 | Proxmox VE 9.2.2 | Clúster de virtualització `clusterjoan11` de 3 nodes (sense màquines a dins) |
 | Windows 11 | 192.168.11.20 | Windows 11 Pro 23H2 (TPM 2.0 + Secure Boot) | Client (`W11-CLIENT11`), unit al domini `joan11.local` |
